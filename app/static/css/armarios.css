@@ -13,6 +13,8 @@ body {
     color: #020617;
 }
 
+html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .page-title h1{color:#d7fbb3}html[data-theme="dark"] .page-title p{color:#bed0c0}html[data-theme="dark"] :is(.armarios-panel,.card-resumo,.filtro-bar,.legenda-bar,.grid-shell,.modal-card,.confirmacao-card){background:#142019!important;border-color:#385b41!important;color:#edf7eb!important}html[data-theme="dark"] :is(.armarios-page input,.armarios-page select){background:#0d1510!important;color:#edf7eb!important;border-color:#416847!important}html[data-theme="dark"] :is(.armarios-page th,.armarios-page td,.armarios-page label,.armarios-page span,.armarios-page p,.armarios-page small){color:#d5e4d5!important}html[data-theme="dark"] .item-armario{background:#101913!important;border-color:#416847!important;color:#baf57a!important}html[data-theme="dark"] .armarios-tab{background:#1a2920!important;color:#d5e4d5!important;border-color:#385b41!important}html[data-theme="dark"] .armarios-tab.active{background:#ff1877!important;color:#fff!important;border-color:#ff70ad!important}
+
 .navbar {
     width: 100%;
     min-height: 80px;

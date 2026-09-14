@@ -19,7 +19,6 @@ from sqlalchemy.orm import Session
 from app.database import Session as SessionLocal, get_db
 from app.models.venda import FechamentoDiario, Venda, ItemVenda
 from app.models.produtos import Produto, EstoqueTamanho, EstoqueVariacao, Tamanho, ordenar_tamanhos
-from app.models.cliente import Cliente
 from app.models.filial import EstoqueFilial, FILIAIS
 from app.controllers.estoque_controller import garantir_estoque_filiais
 from app.auth import get_usuario_logado
@@ -27,7 +26,6 @@ from app.auth import get_usuario_logado
 router = APIRouter(prefix="/pdv", tags=["PDV"])
 templates = Jinja2Templates(directory="app/templates")
 
-DESCONTO_ASSOCIADO = 15.0  # benefício para funcionários
 # O Brasil não adota horário de verão desde 2019. Usar UTC-3 evita depender do
 # pacote tzdata, que não vem instalado em algumas instalações do Windows.
 FUSO_HORARIO = timezone(timedelta(hours=-3), name="America/Sao_Paulo")
@@ -120,12 +118,6 @@ def tela_pdv(
         .order_by(Produto.nome)
         .all()
     )
-    clientes  = (
-        db.query(Cliente)
-        .filter(Cliente.ativo == True)
-        .order_by(Cliente.nome)
-        .all()
-    )
     tamanhos = ordenar_tamanhos(db.query(Tamanho).filter(Tamanho.ativo == True).all())
     garantir_estoque_filiais(db)
     estoque_filiais = {(saldo.produto_id, saldo.filial): saldo.quantidade for saldo in db.query(EstoqueFilial).all()}
@@ -137,9 +129,7 @@ def tela_pdv(
             "request":             request,
             "usuario":             usuario,
             "produtos":            produtos,
-            "clientes":            clientes,
             "tamanhos":            tamanhos,
-            "desconto_associado":  DESCONTO_ASSOCIADO,
             "filiais": FILIAIS,
             "estoque_filiais": estoque_filiais,
         }
@@ -150,7 +140,6 @@ def tela_pdv(
 def finalizar_venda(
     request: Request,
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
-    cliente_id: int    = Form(0),    # 0 = sem cliente identificado
     observacao: str    = Form(""),
     filial: str        = Form("Pinheiros"),
     db: Session        = Depends(get_db),
@@ -176,18 +165,7 @@ def finalizar_venda(
     if not isinstance(itens, list) or not itens:
         return RedirectResponse(url="/pdv?erro=vazio", status_code=302)
 
-    # Busca o cliente e verifica se é associado
-    cliente             = None
     desconto_percentual = 0.0
-
-    if cliente_id:
-        cliente = db.query(Cliente).filter(
-            Cliente.id == cliente_id,
-            Cliente.ativo == True
-        ).first()
-
-        if cliente and cliente.is_associado:
-            desconto_percentual = DESCONTO_ASSOCIADO
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0
@@ -295,7 +273,6 @@ def finalizar_venda(
 
     # ── Persiste tudo em uma única transação
     venda = Venda(
-        cliente_id          = cliente_id or None,
         usuario_id          = usuario.get("id"),
         desconto_percentual = desconto_percentual,
         total_bruto         = round(total_bruto, 2),
@@ -382,12 +359,6 @@ def historico_vendas(
         .order_by(Produto.nome)
         .all()
     )
-    clientes = (
-        db.query(Cliente)
-        .filter(Cliente.ativo == True)
-        .order_by(Cliente.nome)
-        .all()
-    )
     fechamentos = (
         db.query(FechamentoDiario)
         .order_by(FechamentoDiario.data.desc())
@@ -404,9 +375,7 @@ def historico_vendas(
             "usuario": usuario, 
             "vendas": vendas,
             "produtos": produtos,
-            "clientes": clientes,
             "fechamentos": fechamentos,
             "tamanhos": tamanhos,
-            "desconto_associado": DESCONTO_ASSOCIADO,
         }
     )

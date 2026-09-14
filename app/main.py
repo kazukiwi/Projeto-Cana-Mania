@@ -30,7 +30,6 @@ from app.controllers import (
     produto_controller,
     movimentacao_controller,
     pdv_controller,
-    clientes_controller,
     tamanhos_controller,
     estoque_controller,
 )
@@ -147,7 +146,6 @@ app.include_router(categorias_controller.router)
 app.include_router(produto_controller.router)
 app.include_router(movimentacao_controller.router)
 app.include_router(pdv_controller.router)
-app.include_router(clientes_controller.router)
 app.include_router(tamanhos_controller.router)
 app.include_router(estoque_controller.router)
 
@@ -580,8 +578,7 @@ def ativar_armario(
 @app.post("/armarios/reservas")
 def criar_reserva_armario(
     armario_id: int = Form(...),
-    associado_id: int = Form(...),
-    semestre: str = Form(...),
+    local_evento: str = Form(...),
     inicio_em: date = Form(...),
     fim_em: date = Form(...),
     db: Session = Depends(get_db),
@@ -592,12 +589,8 @@ def criar_reserva_armario(
         return RedirectResponse(url="/armarios?erro=periodo", status_code=303)
 
     armario = db.query(Armario).filter(Armario.id == armario_id).first()
-    associado = db.query(Cliente).filter(
-        Cliente.id == associado_id,
-        Cliente.ativo == True,
-        Cliente.is_associado == True,
-    ).first()
-    if not armario or not associado:
+    local_evento = local_evento.strip()
+    if not armario or not local_evento:
         return RedirectResponse(url="/armarios?erro=reservadados", status_code=303)
 
     if armario.status != "disponivel":
@@ -616,8 +609,9 @@ def criar_reserva_armario(
 
     db.add(ReservaArmario(
         armario_id=armario.id,
-        associado_id=associado.id,
-        semestre=semestre.strip(),
+        associado_id=None,
+        local_evento=local_evento,
+        semestre=local_evento,
         inicio_em=inicio,
         fim_em=fim,
         status="ativa",
@@ -625,10 +619,10 @@ def criar_reserva_armario(
     # A disponibilidade usa o status do próprio armário. Mantemos os dois
     # módulos sincronizados para que uma reserva não apareça como disponível.
     armario.status = "ocupado"
-    armario.associado_id = associado.id
-    armario.associado_nome = associado.nome
-    armario.associado_telefone = associado.telefone or ""
-    armario.associado_matricula = associado.matricula or ""
+    armario.associado_id = None
+    armario.associado_nome = local_evento
+    armario.associado_telefone = ""
+    armario.associado_matricula = ""
     armario.atribuido_em = inicio_em.strftime("%d/%m/%Y")
     armario.observacoes = ""
     db.commit()

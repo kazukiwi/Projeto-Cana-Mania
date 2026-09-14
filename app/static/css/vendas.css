@@ -456,6 +456,7 @@ body {
 }
 .resultado-busca-frozen{display:grid;gap:6px;margin-top:8px}.resultado-busca-frozen button{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border:1px solid #f4c0d8;border-radius:9px;background:#fff7fb;color:#20251f;text-align:left;font:inherit;font-weight:700;cursor:pointer;transition:transform .16s,border-color .16s}.resultado-busca-frozen button:hover{transform:translateX(3px);border-color:#ff1877}.resultado-busca-frozen button i{color:#ff1877}.resultado-busca-frozen button small{margin-left:auto;color:#657267;font-weight:600}.resultado-busca-frozen p{margin:4px 0;color:#7b4a60;font-size:.86rem}html[data-theme="dark"] .resultado-busca-frozen button{background:#101a13;color:#edf5ec;border-color:#365840}html[data-theme="dark"] .resultado-busca-frozen p{color:#f2a7c9}
 #select-prod{display:none}.pdv-box-cadastro:has(#busca-frozen) label[for="select-prod"]{display:none}
+.pdv-box-cadastro .form-group:has(#select-cliente),#pdv-linha-desconto{display:none!important}
 
 .pdv-box-carrinho h4 { 
     font-size: 14px; 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard AAPM</title>
+    <title>Dashboard Canamania</title>
 
     <link rel="stylesheet" href="/static/css/dashboard.css?v=podio-bronze-1">
     <link rel="stylesheet" href="/static/css/welcome_toast.css?v=1">
@@ -27,7 +27,6 @@
                 <li><a href="/" class="active">Dashboard</a></li>
                 <li><a href="/produtos">Produtos</a></li>
                 {% if usuario.role == 'admin' %}
-                <li><a href="/clientes">Clientes</a></li>
                 {% endif %}
                 <li><a href="/pdv/historico">Vendas</a></li>
                 <li><a href="/mais_vendidos">Mais vendidos</a></li>
@@ -128,7 +127,7 @@
                 <i class="fa-solid fa-wrench"></i>
             </a>
 
-            <a class="card card-link roxo" href="/clientes" aria-label="Ver associados">
+            <a class="card card-link roxo" href="/usuarios" aria-label="Ver funcionários">
                 <div>
                     <span>Funcionários · 15% off</span>
                     <h3 id="total-associados">{{ total_associados | default(0) }}</h3>

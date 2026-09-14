@@ -535,3 +535,6 @@ body.dashboard-navigating {
     .podium-item:hover,
     .podium-item:hover .podium-imagem { transform: none; }
 }
+
+/* Contraste do painel Canamania no modo escuro. */
+html[data-theme="dark"] .dashboard :is(.panel,.podium-panel,.produtos-categoria-panel){background:#142019!important;border-color:#385b41!important;color:#edf7eb!important}html[data-theme="dark"] .dashboard :is(.podium-info strong,.podium-receita,.podium-percentual,.seletor-categoria label){color:#edf7eb!important}html[data-theme="dark"] .dashboard :is(.produto-vitrine,.seletor-categoria select){background:#101913!important;border-color:#416847!important;color:#edf7eb!important}html[data-theme="dark"] .dashboard .produto-vitrine-nome{color:#edf7eb!important}html[data-theme="dark"] .dashboard .card-link i{background:rgba(255,255,255,.1)!important;box-shadow:inset 0 0 0 1px rgba(186,245,122,.16)}html[data-theme="dark"] .dashboard .azul{color:#ff70ad!important}html[data-theme="dark"] .dashboard .verde{color:#baf57a!important}html[data-theme="dark"] .dashboard .vermelho{color:#ff7fb6!important}html[data-theme="dark"] .dashboard .roxo{color:#9ef078!important}html[data-theme="dark"] .dashboard .card-link span{color:#d7e7d7!important}

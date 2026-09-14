@@ -8,9 +8,6 @@
         <ul class="menu">
             <li><a href="/" class="{{ 'active' if caminho == '/' else '' }}">Dashboard</a></li>
             <li><a href="/produtos" class="{{ 'active' if caminho.startswith('/produtos') else '' }}">Frozens</a></li>
-            {% if usuario.role == 'admin' %}
-            <li><a href="/clientes" class="{{ 'active' if caminho.startswith('/clientes') else '' }}">Clientes</a></li>
-            {% endif %}
             <li><a href="/pdv/" class="{{ 'active' if caminho.startswith('/pdv') else '' }}">PDV</a></li>
             <li><a href="/estoque/" class="{{ 'active' if caminho.startswith('/estoque') else '' }}">Estoque</a></li>
             {% if usuario.role == 'admin' %}

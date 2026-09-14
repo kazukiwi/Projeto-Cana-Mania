@@ -165,14 +165,8 @@ function atualizarTabelaCarrinho() {
         const variacao = item.tamanho ? ` (Tam: ${item.tamanho} | Cor: ${item.cor})` : '';
         return `<tr><td><strong>${item.nome}${variacao}</strong></td><td>${item.quantidade}x</td><td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td><td><button type="button" onclick="removerDoCarrinho(${indice})">Remover</button></td></tr>`;
     }).join('');
-    const cliente = document.getElementById('select-cliente');
-    const associado = cliente?.options[cliente.selectedIndex]?.dataset.associado === 'true';
-    const percentual = associado ? Number(cliente.dataset.descontoAssociado || 10) : 0;
-    const desconto = total * percentual / 100;
     document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-    document.getElementById('pdv-desconto').textContent = `- R$ ${desconto.toFixed(2).replace('.', ',')}`;
-    document.getElementById('pdv-linha-desconto').style.display = associado && total ? 'flex' : 'none';
-    document.getElementById('pdv-total-geral').textContent = `R$ ${(total - desconto).toFixed(2).replace('.', ',')}`;
+    document.getElementById('pdv-total-geral').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
     document.getElementById('btn-salvar-venda-banco').disabled = !carrinho.length;
 }

@@ -28,7 +28,7 @@
                 <li><a href="/pdv/historico">Vendas</a></li>
                 <li><a href="/mais_vendidos">Mais vendidos</a></li>
                 {% if usuario.role == 'admin' %}
-                <li><a href="/armarios" class="active">Armários</a></li>
+                <li><a href="/maquinas" class="active">Máquinas</a></li>
 
                 <li><a href="/usuarios" > </i> Usuários
                 </a></li>
@@ -47,19 +47,19 @@
             <p>Acompanhe disponibilidade, operação e manutenção das máquinas Canamania.</p>
         </section>
 
-        <nav class="armarios-tabs" aria-label="Módulos de armários">
+        <nav class="armarios-tabs" aria-label="Módulos de máquinas">
             <button type="button" class="armarios-tab active" data-armarios-tab="disponibilidade"><i class="fa-solid fa-gears"></i> Disponibilidade</button>
             <button type="button" class="armarios-tab" data-armarios-tab="reserva"><i class="fa-solid fa-calendar-plus"></i> Nova reserva</button>
-            <button type="button" class="armarios-tab" data-armarios-tab="cadastro"><i class="fa-solid fa-plus"></i> Cadastrar armário</button>
+            <button type="button" class="armarios-tab" data-armarios-tab="cadastro"><i class="fa-solid fa-plus"></i> Cadastrar máquina</button>
             <button type="button" class="armarios-tab" data-armarios-tab="historico"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
         </nav>
 
         <div class="feedback-area" aria-live="polite">
             {% if request.query_params.get("reserva") == "ok" %}<div class="alerta-sucesso">Reserva criada com sucesso.</div>{% endif %}
             {% if request.query_params.get("reserva") == "cancelada" %}<div class="alerta-sucesso">Reserva cancelada e mantida no histórico.</div>{% endif %}
-            {% if request.query_params.get("armario") == "ok" %}<div class="alerta-sucesso">Armário cadastrado com sucesso.</div>{% endif %}
-            {% if request.query_params.get("armario") == "desativado" %}<div class="alerta-sucesso">Armário desativado. O histórico de reservas foi preservado.</div>{% endif %}
-            {% if request.query_params.get("armario") == "ativado" %}<div class="alerta-sucesso">Armário ativado e disponível para uso.</div>{% endif %}
+            {% if request.query_params.get("armario") == "ok" %}<div class="alerta-sucesso">Máquina cadastrada com sucesso.</div>{% endif %}
+            {% if request.query_params.get("armario") == "desativado" %}<div class="alerta-sucesso">Máquina desativada. O histórico foi preservado.</div>{% endif %}
+            {% if request.query_params.get("armario") == "ativado" %}<div class="alerta-sucesso">Máquina ativada e disponível para uso.</div>{% endif %}
             {% if request.query_params.get("erro") == "ocupado" %}<div class="alerta-erro">Cancele a reserva ou libere o armário antes de desativá-lo.</div>{% endif %}
             {% if request.query_params.get("erro") == "conflito" %}<div class="alerta-erro">Já existe uma reserva ativa para este armário no período informado.</div>{% endif %}
             {% if request.query_params.get("erro") == "indisponivel" %}<div class="alerta-erro">Este armário não está disponível para reserva.</div>{% endif %}
@@ -68,11 +68,10 @@
         </div>
 
         <section class="armarios-panel" data-armarios-panel="reserva" hidden>
-            <div class="panel-heading"><h2>Reservar armário</h2><p>Consulte a disponibilidade e vincule um associado a um período.</p></div>
+            <div class="panel-heading"><h2>Reservar máquina</h2><p>Informe onde a máquina será utilizada e o período da reserva.</p></div>
             <form action="/armarios/reservas" method="post" class="reserva-form" data-feedback-form>
-                <label>Armário<select name="armario_id" required><option value="">Selecione</option>{% for armario in armarios if armario.status == "disponivel" %}<option value="{{ armario.id }}">Armário {{ armario.numero }}</option>{% endfor %}</select></label>
-                <label>Associado<select name="associado_id" required><option value="">Selecione</option>{% for associado in associados %}<option value="{{ associado.id }}">{{ associado.nome }}{% if associado.matricula %} — {{ associado.matricula }}{% endif %}</option>{% endfor %}</select></label>
-                <label>Semestre<input name="semestre" required placeholder="Ex.: 2026.2" pattern="[0-9]{4}\.[12]"></label>
+                <label>Máquina<select name="armario_id" required><option value="">Selecione</option>{% for armario in armarios if armario.status == "disponivel" %}<option value="{{ armario.id }}">Máquina {{ armario.numero }}</option>{% endfor %}</select></label>
+                <label>Local ou evento<input name="local_evento" required maxlength="150" placeholder="Ex.: Evento na Liberdade"></label>
                 <label>Início<input type="date" name="inicio_em" required></label>
                 <label>Fim<input type="date" name="fim_em" required></label>
                 <button class="btn-primario" type="submit"><i class="fa-solid fa-calendar-check"></i> Confirmar reserva</button>
@@ -80,16 +79,16 @@
         </section>
 
         <section class="armarios-panel" data-armarios-panel="cadastro" hidden>
-            <div class="panel-heading"><h2>Cadastrar armário</h2><p>Adicione um novo armário à consulta de disponibilidade.</p></div>
+            <div class="panel-heading"><h2>Cadastrar máquina</h2><p>Adicione uma máquina ao controle de disponibilidade.</p></div>
             <form action="/armarios" method="post" class="cadastro-armario-form" data-feedback-form>
-                <label>Número do armário<input type="number" name="numero" min="1" max="9999" required placeholder="Ex.: 51"></label>
+                <label>Número da máquina<input type="number" name="numero" min="1" max="9999" required placeholder="Ex.: 51"></label>
                 <button class="btn-primario" type="submit"><i class="fa-solid fa-plus"></i> Cadastrar</button>
             </form>
         </section>
 
         <section class="armarios-panel" data-armarios-panel="historico" hidden>
-            <div class="panel-heading"><h2>Histórico de reservas</h2><p>Pesquise por aluno ou semestre e consulte as reservas realizadas.</p></div>
-            <div class="historico-filtros"><label><i class="fa-solid fa-magnifying-glass"></i><input id="busca-reserva" type="search" placeholder="Buscar por aluno ou matrícula"></label><select id="filtro-semestre"><option value="">Todos os semestres</option>{% for reserva in reservas %}<option value="{{ reserva.semestre }}">{{ reserva.semestre }}</option>{% endfor %}</select></div>
+            <div class="panel-heading"><h2>Histórico de reservas</h2><p>Pesquise por local ou evento e consulte as reservas realizadas.</p></div>
+            <div class="historico-filtros"><label><i class="fa-solid fa-magnifying-glass"></i><input id="busca-reserva" type="search" placeholder="Buscar por local ou evento"></label><select id="filtro-semestre"><option value="">Todos os eventos</option>{% for reserva in reservas %}<option value="{{ reserva.semestre }}">{{ reserva.semestre }}</option>{% endfor %}</select></div>
             <div class="tabela-reservas-wrap"><table class="tabela-reservas"><thead><tr><th>Armário</th><th>Aluno</th><th>Semestre</th><th>Período</th><th>Status</th><th>Ação</th></tr></thead><tbody id="corpo-reservas">{% for reserva in reservas %}<tr data-reserva data-aluno="{{ reserva.associado.nome if reserva.associado else '' }} {{ reserva.associado.matricula if reserva.associado else '' }}" data-semestre="{{ reserva.semestre }}"><td>#{{ reserva.armario.numero }}</td><td>{{ reserva.associado.nome if reserva.associado else 'Associado removido' }}</td><td>{{ reserva.semestre }}</td><td>{{ reserva.inicio_em.strftime('%d/%m/%Y') }} a {{ reserva.fim_em.strftime('%d/%m/%Y') }}</td><td><span class="status-reserva {{ reserva.status }}">{{ reserva.status }}</span></td><td>{% if reserva.status == 'ativa' %}<form action="/armarios/reservas/{{ reserva.id }}/cancelar" method="post" data-confirm="Cancelar esta reserva?"><button class="btn-cancelar-reserva" type="submit">Cancelar</button></form>{% else %}—{% endif %}</td></tr>{% else %}<tr><td colspan="6" class="empty-reservas">Nenhuma reserva registrada.</td></tr>{% endfor %}</tbody></table></div>
         </section>
 
@@ -97,7 +96,7 @@
         <section class="cards-resumo-container">
             <div class="card-resumo card-total">
                 <div>
-                    <span>Total de Armarios</span>
+                    <span>Total de máquinas</span>
                     <strong>{{ total_armarios }}</strong>
                 </div>
                 <i class="fa-solid fa-lock"></i>
@@ -161,7 +160,7 @@
                     data-observacoes="{{ armario.observacoes|e }}"
                     data-nome="{{ armario.associado_nome|e }}"
                     data-matricula="{{ armario.associado_matricula|e }}"
-                    title="Armario {{ armario.numero }}"
+                    title="Máquina {{ armario.numero }}"
                 >
                     {% if armario.status == "manutencao" %}
                     <i class="fa-solid fa-wrench"></i>
@@ -185,8 +184,8 @@
         <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
             <div class="modal-header">
                 <div>
-                    <h2 id="modal-titulo">Armario</h2>
-                    <p id="modal-subtitulo">Altere o status e vincule um associado</p>
+                    <h2 id="modal-titulo">Máquina</h2>
+                    <p id="modal-subtitulo">Altere o status da máquina</p>
                 </div>
                 <button type="button" class="btn-fechar" id="btn-fechar-modal" aria-label="Fechar">
                     <i class="fa-solid fa-xmark"></i>
