@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>{{ "Editar Produto" if editando else "Novo Produto" }} - AAPM</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/form_produtos.css') }}?v=2">
+    <link rel="stylesheet" href="/static/css/feedback.css?v=1">
+    <link rel="stylesheet" href="/static/css/responsive.css?v=1">
+</head>
+<body>
+    {% include "partials/navbar.html" %}
+    {% set possui_variacoes = editando.possui_variacoes_tamanho if editando else (valores.possui_variacoes_tamanho if valores else false) %}
+    <main class="main-content">
+        <div class="page-header"><h1>{{ "Editar Produto" if editando else "Novo Produto" }}</h1></div>
+        {% if erro %}<div class="alert-box">{{ erro }}</div>{% endif %}
+        <div class="form-container">
+            <form action="{{ '/produtos/' + editando.id|string + '/editar' if editando else '/produtos/novo' }}" method="post" enctype="multipart/form-data">
+                <div class="form-grid">
+                    <div class="form-group full-width"><label for="nome">Nome do produto</label><input id="nome" name="nome" required autofocus value="{{ editando.nome if editando else (valores.nome if valores else '') }}"></div>
+                    <div class="form-group"><label for="preco">Preço base (R$)</label><input id="preco" name="preco" type="number" step="0.01" min="0" required value="{{ editando.preco if editando else (valores.preco if valores else '0.00') }}"><small>Usado para produtos sem variações e como sugestão para novas combinações.</small></div>
+                    <div class="form-group"><label for="estoque_atual">Estoque total</label><input id="estoque_atual" name="estoque_atual" type="number" min="0" required value="{{ editando.estoque_atual if editando else (valores.estoque_atual if valores else '0') }}"><small id="ajuda-estoque">Informe o total disponível.</small></div>
+
+                    <section class="form-group full-width variacoes-card" aria-labelledby="titulo-variacoes">
+                        <div><strong id="titulo-variacoes">Variações do produto</strong><p>Este produto possui opções de tamanho e cor?</p></div>
+                        <label class="opcao-variacao" for="possui_variacoes_tamanho"><input id="possui_variacoes_tamanho" name="possui_variacoes_tamanho" type="checkbox" value="true" {{ 'checked' if possui_variacoes else '' }}><span><strong>Sim, controlar estoque por tamanho e cor</strong><small>Ex.: M / Azul, M / Preto e G / Azul terão saldos próprios.</small></span></label>
+                    </section>
+
+                    <section class="form-group full-width" id="estoques-variacoes" hidden>
+                        <div class="variacoes-header"><div><label>Combinações, estoque e preço</label><small>Defina o valor de venda de cada tamanho e cor.</small></div><a href="/tamanhos">Gerenciar tamanhos</a></div>
+                        <input id="variacoes_json" name="variacoes_json" type="hidden" value="[]">
+                        <div class="cabecalho-variacoes" aria-hidden="true"><span>Tamanho</span><span>Cor</span><span>Estoque</span><span>Preço (R$)</span><span></span></div>
+                        <div id="linhas-variacoes"></div>
+                        <button class="btn-add-variacao" id="adicionar-variacao" type="button">+ Adicionar combinação</button>
+                    </section>
+
+                    <div class="form-group full-width"><label for="categoria_id">Categoria</label><select id="categoria_id" name="categoria_id"><option value="0">Sem categoria</option>{% for categoria in categorias %}<option value="{{ categoria.id }}" {{ 'selected' if (editando and editando.categoria_id == categoria.id) or (valores and valores.categoria_id == categoria.id) else '' }}>{{ categoria.nome }}</option>{% endfor %}</select></div>
+                    <div class="form-group full-width">
+                        {% if editando and editando.imagem_path %}<div class="current-image-container"><img src="{{ editando.imagem_url }}" alt="{{ editando.nome }}" class="current-image-preview"><span>Ao enviar uma nova imagem, a atual será substituída.</span></div>{% endif %}
+                        <label for="imagem">{{ "Substituir imagem" if editando else "Imagem do produto" }}</label><input id="imagem" name="imagem" type="file" accept=".jpg,.jpeg,.png,.webp">
+                    </div>
+                </div>
+                <div class="form-actions"><button class="btn-submit" type="submit">{{ "Salvar alterações" if editando else "Criar produto" }}</button><a class="btn-cancel" href="/produtos">Cancelar</a></div>
+            </form>
+        </div>
+    </main>
+    <script>
+        (() => {
+            const possuiVariacoes = document.getElementById('possui_variacoes_tamanho');
+            const bloco = document.getElementById('estoques-variacoes');
+            const linhas = document.getElementById('linhas-variacoes');
+            const estoqueTotal = document.getElementById('estoque_atual');
+            const json = document.getElementById('variacoes_json');
+            const ajuda = document.getElementById('ajuda-estoque');
+            const opcoesTamanho = `{% for tamanho in tamanhos %}<option value="{{ tamanho.id }}">{{ tamanho.nome }}</option>{% endfor %}`;
+
+            function atualizarTotal() {
+                const itens = [...linhas.children].map(linha => ({ tamanho_id: linha.querySelector('.variacao-tamanho').value, cor: linha.querySelector('.variacao-cor').value.trim(), estoque_atual: linha.querySelector('.variacao-estoque').value, preco: linha.querySelector('.variacao-preco').value }));
+                json.value = JSON.stringify(itens);
+                estoqueTotal.value = itens.reduce((total, item) => total + (Number(item.estoque_atual) || 0), 0);
+                return itens;
+            }
+            function adicionar(variacao = {}) {
+                const linha = document.createElement('div');
+                linha.className = 'linha-variacao';
+                linha.innerHTML = `<select class="variacao-tamanho"><option value="">Selecione</option>${opcoesTamanho}</select><input class="variacao-cor" maxlength="50" placeholder="Ex.: Azul"><input class="variacao-estoque" type="number" min="0" value="0"><button type="button" aria-label="Remover combinação">×</button>`;
+                linha.querySelector('.variacao-tamanho').value = variacao.tamanho_id || '';
+                linha.querySelector('.variacao-cor').value = variacao.cor || '';
+                linha.querySelector('.variacao-estoque').value = variacao.estoque_atual ?? 0;
+                linha.querySelector('.variacao-estoque').insertAdjacentHTML('afterend', '<input class="variacao-preco" type="number" step="0.01" min="0" placeholder="0,00">');
+                linha.querySelector('.variacao-preco').value = variacao.preco ?? document.getElementById('preco').value ?? 0;
+                linha.querySelectorAll('input, select').forEach(campo => campo.addEventListener('input', atualizarTotal));
+                linha.querySelector('button').addEventListener('click', () => { linha.remove(); atualizarTotal(); });
+                linhas.append(linha); atualizarTotal();
+            }
+            function alternar() {
+                const ativo = possuiVariacoes.checked;
+                bloco.hidden = !ativo;
+                estoqueTotal.disabled = ativo;
+                estoqueTotal.required = !ativo;
+                ajuda.textContent = ativo ? 'Calculado automaticamente pela soma das combinações.' : 'Informe o total disponível.';
+                if (ativo) atualizarTotal();
+            }
+            document.getElementById('adicionar-variacao').addEventListener('click', () => adicionar());
+            possuiVariacoes.addEventListener('change', alternar);
+            {% if editando and editando.estoques_variacoes %}{% for variacao in editando.estoques_variacoes %}adicionar({ tamanho_id: {{ variacao.tamanho_id }}, cor: {{ variacao.cor|tojson }}, estoque_atual: {{ variacao.estoque_atual }}, preco: {{ variacao.preco }} });{% endfor %}{% elif valores and valores.variacoes %}{% for variacao in valores.variacoes %}adicionar({ tamanho_id: {{ variacao.tamanho_id }}, cor: {{ variacao.cor|tojson }}, estoque_atual: {{ variacao.estoque_atual }}, preco: {{ variacao.preco }} });{% endfor %}{% endif %}
+            document.querySelector('form').addEventListener('submit', evento => {
+                const itens = possuiVariacoes.checked ? atualizarTotal() : [];
+                if (possuiVariacoes.checked && (!itens.length || itens.some(item => !item.tamanho_id || !item.cor || Number(item.estoque_atual) < 0 || item.preco === '' || Number(item.preco) < 0) || !itens.some(item => Number(item.estoque_atual) > 0))) { evento.preventDefault(); alert('Preencha tamanho, cor, estoque e preço em pelo menos uma combinação.'); }
+            });
+            alternar();
+        })();
+    </script>
+</body>
+</html>

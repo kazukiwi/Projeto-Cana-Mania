@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard AAPM</title>
+
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=podio-bronze-1">
+    <link rel="stylesheet" href="/static/css/welcome_toast.css?v=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <link rel="icon" href="../static/img/image.ico" type="image/x-icon">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#">
+                    <img src="/static/img/logo.png" alt="Logo AAPM">
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="/" class="active">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios">Armários</a></li>
+
+                <li><a href="/usuarios" class="nav-link">
+                    <i data-lucide="users"></i> Usuários
+                </a></li>
+                <li><a href="/categorias" class="nav-link">
+                    <i data-lucide="tag"></i> Categorias
+                </a></li>
+                {% endif %}
+                
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    {% if request.query_params.get('login') == 'ok' %}
+    <div id="feedback-bem-vindo" aria-hidden="false">
+        <div class="feedback-bem-vindo-card" role="status" aria-labelledby="feedback-bem-vindo-titulo">
+            <div class="feedback-bem-vindo-icone"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
+            <h2 id="feedback-bem-vindo-titulo">Acesso realizado com sucesso!</h2>
+            <p>Bem-vindo, {{ usuario.nome or 'ao sistema' }}. Seu acesso foi confirmado.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="dashboard">
+
+        <div class="header">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Visão geral das lojas, frozens e máquinas Canamania</p>
+            </div>
+        </div>
+
+        <h2>Visão geral</h2>
+        <div class="cards">
+            <a class="card card-link azul" href="/produtos" aria-label="Ver produtos">
+                <div>
+                    <span>Frozens cadastrados</span>
+                    <h3 id="total-produtos">{{ total_produtos | default(0) }}</h3>
+                </div>
+                <i class="fa-solid fa-box"></i>
+            </a>
+
+            <a class="card card-link vermelho" href="/produtos/?estoque_baixo=true" aria-label="Ver produtos com estoque baixo">
+                <div>
+                    <span>Estoque Baixo</span>
+                    <h3 id="estoque-baixo">{{ estoque_baixo | default(0) }}</h3>
+                </div>
+                <i class="fa-solid fa-chart-line"></i>
+            </a>
+
+            <a class="card card-link verde" href="/pdv/historico" aria-label="Ver histórico de vendas">
+                <div>
+                    <span>Valor Total</span>
+                    <h3 id="valor-total">R$ {{ "%.2f"|format(valor_total | default(0.0)) }}</h3>
+                </div>
+                <i class="fa-solid fa-dollar-sign"></i>
+            </a>
+
+            <a class="card card-link roxo" href="/categorias" aria-label="Ver categorias">
+                <div>
+                    <span>Categorias</span>
+                    <h3 id="total-categorias">{{ total_categorias | default(0) }}</h3>
+                </div>
+                <i class="fa-solid fa-table-cells"></i>
+            </a>
+        </div>
+
+        <h2>Lojas e operação</h2>
+        <div class="cards">
+            <a class="card card-link azul" href="/maquinas" aria-label="Ver máquinas em operação">
+                <div>
+                    <span>Máquinas em operação</span>
+                    <h3 id="armarios-ocupados">{{ armarios_ocupados | default(0) }}</h3>
+                </div>
+                <i class="fa-solid fa-lock"></i>
+            </a>
+
+            <a class="card card-link verde" href="/maquinas" aria-label="Ver máquinas disponíveis">
+                <div>
+                    <span>Máquinas disponíveis</span>
+                    <h3 id="armarios-disponiveis">{{ armarios_disponiveis | default(0) }}</h3>
+                </div>
+                <i class="fa-solid fa-lock-open"></i>
+            </a>
+
+            <a class="card card-link vermelho" href="/maquinas" aria-label="Ver máquinas em manutenção">
+                <div>
+                    <span>Máquinas em manutenção</span>
+                    <h3 id="armarios-manutencao">{{ armarios_manutencao | default(0) }}</h3>
+                </div>
+                <i class="fa-solid fa-wrench"></i>
+            </a>
+
+            <a class="card card-link roxo" href="/clientes" aria-label="Ver associados">
+                <div>
+                    <span>Funcionários · 15% off</span>
+                    <h3 id="total-associados">{{ total_associados | default(0) }}</h3>
+                </div>
+                <i class="fa-solid fa-users"></i>
+            </a>
+        </div>
+
+        <section class="filiais-dashboard">
+            <div class="filiais-heading"><div><h2>Estoque por filial</h2><p>Fábrica Carrão abastece Pinheiros e Liberdade.</p></div><a href="/estoque/">Gerenciar estoque <i class="fa-solid fa-arrow-right"></i></a></div>
+            <div class="filiais-grid">{% for filial in filiais %}<article><span>{{ filial }}</span><strong>{{ estoque_por_filial[filial] }} <small>un.</small></strong><em>{% if filial == 'Carrão (Fábrica)' %}Centro de produção{% else %}Loja{% endif %}</em></article>{% endfor %}</div>
+            {% if alertas_filiais %}<div class="alerta-filial"><i class="fa-solid fa-triangle-exclamation"></i> {{ alertas_filiais|length }} alerta(s) de estoque baixo nas filiais. <a href="/estoque/">Ver detalhes</a></div>{% endif %}
+        </section>
+
+        <div class="bottom">
+            <section class="produtos-categoria-area" aria-labelledby="titulo-produtos-categoria">
+                <h2 id="titulo-produtos-categoria">Produtos por Categoria</h2>
+                <div class="panel produtos-categoria-panel">
+                    <div id="lista-categorias">
+                        {% if produtos_por_categoria %}
+                            <div class="seletor-categoria">
+                                <label for="categoria-produtos">Selecione uma categoria</label>
+                                <select id="categoria-produtos" name="categoria-produtos">
+                                    {% for categoria in produtos_por_categoria %}
+                                        <option value="categoria-{{ loop.index }}">{{ categoria }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% for categoria, produtos in produtos_por_categoria.items() %}
+                                <section id="categoria-{{ loop.index }}" class="vitrine-categoria"{% if not loop.first %} hidden{% endif %} aria-label="Produtos da categoria {{ categoria }}">
+                                    <div class="vitrine-produtos" aria-label="Produtos da categoria {{ categoria }}">
+                                        {% for produto in produtos %}
+                                            <a class="produto-vitrine" href="/produtos/{{ produto.id }}" aria-label="Ver {{ produto.nome }}">
+                                                <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" loading="lazy">
+                                                <span class="produto-vitrine-nome">{{ produto.nome }}</span>
+                                                <strong class="produto-vitrine-preco">R$ {{ '%.2f'|format(produto.preco_exibicao)|replace('.', ',') }}</strong>
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                </section>
+                            {% endfor %}
+                        {% else %}
+                            <div style="color: #6b7280; padding: 15px;">Nenhum produto cadastrado.</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="mais-vendidos-area" aria-labelledby="titulo-mais-vendidos-dashboard">
+                <div class="mais-vendidos-titulo">
+                    <div>
+                        <h2 id="titulo-mais-vendidos-dashboard">Pódio dos mais vendidos</h2>
+                        <p>Participação por unidades vendidas</p>
+                    </div>
+                    <a class="btn-ver-ranking" href="/mais_vendidos"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Ver ranking</a>
+                </div>
+                <div class="panel podium-panel">
+                    {% if mais_vendidos_dashboard %}
+                    <ol class="podium-lista">
+                        {% for produto in mais_vendidos_dashboard %}
+                        <li class="podium-item podium-{{ loop.index }}">
+                            <span class="podium-posicao" aria-label="{{ loop.index }}º lugar">{{ loop.index }}º</span>
+                            {% if produto.id %}<a href="/produtos/{{ produto.id }}" class="podium-imagem-link" aria-label="Ver {{ produto.nome }}">{% endif %}
+                                <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" class="podium-imagem" loading="lazy" onerror="this.onerror=null; this.src='/static/img/produto_padrao.png';">
+                            {% if produto.id %}</a>{% endif %}
+                            <div class="podium-info">
+                                <strong>{{ produto.nome }}</strong>
+                                <span class="podium-receita">R$ {{ "{:,.2f}".format(produto.receita).replace(",", "X").replace(".", ",").replace("X", ".") }}</span>
+                                <span class="podium-percentual">{{ produto.porcentagem }}% das vendas · {{ produto.vendas }} un.</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ol>
+                    {% else %}
+                    <div class="podium-vazio"><i class="fa-solid fa-trophy" aria-hidden="true"></i><p>O pódio aparecerá após as primeiras vendas.</p></div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content" style="text-align:center; padding:20px; color:#ffffff;">
+            <p>&copy; 2026 Canamania. Frozen de caldo de cana.</p>
+        </div>
+    </footer>
+
+    <script src="/static/javascript/dashboard.js?v=4"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,442 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif;
+    background: #f8fafc;
+    color: #020617;
+}
+
+.navbar {
+    width: 100%;
+    min-height: 80px;
+    height: auto;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 60px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.logo img {
+    height: 65px;
+    width: auto;
+    display: block;
+}
+
+.menu {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 17px;
+    transition: 0.3s;
+}
+
+.menu a:hover,
+.menu a.active {
+    color: #09145c;
+    font-weight: 700;
+}
+
+.menu a.btn-sair {
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.armarios-page {
+    flex: 1;
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+.page-title {
+    margin-bottom: 24px;
+}
+
+.page-title h1 {
+    font-size: 32px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    color: #020617;
+}
+
+.page-title p {
+    font-size: 16px;
+    color: #64748b;
+}
+
+.cards-resumo-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.card-resumo {
+    min-height: 104px;
+    background: #fff;
+    border: 1px solid #d9dee7;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-resumo span {
+    display: block;
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.card-resumo strong {
+    display: block;
+    font-size: 28px;
+}
+
+.card-resumo i {
+    width: 44px;
+    height: 44px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.card-total i { background: #f1f5f9; color: #475569; }
+.card-disponivel { border-color: #86efac; }
+.card-disponivel strong { color: #00a84f; }
+.card-disponivel i { background: #dcfce7; color: #00a84f; }
+.card-ocupado { border-color: #93c5fd; }
+.card-ocupado strong { color: #2563eb; }
+.card-ocupado i { background: #eff6ff; color: #2563eb; }
+.card-manutencao { border-color: #fdba74; }
+.card-manutencao strong { color: #f97316; }
+.card-manutencao i { background: #fff7ed; color: #f97316; }
+
+.filtro-bar,
+.legenda-bar,
+.grid-shell {
+    background: #fff;
+    border: 1px solid #d9dee7;
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+}
+
+.filtro-bar {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.filtro-bar span,
+.legenda-bar span {
+    font-size: 14px;
+    color: #0f172a;
+}
+
+.btn-filtro {
+    border: 0;
+    border-radius: 6px;
+    padding: 9px 14px;
+    background: #f3f4f6;
+    color: #020617;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.btn-filtro.active {
+    background: #020617;
+    color: #fff;
+}
+
+.legenda-bar {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 18px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.legenda-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.dot-disponivel { background: #00c853; }
+.dot-ocupado { background: #3b73f6; }
+.dot-manutencao { background: #ff6d00; }
+.dot-desativado { background: #64748b; }
+
+.grid-shell {
+    padding: 20px;
+}
+
+.grid-armarios {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 12px;
+}
+
+.item-armario {
+    aspect-ratio: 1 / 1;
+    min-height: 72px;
+    border: 0;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-weight: 700;
+    transition: transform 0.15s, filter 0.15s;
+}
+
+.item-armario:hover {
+    transform: translateY(-1px);
+    filter: brightness(0.96);
+}
+
+.item-armario i {
+    font-size: 20px;
+}
+
+.item-armario span {
+    font-size: 16px;
+}
+
+.alerta-erro {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+}
+
+.alerta-sucesso { background: #dcfce7; border: 1px solid #86efac; color: #166534; border-radius: 6px; font-size: 14px; font-weight: 700; margin-bottom: 16px; padding: 12px 16px; }
+.armarios-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.armarios-tab { border: 1px solid #d9dee7; background: #fff; color: #334155; border-radius: 6px; padding: 10px 14px; cursor: pointer; font-weight: 700; }
+.armarios-tab.active { background: #09145c; color: #fff; border-color: #09145c; }
+.armarios-panel { background: #fff; border: 1px solid #d9dee7; border-radius: 6px; box-shadow: 0 1px 2px rgba(15,23,42,.12); padding: 22px; margin-bottom: 16px; }
+.panel-heading { margin-bottom: 18px; }.panel-heading h2 { font-size: 20px; margin-bottom: 5px; }.panel-heading p { color: #64748b; font-size: 14px; }
+.reserva-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end; }.reserva-form label, .cadastro-armario-form label { display: grid; gap: 6px; color: #334155; font-size: 13px; font-weight: 700; }.reserva-form input, .reserva-form select, .cadastro-armario-form input, .historico-filtros input, .historico-filtros select { width: 100%; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; font-size: 14px; background: #fff; }.cadastro-armario-form { display: flex; align-items: end; gap: 14px; }.cadastro-armario-form label { width: min(280px,100%); }
+.historico-filtros { display: flex; gap: 12px; margin-bottom: 16px; }.historico-filtros label { position: relative; flex: 1; }.historico-filtros label i { position: absolute; left: 12px; top: 12px; color: #64748b; }.historico-filtros input { padding-left: 34px; }.historico-filtros select { width: 180px; }.tabela-reservas-wrap { overflow-x: auto; }.tabela-reservas { width: 100%; border-collapse: collapse; text-align: left; }.tabela-reservas th, .tabela-reservas td { padding: 13px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }.tabela-reservas th { color: #64748b; background: #f8fafc; }.status-reserva { text-transform: capitalize; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }.status-reserva.ativa { background: #dcfce7; color: #166534; }.status-reserva.cancelada { background: #fee2e2; color: #991b1b; }.btn-cancelar-reserva { background: none; color: #b91c1c; border: 0; font-weight: 700; cursor: pointer; }.empty-reservas { text-align: center; color: #64748b; }
+
+.status-disponivel { background: #00c853; }
+.status-ocupado { background: #3b73f6; }
+.status-manutencao { background: #ff6d00; }
+.status-desativado { background: #64748b; }
+
+.btn-ativar-armario { margin-right: auto; border: 1px solid #86efac; border-radius: 6px; padding: 10px 14px; background: #f0fdf4; color: #166534; font-weight: 700; cursor: pointer; }
+.btn-ativar-armario:hover { background: #dcfce7; }
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.45);
+    padding: 20px;
+    z-index: 20;
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal-card {
+    width: min(460px, 100%);
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+    padding: 20px;
+}
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 16px;
+}
+
+.modal-header h2 {
+    font-size: 18px;
+}
+
+.modal-header p,
+.modal-info,
+.modal-form small {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.btn-fechar {
+    border: 0;
+    background: #f1f5f9;
+    color: #334155;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.modal-form {
+    display: grid;
+    gap: 14px;
+}
+
+.modal-form label span {
+    display: block;
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.modal-form select,
+.modal-form input {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+    background: #fff;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+.btn-secundario,
+.btn-primario {
+    border: 0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-secundario {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+.btn-primario {
+    background: #020617;
+    color: #fff;
+}
+
+.btn-desativar { margin-right: auto; border: 1px solid #fecaca; background: #fff5f5; color: #b91c1c; border-radius: 6px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+.btn-desativar:hover { background: #fee2e2; }
+.modal-confirmacao { z-index: 30; }
+.confirmacao-card { width: min(400px, 100%); background: #fff; border-radius: 14px; padding: 28px; text-align: center; box-shadow: 0 24px 60px rgba(15,23,42,.3); }
+.confirmacao-icone { width: 52px; height: 52px; margin: 0 auto 15px; display: grid; place-items: center; border-radius: 50%; color: #c2410c; background: #fff7ed; font-size: 22px; }
+.confirmacao-card h2 { font-size: 20px; margin-bottom: 9px; }.confirmacao-card p { color: #64748b; font-size: 14px; line-height: 1.5; }.confirmacao-acoes { display: flex; justify-content: center; gap: 10px; margin-top: 24px; }.btn-confirmar-perigo { border: 0; border-radius: 6px; padding: 10px 14px; color: #fff; background: #dc2626; font-weight: 700; cursor: pointer; }.btn-confirmar-perigo:hover { background: #b91c1c; }
+
+.main-footer {
+    margin-top: auto;
+    width: 100%;
+    background: #09145c;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+}
+
+@media (max-width: 1100px) {
+    .navbar {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .menu {
+        justify-content: center;
+        gap: 14px;
+    }
+}
+
+@media (max-width: 760px) {
+    .cards-resumo-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-armarios {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .armarios-page {
+        padding: 28px 0;
+    }
+
+    .page-title h1 {
+        font-size: 26px;
+    }
+    .reserva-form { grid-template-columns: 1fr; }.historico-filtros, .cadastro-armario-form { flex-direction: column; align-items: stretch; }.historico-filtros select, .cadastro-armario-form label { width: 100%; }
+}
+
+@media (max-width: 460px) {
+    .cards-resumo-container {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-armarios {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .item-armario {
+        min-height: 58px;
+    }
+}

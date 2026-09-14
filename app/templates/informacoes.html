@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>{% if pagina == 'termos' %}Termos de Uso{% elif pagina == 'privacidade' %}Política de Privacidade{% else %}Suporte{% endif %} - AAPM</title>
+    <style>
+        :root { --azul: #100e74; --texto: #1e293b; --borda: #e2e8f0; }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; background: #f8fafc; color: var(--texto); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        main { width: min(760px, calc(100% - 40px)); margin: 64px auto; }
+        .voltar { color: var(--azul); text-decoration: none; font-weight: 600; }
+        article { margin-top: 20px; padding: 32px; background: #fff; border: 1px solid var(--borda); border-radius: 12px; box-shadow: 0 4px 12px rgba(15, 23, 42, .06); }
+        h1 { margin: 0 0 20px; color: #0f172a; font-size: 28px; }
+        h2 { margin: 24px 0 8px; font-size: 18px; }
+        p, li { line-height: 1.6; }
+        ul { padding-left: 22px; }
+    </style>
+    <link rel="stylesheet" href="/static/css/responsive.css?v=1">
+</head>
+<body>
+    <main>
+        <a class="voltar" href="/">← Voltar para a tela inicial</a>
+        <article>
+            {% if pagina == 'termos' %}
+                <h1>Termos de Uso</h1>
+                <p>O sistema AAPM é destinado ao gerenciamento de produtos, vendas, clientes e armários da instituição.</p>
+                <h2>Uso responsável</h2>
+                <p>Utilize sua conta apenas para atividades autorizadas e mantenha seus dados de acesso em segurança.</p>
+                <h2>Atualizações</h2>
+                <p>Estes termos podem ser atualizados para acompanhar melhorias no sistema e nas rotinas administrativas.</p>
+            {% elif pagina == 'privacidade' %}
+                <h1>Política de Privacidade</h1>
+                <p>Os dados cadastrados no sistema são usados exclusivamente para as atividades administrativas da AAPM.</p>
+                <h2>Dados tratados</h2>
+                <p>Podem ser armazenados dados de produtos, vendas, clientes e usuários necessários para operar o sistema.</p>
+                <h2>Proteção dos dados</h2>
+                <p>O acesso às informações é restrito a usuários autorizados, de acordo com seu perfil de acesso.</p>
+            {% else %}
+                <h1>Suporte</h1>
+                <p>Se precisar de ajuda para usar o sistema ou identificar algum problema, procure a administração responsável pela AAPM.</p>
+                <h2>Antes de solicitar suporte</h2>
+                <ul>
+                    <li>Descreva o que ocorreu e em qual tela.</li>
+                    <li>Informe os passos realizados antes do problema.</li>
+                    <li>Envie uma captura de tela, se possível.</li>
+                </ul>
+            {% endif %}
+        </article>
+    </main>
+</body>
+</html>

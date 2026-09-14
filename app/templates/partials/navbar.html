@@ -1,0 +1,27 @@
+{% set caminho = request.url.path if request is defined else '' %}
+<link rel="stylesheet" href="/static/css/base.css?v=1">
+<link rel="stylesheet" href="/static/css/ui.css?v=1">
+<link rel="stylesheet" href="/static/css/feedback.css?v=1">
+<header>
+    <nav class="navbar">
+        <div class="logo"><a href="/" class="wordmark"><span>Cana</span>mania<small>frozen de caldo de cana</small></a></div>
+        <ul class="menu">
+            <li><a href="/" class="{{ 'active' if caminho == '/' else '' }}">Dashboard</a></li>
+            <li><a href="/produtos" class="{{ 'active' if caminho.startswith('/produtos') else '' }}">Frozens</a></li>
+            {% if usuario.role == 'admin' %}
+            <li><a href="/clientes" class="{{ 'active' if caminho.startswith('/clientes') else '' }}">Clientes</a></li>
+            {% endif %}
+            <li><a href="/pdv/" class="{{ 'active' if caminho.startswith('/pdv') else '' }}">PDV</a></li>
+            <li><a href="/estoque/" class="{{ 'active' if caminho.startswith('/estoque') else '' }}">Estoque</a></li>
+            {% if usuario.role == 'admin' %}
+            <li><a href="/maquinas" class="{{ 'active' if caminho.startswith('/maquinas') else '' }}">Máquinas</a></li>
+            <li><a href="/usuarios" class="{{ 'active' if caminho.startswith('/usuarios') else '' }}">Funcionários</a></li>
+            <li><a href="/categorias" class="{{ 'active' if caminho.startswith('/categorias') else '' }}">Categorias</a></li>
+            <li><button type="button" class="theme-toggle" aria-label="Alternar tema"><i class="fa-solid fa-moon"></i></button></li>
+            {% endif %}
+            <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+        </ul>
+    </nav>
+</header>
+<script src="/static/javascript/feedback.js?v=2"></script>
+<script src="/static/javascript/theme.js"></script>

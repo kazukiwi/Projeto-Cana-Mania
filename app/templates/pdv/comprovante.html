@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Comprovante de Venda #{{ venda.id }}</title>
+    <link rel="stylesheet" href="/static/css/vendas.css">
+    <link rel="stylesheet" href="/static/css/feedback.css?v=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        @media print {
+            body * { visibility: hidden; }
+            .cupom-container, .cupom-container * { visibility: visible; }
+            .cupom-container { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+    {% if request.query_params.get('sucesso') == 'ok' %}
+    <div id="feedback-bem-vindo" aria-hidden="false">
+        <div class="feedback-bem-vindo-card feedback-venda-realizada" role="dialog" aria-modal="true" aria-labelledby="feedback-venda-realizada-titulo">
+            <div class="feedback-bem-vindo-icone"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
+            <h2 id="feedback-venda-realizada-titulo">Venda realizada com sucesso!</h2>
+            <p>A venda #{{ venda.id }} foi registrada e o estoque foi atualizado.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if false %}<header class="no-print">
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#"><img src="/static/img/logo.png" alt="Logo AAPM"></a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico" class="active">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios">Armários</a></li>
+
+                <li><a href="/usuarios" >
+                </i> Usuários
+                </a></li>
+                <li><a href="/categorias" >
+                    </i> Categorias
+                </a></li>
+                {% endif %}
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <div class="vendas-container-main" style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
+        
+        <div class="no-print" style="display:flex; justify-content:space-between; margin-bottom:20px;">
+            <a href="/pdv/historico" class="btn-nova-venda" style="background:#4b5563; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-arrow-left"></i> Histórico
+            </a>
+            <button onclick="window.print()" style="padding:10px 20px; background:#1e1b4b; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-print"></i> Imprimir Recibo
+            </button>
+        </div>
+
+        <div class="cupom-container" style="background:white; border:1px solid #e5e7eb; border-radius:12px; padding:30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); font-family: monospace;">
+            <div style="text-align:center; margin-bottom:20px;">
+                <h2 style="margin:0 0 5px 0; color:#1e1b4b;">AAPM - SISTEMA DE ESTOQUE</h2>
+                <p style="margin:0; color:#666;">Recibo de Venda Balcão</p>
+                <div style="border-bottom: 2px dashed #ccc; margin: 15px 0;"></div>
+            </div>
+
+            <div style="margin-bottom: 20px; font-size:14px; line-height:1.6;">
+                <strong>ID DA VENDA:</strong> #{{ venda.id }}<br>
+                <strong>DATA/HORA:</strong> {{ venda.criado_em.strftime('%d/%m/%Y %H:%M:%S') }}<br>
+                <strong>CLIENTE:</strong> {{ venda.cliente.nome if venda.cliente else "Consumidor Geral" }}<br>
+                <strong>OPERADOR ID:</strong> {{ venda.usuario_id }}
+            </div>
+
+            <div style="border-bottom: 1px dashed #ccc; margin: 15px 0;"></div>
+
+            <table style="width:100%; border-collapse:collapse; font-size:14px; text-align:left; margin-bottom:20px;">
+                <thead>
+                    <tr>
+                        <th style="padding-bottom:8px;">Item</th>
+                        <th style="padding-bottom:8px; text-align:center;">Qtd</th>
+                        <th style="padding-bottom:8px; text-align:right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in venda.itens %}
+                    <tr>
+                        <td style="padding:6px 0;">{{ item.produto_nome }}{% if item.tamanho %} (Tam: {{ item.tamanho }}{% if item.cor %} / Cor: {{ item.cor }}{% endif %}){% endif %} <br> <small style="color:#666;">1 un x R$ {{ "%.2f"|format(item.preco_unitario) }}</small></td>
+                        <td style="padding:6px 0; text-align:center;">{{ item.quantidade }}</td>
+                        <td style="padding:6px 0; text-align:right;">R$ {{ "%.2f"|format(item.quantidade * item.preco_unitario) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="border-top: 2px dashed #ccc; padding-top:15px; font-size:14px; line-height:1.8;">
+                <div style="display:flex; justify-content:space-between;">
+                    <span>Subtotal Bruto:</span>
+                    <span>R$ {{ "%.2f"|format(venda.total_bruto) }}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; color: #b91c1c;">
+                    <span>Desconto Aplicado ({{ venda.desconto_percentual }}%):</span>
+                    <span>- R$ {{ "%.2f"|format(venda.total_bruto - venda.total_liquido) }}</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:bold; margin-top:10px; color:#111827;">
+                    <span>TOTAL LÍQUIDO:</span>
+                    <span>R$ {{ "%.2f"|format(venda.total_liquido) }}</span>
+                </div>
+            </div>
+
+            {% if venda.observacao %}
+            <div style="margin-top:20px; background:#f9fafb; padding:10px; border-radius:6px; font-size:12px;">
+                <strong>Obs:</strong> {{ venda.observacao }}
+            </div>
+            {% endif %}
+
+            <div style="border-top: 1px dashed #ccc; margin: 20px 0 0 0; padding-top:15px; text-align:center; color:#888; font-size:12px;">
+                Obrigado pela preferência!
+            </div>
+        </div>
+    </div>
+</body>
+</html>

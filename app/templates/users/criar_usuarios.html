@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>{{ "Editar Usuário" if editando else "Novo Usuário" }}</title>
+    <link rel="stylesheet" href="/static/css/criar_usuarios.css">
+    <link rel="stylesheet" href="/static/css/butaobase.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#">
+                    <img src="/static/img/logo.png" alt="Logo AAPM">
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                <li><a href="/clientes">Clientes</a></li>
+                <li><a href="/pdv/historico">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                <li><a href="/armarios">Armários</a></li>
+
+                {# Validação de segurança do Jinja2 para evitar UndefinedError #}
+                {% if usuario is defined and usuario and usuario.role == 'admin' %}
+                <li><a href="/usuarios" class="active">Usuários</a></li>
+                <li><a href="/categorias">Categorias</a></li>
+                {% endif %}
+
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <main class="produtos-container-main">
+        <div class="glass-card">
+
+            <div class="header">
+                <h1>{{ "Editar Usuário" if editando else "Novo Usuário" }}</h1>
+                <p class="subtitle">
+                    {{ "Atualize as informações do perfil selecionado" if editando else "Cadastre novas credenciais de
+                    acesso" }}
+                </p>
+            </div>
+
+            {% if erro %}
+            <div class="alert-box alert-error">
+                <i data-lucide="alert-circle"></i>
+                {{ erro }}
+            </div>
+            {% endif %}
+
+            <form action="{{ '/usuarios/' + editando.id|string + '/editar' if editando else '/usuarios/novo' }}"
+                method="post">
+
+                <div class="input-group">
+                    <label for="nome">Nome completo</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="user" class="input-icon"></i>
+                        <input type="text" id="nome" name="nome" placeholder="Ex: João Silva"
+                            value="{{ editando.nome if editando else (valores.nome if valores else '') }}" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="email">E-mail corporativo</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="mail" class="input-icon"></i>
+                        <input type="email" id="email" name="email" placeholder="admin2@example.com"
+                            value="{{ editando.email if editando else (valores.email if valores else '') }}" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="senha">Senha de acesso</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="key-round" class="input-icon"></i>
+                        <input type="password" id="senha" name="senha" {{ "placeholder='Deixe vazio para não alterar'"
+                            if editando else "placeholder='Mínimo 6 caracteres' required minlength='6'" }}>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="role">Perfil de acesso</label>
+                    <div class="input-wrapper">
+                        <i data-lucide="shield" class="input-icon"></i>
+                        <select id="role" name="role">
+                            <option value="funcionario" {{ 'selected' if (editando and editando.role=='funcionario' ) or
+                                (valores and valores.role=='funcionario' ) else '' }}>Funcionário</option>
+                            <option value="admin" {{ 'selected' if (editando and editando.role=='admin' ) or (valores
+                                and valores.role=='admin' ) else '' }}>Administrador</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="actions-group">
+                    <button type="submit" class="btn-primary">
+                        {{ "Salvar alterações" if editando else "Criar usuário" }}
+                        <i data-lucide="check" style="width:16px; height: 16px;"></i>
+                    </button>
+                    <a href="/usuarios" class="btn-secondary">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2026 AAPM. Todos os direitos reservados.</p>
+            <div class="footer-links">
+                <a href="#">Suporte</a>
+                <a href="#">Privacidade</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Inicializa e insere todos os ícones nos wrappers dos campos
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

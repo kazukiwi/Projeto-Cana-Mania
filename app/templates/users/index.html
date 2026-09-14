@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Gerenciamento de Usuários</title>
+    <link rel="stylesheet" href="/static/css/usuarios.css">
+    <link rel="stylesheet" href="/static/css/listagem.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Pequenos ajustes complementares para alinhar o HTML novo ao CSS antigo */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .btn-create {
+            background-color: #09145c;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-create:hover {
+            background-color: #1e293b;
+            transform: translateY(-1px);
+        }
+
+        .alert-box {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .user-actions-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+    </style>
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#">
+                    <img src="/static/img/logo.png" alt="Logo AAPM">
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios">Armários</a></li>
+
+                <li><a href="/usuarios"class="active">
+                     Usuários
+                </a></li>
+                <li><a href="/categorias">
+                    Categorias
+                </a></li>
+                {% endif %}
+
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <main class="produtos-container-main">
+
+        <div class="page-header header-produtos">
+            <h1>Funcionários</h1>
+            <p class="beneficio-funcionario">Benefício Canamania: 15% de desconto em frozens.</p>
+            <a href="/usuarios/novo" class="btn-create">
+                <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+                Novo usuário
+            </a>
+        </div>
+
+        {# Mensagens de Alerta Estilizadas #}
+        {% if request.query_params.get('criado') == 'ok' %}
+        <div class="alert-box alert-success">
+            <i data-lucide="check-circle"></i>
+            <span>Usuário criado com sucesso!</span>
+        </div>
+        {% endif %}
+
+        {% if request.query_params.get('editado') == 'ok' %}
+        <div class="alert-box alert-success">
+            <i data-lucide="check-circle"></i>
+            <span>Usuário atualizado com sucesso!</span>
+        </div>
+        {% endif %}
+
+        {% if request.query_params.get('erro') == 'autoproprio' %}
+        <div class="alert-box alert-error">
+            <i data-lucide="alert-triangle"></i>
+            <span>Você não pode desativar sua própria conta.</span>
+        </div>
+        {% endif %}
+
+        <div class="filtros-container">
+            <div class="busca-wrapper">
+                <i data-lucide="search" class="icone-busca"></i>
+                <input type="text" id="inputBusca" placeholder="Buscar usuário por nome ou email...">
+            </div>
+
+            <div class="select-wrapper">
+                <i data-lucide="filter" class="icone-filtro"></i>
+                <select id="selectPerfil" name="role">
+                    <option value="">Todos os perfis</option>
+                    <option value="admin" {% if request.query_params.get('role')=='admin' %}selected{% endif %}>
+                        Administrador</option>
+                    <option value="funcionario" {% if request.query_params.get('role')=='funcionario' %}selected{% endif
+                        %}>Funcionário</option>
+                </select>
+            </div>
+
+            <label class="checkbox-wrapper">
+                <input type="checkbox" id="checkAtivos" unchecked>
+                <span>Mostrar apenas ativos</span>
+            </label>
+        </div>
+        <div class="listagem-acoes"><span>Pesquisa e filtros aplicados na tabela.</span><label>Ordenar <select id="ordem-usuarios" class="listagem-ordem"><option value="asc">Nome: A–Z</option><option value="desc">Nome: Z–A</option></select></label></div>
+
+        <div class="tabela-container">
+            <table class="tabela-produtos" data-listagem data-busca="#inputBusca" data-ordem="#ordem-usuarios" data-por-pagina="8">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in usuarios %}
+                    <tr data-role="{{ u.role | lower }}">
+                        <td class="preco-texto">{{ u.nome }}</td>
+                        <td>{{ u.email }}</td>
+                        <td>
+                            <span class="badge-categoria padrao">{{ u.role }}</span>
+                        </td>
+                        <td>
+                            {% if u.ativo %}
+                            <span class="badge-status ativo">Ativo</span>
+                            {% else %}
+                            <span class="badge-status inativo">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="user-actions-wrapper">
+                                <form action="/usuarios/{{ u.id }}/toggle-ativo" method="post" style="display:inline" data-confirm="Alterar o status deste usuário?">
+                                    {% if u.ativo %}
+                                    <button type="submit" class="btn-acao excluir" title="Desativar Usuário"
+                                        style="font-size: 15px;">
+                                        <i data-lucide="user-x"
+                                            style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+                                        Desativar
+                                    </button>
+                                    {% else %}
+                                    <button type="submit" class="btn-acao ver" title="Ativar Usuário"
+                                        style="font-size: 15px;">
+                                        <i data-lucide="user-check"
+                                            style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
+                                        Ativar
+                                    </button>
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content" style="text-align:center; padding:20px; color:#ffffff;">
+            <p>&copy; 2026 AAPM - SENAI. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="/static/javascript/listagem.js?v=4"></script>
+    <script>
+        // Renderiza os ícones do Lucide do seu projeto
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

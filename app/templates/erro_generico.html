@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Não foi possível concluir - AAPM</title>
+    <link rel="stylesheet" href="/static/css/erro.css">
+</head>
+<body>
+    <main class="erro-page">
+        <section class="erro-card" aria-labelledby="titulo-erro">
+            <h1 class="erro-codigo">Oops!</h1>
+            <div class="robo-wrap">
+                <img src="/static/img/robot-404.png" alt="Ilustração de um robô informando um problema" class="robo-img">
+                <div class="balao-fala"><p>{{ mensagem or 'Não foi possível concluir esta ação agora.' }}</p></div>
+            </div>
+            <p class="erro-subtexto">Nenhuma alteração foi realizada. Revise os filtros e tente novamente.</p>
+            <div class="erro-acoes"><a href="{{ voltar_para or '/' }}" class="btn-voltar">Voltar e tentar novamente</a></div>
+        </section>
+    </main>
+</body>
+</html>

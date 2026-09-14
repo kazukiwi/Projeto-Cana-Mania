@@ -1,0 +1,57 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: "Playfair Display", serif; color: #09145c; }
+
+.background {
+    min-height: calc(100vh - 70px);
+    position: relative;
+    overflow: hidden;
+    background: url('/static/img/fundo.png') no-repeat center / cover, linear-gradient(135deg, #c7c4e8, #b4b0df, #c9c7ea);
+}
+
+.navbar { height: 90px; display: flex; align-items: center; padding-left: 20px; background: rgba(255, 255, 255, .65); backdrop-filter: blur(10px); position: relative; z-index: 1; }
+.navbar-logo { width: 180px; display: block; transition: transform .2s; }
+.navbar-logo:hover { transform: scale(1.03); }
+
+.rotating-circle { position: absolute; width: 1250px; left: -520px; top: -150px; opacity: .25; filter: brightness(0) saturate(100%) invert(11%) sepia(31%) saturate(6200%) hue-rotate(225deg) brightness(45%) contrast(115%); animation: rotate 30s linear infinite; }
+@keyframes rotate { to { transform: rotate(360deg); } }
+
+.recovery-container { min-height: calc(100vh - 90px); display: flex; align-items: center; justify-content: center; gap: clamp(70px, 12vw, 220px); padding: 55px 24px; position: relative; z-index: 1; }
+.recovery-copy { max-width: 420px; }
+.recovery-copy h1 { font-size: clamp(68px, 9vw, 110px); margin-bottom: 22px; }
+.recovery-copy p { font-size: 25px; line-height: 1.55; font-weight: 700; color: #101010; text-shadow: 2px 2px 8px rgba(255,255,255,.8); }
+
+.recovery-card { width: min(100%, 460px); padding: 42px; border-radius: 32px; background: #1c1c64; color: #fff; box-shadow: 0 10px 40px rgba(0,0,0,.22); animation: appear .5s ease-out; }
+@keyframes appear { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.status-icon { width: 55px; height: 55px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 20px; background: rgba(255,255,255,.15); font-size: 24px; }
+.status-icon--success { color: #176c36; background: #dff6e6; }
+.status-icon--error { color: #9b202b; background: #ffe1e4; }
+.recovery-card h1 { font: 700 38px/1.1 Arial, Helvetica, sans-serif; margin-bottom: 16px; }
+.intro { font-family: Arial, Helvetica, sans-serif; color: #e5e6f7; line-height: 1.55; font-size: 16px; margin-bottom: 28px; }
+label { display: block; margin: 0 0 8px 2px; font: 600 14px Arial, Helvetica, sans-serif; }
+.input-box { height: 58px; display: flex; align-items: center; padding: 0 18px; margin-bottom: 21px; border: 2px solid rgba(255,255,255,.82); border-radius: 14px; }
+.input-box i { font-size: 19px; }
+.input-box input { width: 100%; margin-left: 14px; border: 0; outline: 0; background: transparent; color: #fff; font: 16px Arial, Helvetica, sans-serif; }
+.input-box input::placeholder { color: #d6d6d6; }
+button { width: 100%; height: 58px; border: 0; border-radius: 14px; background: #fff; color: #09145c; cursor: pointer; font: 700 18px Arial, Helvetica, sans-serif; transition: transform .2s; }
+button:hover { transform: scale(1.02); }
+.secondary-link { display: block; width: fit-content; margin: 24px auto 0; color: #fff; text-decoration: none; border-bottom: 1px solid transparent; font: 14px Arial, Helvetica, sans-serif; }
+.secondary-link:hover { border-color: #fff; }
+.feedback { margin: 0 0 20px; padding: 10px 12px; border-radius: 10px; font: 14px/1.4 Arial, Helvetica, sans-serif; }
+.feedback--error { background: #ffe1e4; color: #871b28; }
+.main-footer { min-height: 70px; display: grid; place-items: center; padding: 20px; background: #09145c; color: #fff; text-align: center; font: 14px Arial, Helvetica, sans-serif; }
+
+@media (max-width: 850px) {
+    .recovery-container { gap: 35px; flex-direction: column; padding-top: 45px; }
+    .recovery-copy { text-align: center; }
+    .recovery-copy h1 { font-size: 68px; margin-bottom: 6px; }
+    .recovery-copy p { font-size: 20px; }
+}
+@media (max-width: 480px) {
+    .navbar { justify-content: center; padding-left: 0; }
+    .navbar-logo { width: 145px; }
+    .recovery-container { padding: 36px 18px; }
+    .recovery-card { padding: 30px 24px; border-radius: 25px; }
+    .recovery-card h1 { font-size: 31px; }
+    .recovery-copy p { font-size: 18px; }
+}

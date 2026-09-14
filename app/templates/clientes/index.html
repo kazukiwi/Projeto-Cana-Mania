@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Clientes - AAPM</title>
+    <link rel="stylesheet" href="/static/css/clientes.css">
+    <link rel="stylesheet" href="/static/css/listagem.css">
+    <link rel="stylesheet" href="/static/css/confirmacao.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/"><img src="/static/img/logo.png" alt="Logo AAPM"></a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes" class="active">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios">Armários</a></li>
+
+                <li><a href="/usuarios">
+                    </i> Usuários
+                </a></li>
+                <li><a href="/categorias">
+                   </i> Categorias
+                </a></li>
+                {% endif %}
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <main class="clientes-container">
+        <div class="page-header">
+            <div>
+                <h1>Clientes</h1>
+                <p>{{ clientes|length }} clientes encontrados - {{ total_associados }} associados ativos</p>
+            </div>
+            <a href="/clientes/novo" class="btn-primary">
+                <i class="fa-solid fa-plus"></i> Novo Cliente
+            </a>
+        </div>
+
+        <section class="summary-grid">
+            <div class="summary-card">
+                <span>Total</span>
+                <strong>{{ clientes|length }}</strong>
+            </div>
+            <div class="summary-card success">
+                <span>Associados ativos</span>
+                <strong>{{ total_associados }}</strong>
+            </div>
+            <div class="summary-card discount">
+                <span>Desconto aplicado no PDV</span>
+                <strong>10%</strong>
+            </div>
+        </section>
+
+        <form method="get" action="/clientes/" class="filters">
+            <div class="search-field">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="busca" value="{{ busca }}" placeholder="Buscar por nome ou matricula">
+            </div>
+            <label class="checkbox-field">
+                <input type="checkbox" name="apenas_associados" value="true" {% if apenas_associados %}checked{% endif %}>
+                <span>Apenas associados</span>
+            </label>
+            <button type="submit" class="btn-secondary">
+                <i class="fa-solid fa-filter"></i> Filtrar
+            </button>
+        </form>
+        <div class="listagem-acoes"><span>Resultados atualizados durante a pesquisa.</span><label>Ordenar <select id="ordem-clientes" class="listagem-ordem"><option value="asc">Nome: A–Z</option><option value="desc">Nome: Z–A</option></select></label></div>
+
+        <div class="table-shell">
+            <table data-listagem data-busca=".search-field input" data-ordem="#ordem-clientes" data-por-pagina="8">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Matricula</th>
+                        <th>Telefone</th>
+                        <th>Associado</th>
+                        <th>Status</th>
+                        <th>Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <td><strong>{{ cliente.nome }}</strong></td>
+                        <td>{{ cliente.matricula or '-' }}</td>
+                        <td>{{ cliente.telefone or '-' }}</td>
+                        <td>
+                            {% if cliente.is_associado %}
+                            <span class="badge badge-success">10% de desconto</span>
+                            {% else %}
+                            <span class="badge">Sem desconto</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if cliente.ativo %}
+                            <span class="status active">Ativo</span>
+                            {% else %}
+                            <span class="status inactive">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td class="actions">
+                            <a href="/clientes/{{ cliente.id }}/editar" title="Editar cliente">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                            <form action="/clientes/{{ cliente.id }}/toggle-ativo" method="post" data-confirmacao
+                                data-titulo="{{ 'Desativar cliente?' if cliente.ativo else 'Reativar cliente?' }}"
+                                data-mensagem="{{ cliente.nome }} {{ 'não poderá mais ser selecionado em novas vendas.' if cliente.ativo else 'voltará a ficar disponível para novas vendas.' }}"
+                                data-confirmar="{{ 'Desativar cliente' if cliente.ativo else 'Reativar cliente' }}">
+                                <button type="submit" title="Alterar status">
+                                    {% if cliente.ativo %}
+                                    <i class="fa-solid fa-ban"></i>
+                                    {% else %}
+                                    <i class="fa-solid fa-check"></i>
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="empty">Nenhum cliente cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div class="modal-confirmacao-acao" id="modal-confirmacao-acao" aria-hidden="true">
+        <div class="confirmacao-acao-card" role="dialog" aria-modal="true" aria-labelledby="confirmacao-acao-titulo">
+            <div class="confirmacao-acao-icon"><i class="fa-solid fa-user-gear"></i></div>
+            <h2 id="confirmacao-acao-titulo">Confirmar ação</h2><p id="confirmacao-acao-texto"></p>
+            <form method="post" id="form-confirmacao-acao" class="confirmacao-acao-botoes"><button type="button" class="confirmacao-acao-cancelar" id="confirmacao-acao-cancelar">Voltar</button><button type="button" class="confirmacao-acao-confirmar" id="confirmacao-acao-confirmar">Confirmar</button></form>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <p>2026 AAPM - SENAI. Todos os direitos reservados.</p>
+    </footer>
+    <script src="/static/javascript/listagem.js?v=3"></script>
+    <script src="/static/javascript/confirmacao.js?v=1"></script>
+</body>
+
+</html>

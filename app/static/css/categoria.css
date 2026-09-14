@@ -1,0 +1,368 @@
+/* ==========================================================================
+   1. RESETS E CONFIGURAÇÕES PADRÃO
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+    color: #334155;
+}
+
+/* ==========================================================================
+   2. NAVBAR (CABEÇALHO)
+   ========================================================================== */
+.navbar {
+    width: 100%;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 60px;
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.logo img {
+    height: 65px;
+    width: auto;
+    display: block;
+}
+
+.menu {
+    display: flex;
+    gap: 35px;
+    list-style: none;
+    align-items: center;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 18px;
+    font-weight: 500;
+    transition: color 0.2s, font-weight 0.2s;
+}
+
+.menu a:hover,
+.menu a.active {
+    color: #09145c;
+    font-weight: bold;
+}
+
+/* Links Condicionais do Admin */
+.menu .nav-link {
+    font-size: 18px;
+}
+
+/* Botão Sair Especial */
+.menu a.btn-sair {
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.menu a.btn-sair:hover {
+    color: #991b1b;
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   3. ESTRUTURA DO CONTEÚDO PRINCIPAL
+   ========================================================================== */
+.main-content {
+    flex: 1;
+    padding: 40px 60px;
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    font-size: 32px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Botão de Novo Usuário */
+.btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #09145c;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-create:hover {
+    background-color: #050b33;
+    transform: translateY(-1px);
+}
+
+.btn-create:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   4. ALERTAS / MEIOS DE FEEDBACK
+   ========================================================================== */
+.alert-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    font-size: 15px;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border-color: #bbf7d0;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+/* ==========================================================================
+   5. TABELA DE USUÁRIOS
+   ========================================================================== */
+.table-container {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 15px;
+}
+
+th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: bold;
+    padding: 16px 20px;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* ==========================================================================
+   6. BADGES (PERFIL E STATUS)
+   ========================================================================== */
+.badge {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Badges de Regra/Perfil */
+.badge-role {
+    background-color: #f1f5f9;
+    color: #475569;
+    text-transform: capitalize;
+}
+
+/* Badges de Status (Ativo/Inativo) */
+.badge-active {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.badge-inactive {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* ==========================================================================
+   7. CÉLULA DE AÇÕES E BOTÕES
+   ========================================================================== */
+.actions-cell {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-edit, .btn-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+/* Botão Editar */
+.btn-edit {
+    color: #2563eb;
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.btn-edit:hover {
+    background-color: #dbeafe;
+    transform: translateY(-1px);
+}
+
+/* Botões de Alterar Estado (Ativar/Desativar) */
+.btn-toggle.deactivate {
+    color: #dc2626;
+    background-color: #fef2f2;
+    border-color: #fecaca;
+}
+
+.btn-toggle.deactivate:hover {
+    background-color: #fee2e2;
+    transform: translateY(-1px);
+}
+
+.btn-toggle.activate {
+    color: #16a34a;
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.btn-toggle.activate:hover {
+    background-color: #eafaf1;
+    transform: translateY(-1px);
+}
+
+button:active, a:active {
+    transform: translateY(0) !important;
+}
+
+/* ==========================================================================
+   8. RODAPÉ (FOOTER)
+   ========================================================================== */
+.main-footer { 
+    width: 100%; 
+    background-color: #09145c; 
+    padding: 20px; 
+    text-align: center; 
+    color: rgb(255, 255, 255); 
+    font-size: 13px; 
+    margin-top: auto; 
+}
+
+@media (max-width: 1100px) {
+    .navbar {
+        height: auto;
+        min-height: 80px;
+        padding: 16px 24px;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .menu {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px 22px;
+        text-align: center;
+    }
+
+    .menu a,
+    .menu .nav-link {
+        font-size: 16px;
+    }
+
+    .main-content {
+        padding: 28px 24px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 820px;
+    }
+}
+
+@media (max-width: 640px) {
+    .logo img {
+        height: 54px;
+    }
+
+    .main-content {
+        padding: 22px 16px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .page-header h1 {
+        font-size: 26px;
+    }
+
+    .btn-create {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .actions-cell {
+        flex-wrap: wrap;
+    }
+}
+
+/* Categorias Canamania */
+.main-content{width:min(1280px,calc(100% - 48px));margin-inline:auto;padding:44px 0 64px}.page-header h1{color:#083d2c;letter-spacing:-.04em}.table-container{border:1px solid #dbead6;border-radius:18px;overflow:hidden;box-shadow:0 15px 32px rgba(8,61,44,.07)}.table-container table thead{background:#083d2c}.table-container table th{color:#fff}.table-container table tbody tr{transition:background .2s}.table-container table tbody tr:hover{background:#fff1f7}.btn-create{background:#ff1877!important;border-radius:11px!important}.btn-create:hover{background:#c9085a!important}html[data-theme="dark"] .main-content{color:#eef5ed}html[data-theme="dark"] .page-header h1{color:#d7fbb3}html[data-theme="dark"] .table-container{border-color:#31513a;box-shadow:none}html[data-theme="dark"] .table-container table thead{background:#061e15}html[data-theme="dark"] .table-container table tbody tr{background:#141d17}html[data-theme="dark"] .table-container table tbody tr:hover{background:#202d23}html[data-theme="dark"] .table-container td{color:#e5ede5!important}

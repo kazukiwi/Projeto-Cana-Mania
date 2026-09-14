@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Redefinir senha | AAPM</title>
+    <link rel="stylesheet" href="/static/css/recuperar_senha.css">
+    <link rel="stylesheet" href="/static/css/responsive.css?v=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    <div class="background">
+        <img src="/static/img/circulo.png" alt="" class="rotating-circle">
+        <header>
+            <nav class="navbar">
+                <a href="/" aria-label="Voltar para o login"><img src="/static/img/logo.png" alt="Logo AAPM" class="navbar-logo"></a>
+            </nav>
+        </header>
+
+        <main class="recovery-container">
+            <section class="recovery-copy">
+                <h1>AAPM</h1>
+                <p>Escolha uma senha forte para manter sua conta protegida.</p>
+            </section>
+
+            <section class="recovery-card" aria-labelledby="titulo-nova-senha">
+                {% if token_invalido %}
+                <div class="status-icon status-icon--error"><i class="fa-solid fa-link-slash"></i></div>
+                <h1 id="titulo-nova-senha">Link inválido ou expirado</h1>
+                <p class="intro">Por segurança, os links de redefinição expiram após 30 minutos.</p>
+                <a class="secondary-link" href="/auth/esqueci-senha">Solicitar um novo link</a>
+                {% else %}
+                <div class="status-icon"><i class="fa-solid fa-lock"></i></div>
+                <h1 id="titulo-nova-senha">Crie uma nova senha</h1>
+                <p class="intro">Use pelo menos 8 caracteres e confirme a nova senha abaixo.</p>
+
+                {% if erro %}<p class="feedback feedback--error">{{ erro }}</p>{% endif %}
+
+                <form action="/auth/redefinir-senha/{{ token }}" method="post">
+                    <label for="senha">Nova senha</label>
+                    <div class="input-box">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" name="senha" id="senha" placeholder="Digite a nova senha" autocomplete="new-password" minlength="8" required>
+                    </div>
+                    <label for="confirmar_senha">Confirmar nova senha</label>
+                    <div class="input-box">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <input type="password" name="confirmar_senha" id="confirmar_senha" placeholder="Repita a nova senha" autocomplete="new-password" minlength="8" required>
+                    </div>
+                    <button type="submit">Redefinir senha</button>
+                </form>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    <footer class="main-footer"><p>&copy; 2026 AAPM - SENAI. Todos os direitos reservados.</p></footer>
+</body>
+</html>

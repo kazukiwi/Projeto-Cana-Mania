@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Detalhes do Produto - {{ produto.nome }}</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', path='css/detalhe.css') }}">
+    <link rel="stylesheet" href="/static/css/responsive.css?v=1">
+</head>
+<body>
+    
+    <main class="main-content">
+        <div class="page-header">
+            <a href="/produtos" class="btn-back">
+                <i data-lucide="arrow-left" style="width: 16px;"></i> Voltar para a lista
+            </a>
+            <h1>{{ produto.nome }}</h1>
+        </div>
+
+        {% if request.query_params.get('editado') == 'ok' %}
+            <div class="alert-box">
+                <i data-lucide="check-circle" style="width:18px; color:#34d399;"></i>
+                Produto atualizado com sucesso!
+            </div>
+        {% endif %}
+
+        <div class="product-container">
+            
+            <div class="image-wrapper">
+                {% if produto.imagem_url %}
+                    <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" class="product-img"
+                         onerror="this.onerror=null; this.src='/static/img/produto_padrao.png';">
+                {% else %}
+                    <div class="no-image">
+                        <i data-lucide="image-off" style="width: 40px; height: 40px;"></i>
+                        <span>Sem imagem disponível</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="product-info">
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Categoria</span>
+                        <span class="info-value">
+                            {% if produto.categoria %}
+                                <span class="category-badge">{{ produto.categoria.nome }}</span>
+                            {% else %}\n                                <span style="color: #64748b;">—</span>
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">{{ 'Maior preço' if produto.possui_variacoes_tamanho else 'Preço unitário' }}</span>
+                        <span class="info-value price-highlight">R$ {{ "%.2f"|format(produto.preco_exibicao) }}</span>
+                    </div>
+
+                    <div class="info-row">
+                        <span class="info-label">Estoque Atual</span>
+                        <span class="info-value" style="font-size: 1.1rem;">{{ produto.estoque_atual }} un.</span>
+                    </div>
+
+                    {% if produto.possui_variacoes_tamanho and produto.estoques_variacoes %}
+                    <div class="info-row">
+                        <span class="info-label">Tamanhos disponíveis</span>
+                        <div class="tamanhos-lista" aria-label="Estoque por tamanho">
+                            {% for estoque in produto.estoques_variacoes %}
+                            <span class="tamanho-item">
+                                <strong>{{ estoque.tamanho.nome }} / {{ estoque.cor }}</strong>
+                                <span>{{ estoque.estoque_atual }} un. · R$ {{ "%.2f"|format(estoque.preco) }}</span>
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if admin or usuario.role == 'admin' %}
+                <div class="admin-actions">
+                    <a href="/produtos/{{ produto.id }}/editar" class="btn-edit">
+                        <i data-lucide="edit-2" style="width: 16px;"></i>
+                        Editar Produto
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

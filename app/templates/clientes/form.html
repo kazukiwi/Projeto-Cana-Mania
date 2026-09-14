@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>{% if editando %}Editar Cliente{% else %}Novo Cliente{% endif %} - AAPM</title>
+    <link rel="stylesheet" href="/static/css/clientes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/"><img src="/static/img/logo.png" alt="Logo AAPM"></a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico" class="active">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios">Armários</a></li>
+
+                <li><a href="/usuarios" >
+                </i> Usuários
+                </a></li>
+                <li><a href="/categorias" >
+                    </i> Categorias
+                </a></li>
+                {% endif %}
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <main class="clientes-container narrow">
+        <div class="page-header">
+            <div>
+                <h1>{% if editando %}Editar Cliente{% else %}Novo Cliente{% endif %}</h1>
+                <p>Marque o cliente como associado para liberar 10% de desconto no PDV.</p>
+            </div>
+        </div>
+
+        {% if erro %}
+        <div class="alert-error">{{ erro }}</div>
+        {% endif %}
+
+        <form method="post" class="client-form">
+            <label>
+                <span>Nome</span>
+                <input type="text" name="nome" required value="{{ (valores.nome if valores is defined else editando.nome if editando else '') }}">
+            </label>
+
+            <label>
+                <span>Matricula</span>
+                <input type="text" name="matricula" value="{{ (valores.matricula if valores is defined else editando.matricula if editando and editando.matricula else '') }}">
+            </label>
+
+            <label>
+                <span>Telefone</span>
+                <input type="text" name="telefone" value="{{ (valores.telefone if valores is defined else editando.telefone if editando and editando.telefone else '') }}">
+            </label>
+
+            <label class="switch-row">
+                <input type="checkbox" name="is_associado" value="true" {% if (valores is defined and valores.is_associado) or (editando and editando.is_associado) %}checked{% endif %}>
+                <span>
+                    Associado AAPM
+                    <small>Aplica automaticamente 10% de desconto nas vendas do PDV.</small>
+                </span>
+            </label>
+
+            <button type="submit" class="btn-primary wide">
+                <i class="fa-solid fa-floppy-disk"></i> Salvar Cliente
+            </button>
+            <a href="/clientes" class="btn-secondary">
+                Cancelar
+            </a>
+        </form>
+    </main>
+
+    <footer class="main-footer">
+        <p>2026 AAPM - SENAI. Todos os direitos reservados.</p>
+    </footer>
+</body>
+
+</html>

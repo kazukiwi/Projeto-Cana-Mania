@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>PDV - Nova Venda</title>
+    <link rel="stylesheet" href="/static/css/vendas.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#"><img src="/static/img/logo.png" alt="Logo AAPM"></a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico" class="active">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios">Armários</a></li>
+
+                <li><a href="/usuarios" >
+                </i> Usuários
+                </a></li>
+                <li><a href="/categorias" >
+                    </i> Categorias
+                </a></li>
+                {% endif %}
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <div class="vendas-container-main">
+        <div class="header-vendas">
+            <div>
+                <h1><i class="fa-solid fa-cash-register"></i> Ponto de Venda</h1>
+                <p>Monte o carrinho e fature uma nova venda diretamente no balcão</p>
+            </div>
+            <a href="/pdv/historico" class="btn-voltar-historico" style="background-color: #4b5563; text-decoration: none; color: white; padding: 10px 15px; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-arrow-left"></i> Voltar ao Histórico
+            </a>
+        </div>
+
+        <div class="pdv-layout-split" style="display: flex; gap: 20px; margin-top: 20px;">
+            <div class="pdv-box-cadastro" style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="select-cliente" style="display:block; font-weight:bold; margin-bottom:5px;">Cliente</label>
+                    <select id="select-cliente" name="cliente_id" form="form-finalizar-real" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background-color: white;">
+                        <option value="0">Venda Balcão (Sem identificação)</option>
+                        {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}" data-associado="{{ 'true' if cliente.is_associado else 'false' }}">
+                            {{ cliente.nome }} {% if cliente.is_associado %}(Associado -{{ desconto_associado }}%){% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="filial-pdv" style="display:block; font-weight:bold; margin-bottom:5px;">Loja da venda</label>
+                    <select id="filial-pdv" name="filial" form="form-finalizar-real" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background-color: white;">
+                        {% for filial in filiais %}<option value="{{ filial }}">{{ filial }}</option>{% endfor %}
+                    </select>
+                </div>
+
+                <form id="form-add-item-pdv">
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="busca-frozen" style="display:block; font-weight:bold; margin-bottom:5px;">Produto</label>
+                        <input id="busca-frozen" type="search" placeholder="Digite para procurar um frozen..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="resultado-busca-frozen" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+                        <div id="resultado-busca-frozen" class="resultado-busca-frozen" aria-live="polite"></div>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 15px;">
+                        <label for="select-prod" style="display:block; font-weight:bold; margin-bottom:5px;">Selecionar Produto</label>
+                        <select id="select-prod" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background-color: white;">
+                            <option value="" disabled selected>Escolha um produto...</option>
+                            {% for produto in produtos %}
+                                {% if produto.ativo and (estoque_filiais.get((produto.id, 'Pinheiros'), 0) > 0) %}
+                                <option value="{{ produto.id }}" data-nome="{{ produto.nome }}" data-preco="{{ produto.preco_exibicao }}" data-estoque="{{ produto.estoque_atual }}" data-possui-variacoes="{{ 'true' if produto.possui_variacoes_tamanho else 'false' }}"{% for estoque in produto.estoques_tamanho %} data-tamanho-{{ estoque.tamanho_id }}="{{ estoque.estoque_atual }}"{% endfor %}>
+                                    {{ produto.nome }}
+                                </option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="grupo-tamanho" style="display: none; margin-bottom: 15px;">
+                        <label for="pdv-tamanho" style="display:block; font-weight:bold; margin-bottom:5px;">Tamanho</label>
+                        <select id="pdv-tamanho" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background-color: white;">
+                            <option value="" disabled selected>Selecione o tamanho...</option>
+                            {% for tamanho in tamanhos %}
+                            <option value="{{ tamanho.id }}">{{ tamanho.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group" id="grupo-cor" style="display: none; margin-bottom: 15px;">
+                        <label for="pdv-cor" style="display:block; font-weight:bold; margin-bottom:5px;">Cor</label>
+                        <select id="pdv-cor" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background-color: white;"><option value="" disabled selected>Selecione a cor...</option></select>
+                    </div>
+
+                    <div class="form-row-split" style="display:flex; gap:15px; margin-bottom: 15px;">
+                        <div class="form-group flex-1" style="flex:1;">
+                            <label for="pdv-qtd" style="display:block; font-weight:bold; margin-bottom:5px;">Qtd</label>
+                            <input type="number" id="pdv-qtd" min="1" value="1" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+                        </div>
+                        <div class="form-group flex-1" style="flex:1;">
+                            <label for="pdv-estoque" style="display:block; font-weight:bold; margin-bottom:5px;">Estoque</label>
+                            <input type="text" id="pdv-estoque" readonly placeholder="--" class="input-readonly" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background:#f3f4f6;">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label for="pdv-preco" style="display:block; font-weight:bold; margin-bottom:5px;">Preço Unitário</label>
+                        <input type="text" id="pdv-preco" readonly placeholder="R$ 0,00" class="input-readonly field-destaque" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background:#f3f4f6; font-weight:bold;">
+                    </div>
+
+                    <button type="button" id="btn-adicionar-carrinho" class="btn-add-carrinho-pdv" style="width:100%; padding:12px; background:#1e1b4b; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+                        <i class="fa-solid fa-plus"></i> Adicionar Item ao Carrinho
+                    </button>
+                </form>
+            </div>
+
+            <div class="pdv-box-carrinho" style="flex: 1.2; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display:flex; flex-direction:column; justify-content:space-between;">
+                <div>
+                    <h3 style="margin-top:0;">Itens da Venda Atual</h3>
+                    <div class="mini-tabela-wrapper" style="max-height: 250px; overflow-y:auto; margin-bottom:20px; border: 1px solid #e5e7eb; border-radius:6px;">
+                        <table class="mini-tabela-pdv" style="width:100%; border-collapse:collapse; text-align:left;">
+                            <thead style="background:#f9fafb; position:sticky; top:0;">
+                                <tr>
+                                    <th style="padding:10px; border-bottom:1px solid #e5e7eb;">Item</th>
+                                    <th style="padding:10px; border-bottom:1px solid #e5e7eb;">Qtd</th>
+                                    <th style="padding:10px; border-bottom:1px solid #e5e7eb;">Subtotal</th>
+                                    <th style="padding:10px; border-bottom:1px solid #e5e7eb; text-align: center;">Remover</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpo-carrinho-pdv">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <form id="form-finalizar-real" action="/pdv/finalizar" method="POST">
+                    <input type="hidden" name="carrinho_json" id="carrinho_json_input">
+
+                    <div class="form-group" style="margin-bottom:15px;">
+                        <label for="observacao" style="display:block; font-weight:bold; margin-bottom:5px;">Observações da Venda</label>
+                        <input type="text" name="observacao" id="observacao" placeholder="Ex: Venda corporativa, pagamento via Pix..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+                    </div>
+
+                    <div class="pdv-totalizador-rodape" style="background:#f3f4f6; padding:15px; border-radius:6px;">
+                        <div class="linha-total" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:18px;">
+                            <span>Total Bruto:</span>
+                            <strong id="pdv-total-bruto" style="font-size:20px; color:#1e1b4b;">R$ 0,00</strong>
+                        </div>
+                        <div class="linha-total" id="pdv-linha-desconto" style="display:none; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:16px; color:#16a34a;">
+                            <span>Desconto associado ({{ desconto_associado }}%):</span>
+                            <strong id="pdv-desconto">- R$ 0,00</strong>
+                        </div>
+                        <div class="linha-total" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:18px;">
+                            <span>Total Final:</span>
+                            <strong id="pdv-total-geral" style="font-size:24px; color:#1e1b4b;">R$ 0,00</strong>
+                        </div>
+                        <button type="submit" id="btn-salvar-venda-banco" class="btn-salvar-venda-final" disabled style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer; opacity:0.6;">
+                            <i class="fa-solid fa-check"></i> Finalizar e Emitir Cupom
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content" style="text-align:center; padding:20px; color:#666;">
+            <p>&copy; 2026 Canamania. Frozen de caldo de cana.</p>
+        </div>
+    </footer>
+
+    <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
+    <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
+    <script src="/static/javascript/vendas.js?v=preco-variacao-1"></script>
+    <script type="application/x-disabled">
+        let carrinho = [];
+
+        // Atualiza campos de preço e estoque ao mudar o produto selecionado
+        const selectProd = document.getElementById('select-prod');
+        const grupoTamanho = document.getElementById('grupo-tamanho');
+        const selectTamanho = document.getElementById('pdv-tamanho');
+        if (selectProd) {
+            selectProd.addEventListener('change', function () {
+                const selectedOption = this.options[this.selectedIndex];
+                const preco = selectedOption.getAttribute('data-preco');
+                const estoque = selectedOption.getAttribute('data-estoque');
+                const possuiVariacoes = selectedOption.getAttribute('data-possui-variacoes') === 'true';
+
+                if (preco) {
+                    document.getElementById('pdv-preco').value = `R$ ${parseFloat(preco).toFixed(2).replace('.', ',')}`;
+                }
+                if (estoque) {
+                    document.getElementById('pdv-estoque').value = estoque;
+                    document.getElementById('pdv-qtd').max = estoque;
+                }
+                document.getElementById('pdv-qtd').value = 1;
+
+                if (possuiVariacoes) {
+                    grupoTamanho.style.display = 'block';
+                    selectTamanho.required = true;
+                    selectTamanho.value = '';
+                    Array.from(selectTamanho.options).forEach(opcao => {
+                        if (!opcao.value) return;
+                        const saldo = parseInt(selectedOption.getAttribute(`data-tamanho-${opcao.value}`) || '0');
+                        opcao.disabled = saldo <= 0;
+                        opcao.textContent = `${opcao.value} (${saldo} un)`;
+                    });
+                } else {
+                    grupoTamanho.style.display = 'none';
+                    selectTamanho.required = false;
+                    selectTamanho.value = '';
+                }
+            });
+        }
+
+        if (selectTamanho) {
+            selectTamanho.addEventListener('change', function () {
+                const option = selectProd.options[selectProd.selectedIndex];
+                const estoque = parseInt(option.getAttribute(`data-tamanho-${this.value}`) || '0');
+                document.getElementById('pdv-estoque').value = `${estoque} un`;
+                document.getElementById('pdv-qtd').max = estoque;
+            });
+        }
+
+        // Adiciona itens ao carrinho local
+        const formAddItem = document.getElementById('form-add-item-pdv');
+        if (formAddItem) {
+            formAddItem.addEventListener('submit', function (e) {
+                e.preventDefault();
+                
+                const select = document.getElementById('select-prod');
+                const option = select.options[select.selectedIndex];
+                
+                if (!select.value) return;
+
+                const pId = parseInt(select.value);
+                const nome = option.getAttribute('data-nome');
+                const preco = parseFloat(option.getAttribute('data-preco'));
+                const qtd = parseInt(document.getElementById('pdv-qtd').value);
+                const tamanhoId = grupoTamanho.style.display === 'block' ? selectTamanho.value : null;
+                const tamanho = tamanhoId ? selectTamanho.options[selectTamanho.selectedIndex].textContent.split(' (')[0] : null;
+                if (grupoTamanho.style.display === 'block' && !tamanhoId) {
+                    selectTamanho.reportValidity();
+                    return;
+                }
+                const estoqueMax = tamanhoId
+                    ? parseInt(option.getAttribute(`data-tamanho-${tamanhoId}`) || '0')
+                    : parseInt(option.getAttribute('data-estoque'));
+
+                const itemExistente = carrinho.find(item => item.produto_id === pId && item.tamanho_id === tamanhoId);
+
+                if (itemExistente) {
+                    if (itemExistente.quantidade + qtd > estoqueMax) {
+                        alert("Quantidade excede o limite disponível em estoque!");
+                        return;
+                    }
+                    itemExistente.quantidade += qtd;
+                } else {
+                    if (qtd > estoqueMax) {
+                        alert("Quantidade excede o limite disponível em estoque!");
+                        return;
+                    }
+                    carrinho.push({
+                        produto_id: pId,
+                        nome: nome,
+                        preco: preco,
+                        quantidade: qtd,
+                        tamanho: tamanho,
+                        tamanho_id: tamanhoId
+                    });
+                }
+
+                atualizarTabelaCarrinho();
+                
+                // Reseta o formulário de inserção
+                select.value = "";
+                document.getElementById('pdv-estoque').value = "--";
+                document.getElementById('pdv-preco').value = "R$ 0,00";
+                document.getElementById('pdv-qtd').value = 1;
+                grupoTamanho.style.display = 'none';
+                selectTamanho.required = false;
+                selectTamanho.value = '';
+            });
+        }
+
+        // Atualiza o HTML e o campo oculto do carrinho
+        function atualizarTabelaCarrinho() {
+            const corpo = document.getElementById('corpo-carrinho-pdv');
+            const totalBrutoTxt = document.getElementById('pdv-total-bruto');
+            const totalTxt = document.getElementById('pdv-total-geral');
+            const descontoTxt = document.getElementById('pdv-desconto');
+            const linhaDesconto = document.getElementById('pdv-linha-desconto');
+            const btnFinalizar = document.getElementById('btn-salvar-venda-banco');
+            const hiddenInput = document.getElementById('carrinho_json_input');
+            const selectCliente = document.getElementById('select-cliente');
+
+            if (!corpo) return;
+            corpo.innerHTML = "";
+            let totalGeral = 0;
+
+            carrinho.forEach((item, idx) => {
+                const subtotal = item.preco * item.quantidade;
+                totalGeral += subtotal;
+
+                corpo.innerHTML += `
+                    <tr>
+                        <td style="padding:10px; border-bottom:1px solid #e5e7eb;"><strong>${item.nome}${item.tamanho ? ` (Tam: ${item.tamanho})` : ''}</strong></td>
+                        <td style="padding:10px; border-bottom:1px solid #e5e7eb;">${item.quantidade}x</td>
+                        <td style="padding:10px; border-bottom:1px solid #e5e7eb;">R$ ${subtotal.toFixed(2).replace('.', ',')}</td>
+                        <td style="padding:10px; border-bottom:1px solid #e5e7eb; text-align: center;">
+                            <button type="button" onclick="removerDoCarrinho(${idx})" style="color:#dc2626; background:none; border:none; cursor:pointer;">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            const clienteSelecionado = selectCliente ? selectCliente.options[selectCliente.selectedIndex] : null;
+            const associado = clienteSelecionado && clienteSelecionado.getAttribute('data-associado') === 'true';
+            const descontoPercentual = associado ? {{ desconto_associado }} : 0;
+            const descontoValor = totalGeral * (descontoPercentual / 100);
+            const totalFinal = totalGeral - descontoValor;
+
+            if (totalBrutoTxt) totalBrutoTxt.textContent = `R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+            if (descontoTxt) descontoTxt.textContent = `- R$ ${descontoValor.toFixed(2).replace('.', ',')}`;
+            if (linhaDesconto) linhaDesconto.style.display = associado && totalGeral > 0 ? "flex" : "none";
+            if (totalTxt) totalTxt.textContent = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
+            if (hiddenInput) hiddenInput.value = JSON.stringify(carrinho);
+            
+            if (btnFinalizar) {
+                btnFinalizar.disabled = carrinho.length === 0;
+                btnFinalizar.style.opacity = carrinho.length === 0 ? "0.6" : "1";
+            }
+        }
+
+        // Função global de remoção
+        window.removerDoCarrinho = function(idx) {
+            carrinho.splice(idx, 1);
+            atualizarTabelaCarrinho();
+        }
+
+        // Vincula a alteração do cliente
+        document.getElementById('select-cliente').addEventListener('change', function () {
+            atualizarTabelaCarrinho();
+        });
+    </script>
+</body>
+
+</html>

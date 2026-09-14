@@ -1,0 +1,142 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+}
+
+.navbar {
+    width: 100%;
+    height: 80px;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 60px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.logo img { height: 65px; width: auto; }
+.menu { display: flex; gap: 35px; list-style: none; }
+.menu a { text-decoration: none; color: #6b7280; font-size: 17px; transition: color 0.2s; }
+.menu a:hover, .menu a.active { color: #09145c; font-weight: bold; }
+.menu a.btn-sair { color: #dc2626; display: flex; align-items: center; gap: 6px; }
+
+.vendas-container-main {
+    flex: 1;
+    padding: 40px 60px;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header-vendas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.header-vendas h1 { font-size: 28px; color: #0f172a; font-weight: 700; }
+.header-vendas p { color: #64748b; font-size: 14px; margin-top: 4px; }
+
+.indicadores-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.card-indicador {
+    background: white;
+    padding: 20px 24px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.card-header-ind { color: #64748b; font-size: 14px; margin-bottom: 8px; font-weight: 500; }
+.card-indicador h2 { font-size: 26px; color: #0f172a; font-weight: 700; }
+
+.filtros-vendas-container {
+    background: white;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.periodos-botoes {
+    display: flex;
+    gap: 8px;
+    background-color: #f1f5f9;
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.btn-periodo {
+    padding: 6px 16px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-periodo.active {
+    background-color: #2563eb;
+    color: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.graficos-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.card-grafico-item {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.card-grafico-item h3 { font-size: 16px; color: #0f172a; font-weight: 700; margin-bottom: 15px; }
+.canvas-chart-container { position: relative; height: 320px; width: 100%; }
+
+.card-historico { background: white; padding: 24px; border-radius: 12px; border: 1px solid #e2e8f0; }
+.card-historico h3 { font-size: 16px; color: #0f172a; font-weight: 700; }
+.tabela-container { width: 100%; overflow-x: auto; }
+.tabela-vendas { width: 100%; border-collapse: collapse; text-align: left; }
+.tabela-vendas th { padding: 12px 14px; color: #64748b; font-size: 13px; font-weight: 600; border-bottom: 1px solid #e2e8f0; background: #f8fafc; }
+.tabela-vendas td { padding: 14px; border-bottom: 1px solid #f1f5f9; color: #334155; font-size: 14px; }
+
+.badge-categoria {
+    background-color: #eff6ff;
+    color: #2563eb;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.main-footer { width: 100%; background-color: #09145c; padding: 20px; text-align: center; color: white; font-size: 13px; margin-top: auto; }
+
+@media(max-width: 1024px) {
+    .indicadores-grid, .graficos-grid-layout { grid-template-columns: 1fr !important; }
+}

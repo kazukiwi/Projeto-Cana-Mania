@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon"><title>Gerenciamento de Tamanhos</title>
+    <link rel="stylesheet" href="/static/css/categoria.css"><link rel="stylesheet" href="/static/css/tamanhos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+<body>
+    {% if false %}<header><nav class="navbar"><div class="logo"><a href="/"><img src="/static/img/logo.png" alt="Logo AAPM"></a></div><ul class="menu">
+        <li><a href="/">Dashboard</a></li><li><a href="/produtos" class="active">Produtos</a></li>
+        {% if usuario.role == 'admin' %}<li><a href="/clientes">Clientes</a></li>{% endif %}
+        <li><a href="/pdv/historico">Vendas</a></li><li><a href="/mais_vendidos">Mais vendidos</a></li>
+        {% if usuario.role == 'admin' %}<li><a href="/armarios">Armários</a></li><li><a href="/usuarios">Usuários</a></li><li><a href="/categorias">Categorias</a></li>{% endif %}
+        <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+    </ul></nav></header>{% endif %}
+    {% include "partials/navbar.html" %}
+    <main class="main-content">
+        <div class="page-header"><div><h1>Gerenciamento de Tamanhos</h1><p class="page-subtitle">Cadastre os tamanhos disponíveis para produtos com variações.</p></div><a href="/produtos" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Voltar aos produtos</a></div>
+        {% if request.query_params.get('criado') == 'ok' %}<div class="alert-box alert-success"><i data-lucide="check-circle"></i> Tamanho cadastrado com sucesso!</div>{% endif %}
+        {% if request.query_params.get('erro') == 'nome' %}<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i> Informe um nome único de até 30 caracteres.</div>{% endif %}
+        {% if request.query_params.get('erro') == 'estoque' %}<div class="alert-box alert-error"><i data-lucide="alert-triangle"></i> Zere o estoque deste tamanho antes de desativá-lo.</div>{% endif %}
+        <section class="create-card"><div class="card-title"><i class="fa-solid fa-ruler-combined"></i><div><h2>Novo tamanho</h2><p>Exemplos: PP, XG, 36, 38 ou Único. A lista é ordenada automaticamente do menor para o maior.</p></div></div><form method="post" action="/tamanhos" class="size-form"><div class="field"><label for="nome">Nome do tamanho</label><input id="nome" name="nome" placeholder="Ex.: XG" required maxlength="30" autofocus></div><button type="submit" class="btn-create"><i class="fa-solid fa-plus"></i> Adicionar tamanho</button></form></section>
+        <section class="table-container"><table><thead><tr><th>Tamanho</th><th>Status</th><th>Ações</th></tr></thead><tbody>{% for tamanho in tamanhos %}<tr><td class="size-name"><i class="fa-solid fa-shirt"></i>{{ tamanho.nome }}</td><td><span class="badge {{ 'badge-active' if tamanho.ativo else 'badge-inactive' }}">{{ 'Ativo' if tamanho.ativo else 'Inativo' }}</span></td><td><form method="post" action="/tamanhos/{{ tamanho.id }}/alternar"><button type="submit" class="btn-toggle {{ 'deactivate' if tamanho.ativo else 'activate' }}"><i class="fa-solid {{ 'fa-ban' if tamanho.ativo else 'fa-check' }}"></i>{{ 'Desativar' if tamanho.ativo else 'Ativar' }}</button></form></td></tr>{% else %}<tr><td colspan="3" class="empty-state">Nenhum tamanho cadastrado.</td></tr>{% endfor %}</tbody></table></section>
+    </main>
+    <footer class="main-footer"><p>&copy; 2026 AAPM - SENAI. Todos os direitos reservados.</p></footer>
+    <script src="https://unpkg.com/lucide@latest"></script><script>lucide.createIcons();</script>
+</body></html>

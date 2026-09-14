@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Produtos - AAPM</title>
+
+    <link class="cdn" rel="stylesheet" href="/static/css/produtos.css?v=2">
+    <link rel="stylesheet" href="/static/css/listagem.css">
+    <link rel="stylesheet" href="/static/css/confirmacao.css">
+    <link class="cdn" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#">
+                    <img src="/static/img/logo.png" alt="Logo AAPM">
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos" class="active">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios">Armários</a></li>
+
+                <li><a href="/usuarios" >
+                    </i> Usuários
+                </a></li>
+                <li><a href="/categorias" >
+                    </i> Categorias
+                </a></li>
+                {% endif %}
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <div class="produtos-container-main">
+
+        <div class="header-produtos"
+            style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px;">
+            <div>
+                <h1 style="margin: 0; padding: 0;">Produtos</h1>
+                <p id="contador-produtos" style="margin: 5px 0 0 0; color: #666;">{{ produtos|length }} produtos
+                    encontrados</p>
+            </div>
+
+            {% if usuario and (usuario.is_admin or usuario.role == "admin") %}
+            <a href="/produtos/novo" class="btn-novo-produto"
+                style="padding: 10px 20px; background-color: #1e1b4b; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: background 0.2s; text-decoration: none;">
+                <i class="fa-solid fa-plus"></i> Novo Produto
+            </a>
+            {% endif %}
+        </div>
+
+        {% if request.query_params.get('criado') == 'ok' %}
+        <div class="alert-box alert-success"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Produto criado com sucesso.</div>
+        {% elif request.query_params.get('desativado') == 'ok' %}
+        <div class="alert-box alert-success"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Produto desativado com sucesso.</div>
+        {% endif %}
+
+        <form method="GET" action="/produtos/" class="filtros-container" id="form-filtros">
+            <div class="busca-wrapper">
+                <i class="fa-solid fa-magnifying-glass icone-busca"></i>
+                <input type="text" id="input-busca" name="busca" value="{{ busca }}" placeholder="Buscar produtos pelo nome...">
+            </div>
+
+            <div class="select-wrapper">
+                <i class="fa-solid fa-filter icone-filtro"></i>
+                <select id="select-categoria" name="categoria_id">
+                    <option value="0">Todas as categorias</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if categoria_id == cat.id %}selected{% endif %}>{{ cat.nome }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <label class="checkbox-wrapper">
+                <input type="checkbox" id="check-estoque-baixo" name="estoque_baixo" value="1" {% if estoque_baixo %}checked{% endif %}>
+                <span>Apenas estoque baixo</span>
+            </label>
+        </form>
+        <div class="listagem-acoes"><span>Use os filtros para refinar a lista.</span><label>Ordenar <select id="ordem-produtos" class="listagem-ordem"><option value="asc">Nome: A–Z</option><option value="desc">Nome: Z–A</option></select></label></div>
+
+        <div class="tabela-container">
+            <table class="tabela-produtos" data-listagem data-busca="#input-busca" data-ordem="#ordem-produtos" data-ordem-coluna="1" data-por-pagina="8">
+                <thead>
+                    <tr>
+                        <th>IMAGEM</th>
+                        <th>NOME</th>
+                        <th>CATEGORIA</th>
+                        <th>ESTOQUE</th>
+                        <th>PREÇO</th>
+                        <th>STATUS</th>
+                        <th style="text-align: center;">AÇÕES</th>
+                    </tr>
+                </thead>
+                <tbody id="corpo-tabela">
+                    {% for produto in produtos %}
+                    {% set possui_preview_variacoes = produto.possui_variacoes_tamanho and produto.estoques_variacoes %}
+                    <tr{% if possui_preview_variacoes %} class="produto-com-variacoes" data-produto-variacoes{% endif %}>
+                        <td>
+                            <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" class="produto-thumb"
+                                loading="lazy" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                onerror="this.onerror=null; this.src='/static/img/produto_padrao.png';">
+                        </td>
+                        <td>
+                            <a href="/produtos/{{ produto.id }}"
+                                style="color: #1e1b4b; text-decoration: none; font-weight: bold;">
+                                {{ produto.nome }}
+                            </a>
+                            {% if possui_preview_variacoes %}
+                            <button type="button" class="btn-visualizar-variacoes" aria-expanded="false" aria-controls="variacoes-produto-{{ produto.id }}">
+                                <i class="fa-solid fa-layer-group" aria-hidden="true"></i> Ver variações
+                            </button>
+                            {% endif %}
+                        </td>
+                        <td>{{ produto.categoria.nome if produto.categoria else 'Sem categoria' }}</td>
+                        <td>
+                            <strong>{{ produto.estoque_atual }} un.</strong>
+                            {% if produto.variacoes_com_estoque_baixo %}
+                            <div class="variacoes-estoque-baixo" aria-label="Variações com estoque baixo">
+                                {% for variacao in produto.variacoes_com_estoque_baixo %}
+                                <span>{{ variacao.tamanho.nome if variacao.tamanho else 'Tam.' }} · {{ variacao.cor }}: {{ variacao.estoque_atual }} un.</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>R$ {{ "%.2f"|format(produto.preco_exibicao) }}</td>
+                        <td>
+                            {% if produto.estoque_baixo %}
+                                <span class="badge-status baixo-estoque"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Estoque baixo</span>
+                                {% if produto.variacoes_com_estoque_baixo %}
+                                <small class="descricao-estoque-baixo">{{ produto.variacoes_com_estoque_baixo|length }} variaç{{ 'ão' if produto.variacoes_com_estoque_baixo|length == 1 else 'ões' }} em alerta</small>
+                                {% endif %}
+                                {% else %}
+                                <span class="badge-status ativo"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Ativo</span>
+                                {% endif %}
+                        </td>
+                        <td style="text-align: center;">
+                            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 15px;">
+
+                                {% if usuario and (usuario.is_admin or usuario.role == "admin") %}
+                                <a href="/produtos/{{ produto.id }}/editar"
+                                    style="color: #1e1b4b; text-decoration: none; font-size: 18px; display: inline-flex; align-items: center;">
+                                    <i class="fa-solid fa-pen-to-square" title="Editar Produto"></i>
+                                </a>
+
+                                <form action="/produtos/{{ produto.id }}/desativar" method="POST"
+                                    data-confirmacao data-titulo="Desativar produto?"
+                                    data-mensagem="{{ produto.nome }} deixará de aparecer nas vendas e na lista de produtos ativos."
+                                    data-confirmar="Desativar produto"
+                                    style="margin: 0; padding: 0; display: inline-flex; align-items: center;">
+                                    <button type="submit"
+                                        style="background: none; border: none; color: red; cursor: pointer; font-size: 18px; padding: 0; display: inline-flex; align-items: center;">
+                                        <i class="fa-solid fa-trash" title="Desativar Produto"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span style="color: #9ca3af; font-size: 0.9em; font-style: italic;">Sem permissão</span>
+                                {% endif %}
+
+                            </div>
+                        </td>
+                    </tr>
+                    {% if possui_preview_variacoes %}
+                    <tr class="variacoes-preview-row" data-variacoes-preview aria-hidden="true">
+                        <td colspan="7">
+                            <section class="variacoes-preview-panel" id="variacoes-produto-{{ produto.id }}" aria-label="Variações de {{ produto.nome }}">
+                                <div class="variacoes-preview-resumo">
+                                    <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" class="variacoes-preview-imagem" loading="lazy" onerror="this.onerror=null; this.src='/static/img/produto_padrao.png';">
+                                    <div>
+                                        <h3>{{ produto.nome }}</h3>
+                                        <p>{{ produto.categoria.nome if produto.categoria else 'Sem categoria' }}</p>
+                                        <div class="variacoes-preview-metricas"><span><strong>Estoque total:</strong> {{ produto.estoque_atual }} un.</span><span><strong>Maior preço:</strong> R$ {{ "%.2f"|format(produto.preco_exibicao) }}</span></div>
+                                    </div>
+                                </div>
+                                <div class="variacoes-preview-lista">
+                                    <h4>Variações</h4>
+                                    <div class="variacoes-preview-cabecalho"><span>Variação</span><span>Estoque</span><span>Preço</span><span>Status</span></div>
+                                    <div class="variacoes-preview-itens">
+                                        {% for variacao in produto.estoques_variacoes %}
+                                        <div class="variacao-preview-item">
+                                            <span>{{ variacao.tamanho.nome if variacao.tamanho else 'Tam.' }} / {{ variacao.cor }}</span>
+                                            <span>{{ variacao.estoque_atual }} un.</span>
+                                            <span>R$ {{ "%.2f"|format(variacao.preco) }}</span>
+                                            {% if variacao in produto.variacoes_com_estoque_baixo %}
+                                            <span class="badge-status baixo-estoque"><i class="fa-solid fa-circle" aria-hidden="true"></i> Estoque baixo</span>
+                                            {% else %}
+                                            <span class="badge-status ativo"><i class="fa-solid fa-circle" aria-hidden="true"></i> Disponível</span>
+                                            {% endif %}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </section>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #666; padding: 20px;">Nenhum produto
+                            cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    {% if usuario and (usuario.is_admin or usuario.role == "admin") %}
+    <div id="modal-produto" class="modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000;">
+        <div class="modal-content"
+            style="background: white; padding: 24px; border-radius: 12px; width: 450px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+
+            <div class="modal-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; font-size: 22px; color: #1e1b4b;">Novo Produto</h2>
+                <button onclick="document.getElementById('modal-produto').style.display='none'"
+                    style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">&times;</button>
+            </div>
+
+            <form action="/produtos/novo" method="POST">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="nome" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Nome
+                        do Produto</label>
+                    <input type="text" id="nome" name="nome" placeholder="Ex: Cadeira Ergonômica" required
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="categoria_id"
+                        style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Categoria</label>
+                    <select id="categoria_id" name="categoria_id" required
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; background-color: white; box-sizing: border-box;">
+                        <option value="" disabled selected>Selecione uma categoria...</option>
+                        {% for cat in categorias %}
+                        <option value="{{ cat.id }}">{{ cat.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label for="imagem_url"
+                        style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">URL da
+                        Imagem</label>
+                    <input type="text" id="imagem_url" name="imagem_url" placeholder="Ex: /static/img/cadeira.jpg"
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                </div>
+
+                <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="estoque_atual"
+                            style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Qtd. em
+                            Estoque</label>
+                        <input type="number" id="estoque_atual" name="estoque_atual" value="0" min="0" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="preco"
+                            style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Preço Unitário
+                            (R$)</label>
+                        <input type="number" id="preco" name="preco" value="0.00" step="0.01" min="0" required
+                            style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <button type="submit"
+                    style="width: 100%; padding: 12px; background-color: #1e1b4b; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
+                    Salvar Produto
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="modal-confirmacao-acao" id="modal-confirmacao-acao" aria-hidden="true">
+        <div class="confirmacao-acao-card" role="dialog" aria-modal="true" aria-labelledby="confirmacao-acao-titulo">
+            <div class="confirmacao-acao-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h2 id="confirmacao-acao-titulo">Confirmar ação</h2><p id="confirmacao-acao-texto"></p>
+            <form method="post" id="form-confirmacao-acao" class="confirmacao-acao-botoes"><button type="button" class="confirmacao-acao-cancelar" id="confirmacao-acao-cancelar">Voltar</button><button type="button" class="confirmacao-acao-confirmar" id="confirmacao-acao-confirmar">Confirmar</button></form>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content" style="text-align:center; padding:20px; color:#ffffff;">
+            <p>&copy; 2026 Canamania. Frozen de caldo de cana.</p>
+        </div>
+    </footer>
+
+
+    <script src="/static/javascript/listagem.js?v=5"></script>
+    <script src="/static/javascript/produto_variacoes_preview.js?v=1"></script>
+    <script>
+        // Submete o formulário de filtros ao alterar categoria ou estoque baixo
+        (function () {
+            const form = document.getElementById('form-filtros');
+            const selectCategoria = document.getElementById('select-categoria');
+            const checkEstoqueBaixo = document.getElementById('check-estoque-baixo');
+            if (selectCategoria) selectCategoria.addEventListener('change', () => form.submit());
+            if (checkEstoqueBaixo) checkEstoqueBaixo.addEventListener('change', () => form.submit());
+        })();
+    </script>
+    <script src="/static/javascript/confirmacao.js?v=1"></script>
+</body>
+
+</html>

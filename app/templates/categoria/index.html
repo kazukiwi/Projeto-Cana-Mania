@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Gerenciamento de Usuários</title>
+
+    <link rel="stylesheet" href="/static/css/categoria.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#">
+                    <img src="/static/img/logo.png" alt="Logo AAPM">
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios">Armários</a></li>
+
+                <li><a href="/usuarios">
+                   </i> Usuários
+                </a></li>
+                <li><a href="/categorias" class="active">
+                    </i> Categorias
+                </a></li>
+                {% endif %}
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Gerenciamento de Categorias</h1>
+            <a href="/categorias/nova" class="btn-create">
+                <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
+                Nova categoria
+            </a>
+        </div>
+
+        {% if request.query_params.get('criado') == 'ok' %}
+        <div class="alert-box alert-success">
+            <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+            Categoria criada com sucesso!
+        </div>
+        {% endif %}
+
+        {% if request.query_params.get('editado') == 'ok' %}
+        <div class="alert-box alert-success">
+            <i data-lucide="check-circle" style="width: 18px; height: 18px;"></i>
+            Categoria atualizada com sucesso!
+        </div>
+        {% endif %}
+
+        {% if request.query_params.get('erro') == 'ja_existe' %}
+        <div class="alert-box alert-error">
+            <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i>
+            Você não pode cadastrar uma categoria já existente.
+        </div>
+        {% endif %}
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome da Categoria</th>
+                        <th>Descrição</th>
+                        <th>Qtd. de Produtos</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in categorias %}
+                    <tr>
+                        <td style="font-weight: 600;">{{ c.nome }}</td>
+                        <td style="color: #94a3b8;">{{ c.descricao or 'Sem descrição' }}</td>
+                        <td>
+                            {# Verificamos se a lista de produtos daquela categoria não está vazia #}
+                            {% if c.produtos|length > 0 %}
+                            <span class="badge badge-count">{{ c.produtos|length }}</span>
+                            {% else %}
+                            <span class="text-muted">Nenhum
+                                produto</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if c.ativo %}
+                            <span class="badge badge-active">Ativa</span>
+                            {% else %}
+                            <span class="badge badge-inactive">Inativa</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="actions-cell">
+                                <a href="/categorias/{{ c.id }}/editar" class="btn-edit">
+                                    <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                                    Editar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content" style="text-align:center; padding:20px; color:#ffffff;">
+            <p>&copy; 2026 Canamania. Frozen de caldo de cana.</p>
+        </div>
+    </footer>
+
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

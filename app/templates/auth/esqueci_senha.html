@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Esqueci minha senha | AAPM</title>
+    <link rel="stylesheet" href="/static/css/recuperar_senha.css">
+    <link rel="stylesheet" href="/static/css/responsive.css?v=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head>
+<body>
+    <div class="background">
+        <img src="/static/img/circulo.png" alt="" class="rotating-circle">
+        <header>
+            <nav class="navbar">
+                <a href="/" aria-label="Voltar para o login"><img src="/static/img/logo.png" alt="Logo AAPM" class="navbar-logo"></a>
+            </nav>
+        </header>
+
+        <main class="recovery-container">
+            <section class="recovery-copy">
+                <h1>AAPM</h1>
+                <p>Recupere o acesso à sua conta de forma simples e segura.</p>
+            </section>
+
+            <section class="recovery-card" aria-labelledby="titulo-recuperacao">
+                {% if sucesso %}
+                <div class="status-icon status-icon--success"><i class="fa-solid fa-envelope-circle-check"></i></div>
+                <h1 id="titulo-recuperacao">Verifique seu e-mail</h1>
+                <p class="intro">Se houver uma conta ativa com esse endereço, enviaremos um link para redefinir sua senha. Ele é válido por 30 minutos.</p>
+                <a class="secondary-link" href="/">Voltar para o login</a>
+                {% else %}
+                <div class="status-icon"><i class="fa-solid fa-key"></i></div>
+                <h1 id="titulo-recuperacao">Esqueceu a senha?</h1>
+                <p class="intro">Informe seu e-mail e enviaremos um link seguro para criar uma nova senha.</p>
+
+                {% if erro %}<p class="feedback feedback--error">{{ erro }}</p>{% endif %}
+
+                <form action="/auth/esqueci-senha" method="post">
+                    <label for="email">E-mail cadastrado</label>
+                    <div class="input-box">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" name="email" id="email" value="{{ email or '' }}" placeholder="nome@exemplo.com" autocomplete="email" required>
+                    </div>
+                    <button type="submit">Enviar link de recuperação</button>
+                </form>
+                <a class="secondary-link" href="/"><i class="fa-solid fa-arrow-left"></i> Voltar para o login</a>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+
+    <footer class="main-footer"><p>&copy; 2026 AAPM - SENAI. Todos os direitos reservados.</p></footer>
+</body>
+</html>

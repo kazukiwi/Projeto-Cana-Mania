@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>{{ "Editar Categoria" if editando else "Nova Categoria" }} - AAPM</title>
+
+    <link rel="stylesheet" href="/static/css/form_categoria.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="#">
+                    <img src="/static/img/logo.png" alt="Logo AAPM">
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                <li><a href="/clientes">Clientes</a></li>
+                <li><a href="/pdv/historico">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                <li><a href="/armarios">Armários</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/usuarios" class="nav-link">Usuários</a></li>
+                <li><a href="/categorias" class="active">Categorias</a></li>
+                {% endif %}
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1>{{ "Editar Categoria #" + editando.id|string if editando else "Nova Categoria" }}</h1>
+        </div>
+
+        {# --- Alerta de Erro --- #}
+        {% if request.query_params.get('erro') == 'ja_existe' %}
+        <div class="alert-box">
+            <i data-lucide="alert-triangle" style="width: 18px; height: 18px;"></i>
+            Você não pode cadastrar uma categoria já existente.
+        </div>
+        {% endif %}
+
+        <div class="form-container">
+            <form action="{{ '/categorias/' + editando.id|string + '/editar' if editando else '/categorias/nova' }}"
+                method="POST">
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="nome">Nome da Categoria</label>
+                        <input type="text" id="nome" name="nome" required placeholder="Breve nome da categoria..."
+                            value="{{ editando.nome if editando else (valores.nome if valores else '') }}" autofocus>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="descricao">Descrição</label>
+                        <textarea id="descricao" name="descricao" rows="3"
+                            placeholder="Breve descrição...">{{ editando.descricao if editando else (valores.descricao if valores else '') }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ativo">Status</label>
+                        <select id="ativo" name="ativo">
+                            <option value="true" {{ 'selected' if not editando or editando.ativo else '' }}>Ativa
+                            </option>
+                            <option value="false" {{ 'selected' if editando and not editando.ativo else '' }}>Inativa
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                {# --- Botões de Ações --- #}
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i data-lucide="check" style="width: 16px;"></i>
+                        {{ "Salvar alterações" if editando else "Criar categoria" }}
+                    </button>
+                    <a href="/categorias" class="btn-cancel">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

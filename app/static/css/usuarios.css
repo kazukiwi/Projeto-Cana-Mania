@@ -1,0 +1,492 @@
+/* ==========================================================================
+   1. RESETS E CONFIGURAÇÕES PADRÃO
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+    color: #334155;
+}
+
+/* ==========================================================================
+   2. NAVBAR (CABEÇALHO)
+   ========================================================================== */
+.navbar {
+    width: 100%;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 60px;
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.logo img {
+    height: 65px;
+    width: auto;
+    display: block;
+}
+
+.menu {
+    display: flex;
+    gap: 35px;
+    list-style: none;
+    align-items: center;
+}
+
+.menu a {
+    text-decoration: none;
+    color: #6b7280;
+    font-size: 18px;
+    font-weight: 500;
+    transition: color 0.2s, font-weight 0.2s;
+}
+
+.menu a:hover,
+.menu a.active {
+    color: #09145c;
+    font-weight: bold;
+}
+
+/* Links Condicionais do Admin */
+.menu .nav-link {
+    font-size: 18px;
+}
+
+/* Botão Sair Especial */
+.menu a.btn-sair {
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+}
+
+.menu a.btn-sair:hover {
+    color: #991b1b;
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   3. ESTRUTURA DO CONTEÚDO PRINCIPAL
+   ========================================================================== */
+.main-content,
+.produtos-container-main {
+    flex: 1;
+    padding: 40px 60px;
+    max-width: 1600px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.page-header,
+.header-produtos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.page-header h1,
+.header-produtos h1 {
+    font-size: 32px;
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Botão de Criar (Novo Usuário / Produto) */
+.btn-create {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #09145c;
+    color: #ffffff;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-create:hover {
+    background-color: #050b33;
+    transform: translateY(-1px);
+}
+
+.btn-create:active {
+    transform: translateY(0);
+}
+
+/* ==========================================================================
+   4. BARRA DE FILTROS E BUSCA
+   ========================================================================== */
+.filtros-container {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.busca-wrapper, 
+.select-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.icone-busca, 
+.icone-filtro {
+    position: absolute;
+    left: 15px;
+    color: #94a3b8;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.filtros-container input[type="text"],
+.filtros-container select {
+    padding: 12px 15px 12px 45px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #334155;
+    width: 280px;
+    outline: none;
+    background-color: #f8fafc;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.filtros-container input[type="text"]:focus,
+.filtros-container select:focus {
+    border-color: #09145c;
+    background-color: #ffffff;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    color: #475569;
+    user-select: none;
+}
+
+.checkbox-wrapper input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   5. ALERTAS / MEIOS DE FEEDBACK
+   ========================================================================== */
+.alert-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    font-size: 15px;
+    font-weight: 500;
+    border: 1px solid transparent;
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border-color: #bbf7d0;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
+}
+
+/* ==========================================================================
+   6. TABELA DE DADOS (PRODUTOS / USUÁRIOS)
+   ========================================================================== */
+.table-container,
+.tabela-container {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+table,
+.tabela-produtos {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 15px;
+}
+
+th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: bold;
+    padding: 16px 20px;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e2e8f0;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    vertical-align: middle;
+}
+
+tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.preco-texto {
+    font-weight: bold;
+    color: #0f172a;
+}
+
+/* ==========================================================================
+   7. BADGES (PERFIL, CATEGORIA E STATUS)
+   ========================================================================== */
+.badge,
+.badge-categoria {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Mapeamento de Regra/Perfil/Categoria Padrão */
+.badge-role,
+.badge-categoria.padrao {
+    background-color: #f1f5f9;
+    color: #475569;
+    text-transform: capitalize;
+}
+
+/* Badges de Status (Ativo/Inativo) */
+.badge-status,
+.badge-active,
+.badge-inactive {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.badge-active,
+.badge-status.ativo {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.badge-inactive,
+.badge-status.inativo {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* ==========================================================================
+   8. CÉLULA DE AÇÕES E BOTÕES
+   ========================================================================== */
+.actions-cell,
+.user-actions-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.btn-edit, 
+.btn-toggle,
+.btn-acao {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+    background: none;
+}
+
+/* Botão Editar / Visualizar */
+.btn-edit,
+.btn-acao.ver {
+    color: #2563eb;
+    background-color: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.btn-edit:hover,
+.btn-acao.ver:hover {
+    background-color: #dbeafe;
+    transform: translateY(-1px);
+}
+
+/* Botões de Alterar Estado (Desativar / Excluir) */
+.btn-toggle.deactivate,
+.btn-acao.excluir {
+    color: #dc2626;
+    background-color: #fef2f2;
+    border-color: #fecaca;
+}
+
+.btn-toggle.deactivate:hover,
+.btn-acao.excluir:hover {
+    background-color: #fee2e2;
+    transform: translateY(-1px);
+}
+
+/* Botão Ativar Específico */
+.btn-toggle.activate,
+.btn-ativar {
+    color: #16a34a;
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.btn-toggle.activate:hover,
+.btn-ativar:hover {
+    background-color: #eafaf1;
+    transform: translateY(-1px);
+}
+
+button:active, a:active {
+    transform: translateY(0) !important;
+}
+
+/* ============================================================
+   RODAPÉ (FOOTER)
+   ============================================================ */
+.main-footer { 
+    width: 100%; 
+    background-color: #09145c; 
+    padding: 20px; 
+    text-align: center; 
+    color: rgb(255, 255, 255); 
+    font-size: 13px; 
+    margin-top: auto; 
+}
+
+@media (max-width: 1100px) {
+    .navbar {
+        height: auto;
+        min-height: 80px;
+        padding: 16px 24px;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .menu {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 14px 22px;
+        text-align: center;
+    }
+
+    .menu a,
+    .menu .nav-link {
+        font-size: 16px;
+    }
+
+    .main-content,
+    .produtos-container-main {
+        padding: 28px 24px;
+    }
+
+    .table-container,
+    .tabela-container {
+        overflow-x: auto;
+    }
+
+    table,
+    .tabela-produtos {
+        min-width: 760px;
+    }
+}
+
+@media (max-width: 640px) {
+    .logo img {
+        height: 54px;
+    }
+
+    .main-content,
+    .produtos-container-main {
+        padding: 22px 16px;
+    }
+
+    .page-header,
+    .header-produtos {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+    }
+
+    .page-header h1,
+    .header-produtos h1 {
+        font-size: 26px;
+    }
+
+    .btn-create {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .filtros-container {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .busca-wrapper,
+    .select-wrapper,
+    .filtros-container input[type="text"],
+    .filtros-container select,
+    .checkbox-wrapper {
+        width: 100%;
+    }
+
+    .actions-cell,
+    .user-actions-wrapper {
+        flex-wrap: wrap;
+    }
+}
+ .beneficio-funcionario{margin:.35rem 0 0;color:#c9085a;font-weight:700}

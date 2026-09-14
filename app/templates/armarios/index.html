@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
+    <title>Máquinas | Canamania</title>
+    <link rel="stylesheet" href="/static/css/armarios.css?v=3">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
+</head>
+
+<body>
+    {% if false %}<header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="/">
+                    <img src="/static/img/logo.png" alt="Logo AAPM">
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="/">Dashboard</a></li>
+                <li><a href="/produtos">Produtos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/clientes">Clientes</a></li>
+                {% endif %}
+                <li><a href="/pdv/historico">Vendas</a></li>
+                <li><a href="/mais_vendidos">Mais vendidos</a></li>
+                {% if usuario.role == 'admin' %}
+                <li><a href="/armarios" class="active">Armários</a></li>
+
+                <li><a href="/usuarios" > </i> Usuários
+                </a></li>
+                <li><a href="/categorias" ></i> Categorias
+                </a></li>
+                {% endif %}
+                <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>
+            </ul>
+        </nav>
+    </header>{% endif %}
+    {% include "partials/navbar.html" %}
+
+    <main class="armarios-page">
+        <section class="page-title">
+            <h1>Controle de máquinas</h1>
+            <p>Acompanhe disponibilidade, operação e manutenção das máquinas Canamania.</p>
+        </section>
+
+        <nav class="armarios-tabs" aria-label="Módulos de armários">
+            <button type="button" class="armarios-tab active" data-armarios-tab="disponibilidade"><i class="fa-solid fa-gears"></i> Disponibilidade</button>
+            <button type="button" class="armarios-tab" data-armarios-tab="reserva"><i class="fa-solid fa-calendar-plus"></i> Nova reserva</button>
+            <button type="button" class="armarios-tab" data-armarios-tab="cadastro"><i class="fa-solid fa-plus"></i> Cadastrar armário</button>
+            <button type="button" class="armarios-tab" data-armarios-tab="historico"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
+        </nav>
+
+        <div class="feedback-area" aria-live="polite">
+            {% if request.query_params.get("reserva") == "ok" %}<div class="alerta-sucesso">Reserva criada com sucesso.</div>{% endif %}
+            {% if request.query_params.get("reserva") == "cancelada" %}<div class="alerta-sucesso">Reserva cancelada e mantida no histórico.</div>{% endif %}
+            {% if request.query_params.get("armario") == "ok" %}<div class="alerta-sucesso">Armário cadastrado com sucesso.</div>{% endif %}
+            {% if request.query_params.get("armario") == "desativado" %}<div class="alerta-sucesso">Armário desativado. O histórico de reservas foi preservado.</div>{% endif %}
+            {% if request.query_params.get("armario") == "ativado" %}<div class="alerta-sucesso">Armário ativado e disponível para uso.</div>{% endif %}
+            {% if request.query_params.get("erro") == "ocupado" %}<div class="alerta-erro">Cancele a reserva ou libere o armário antes de desativá-lo.</div>{% endif %}
+            {% if request.query_params.get("erro") == "conflito" %}<div class="alerta-erro">Já existe uma reserva ativa para este armário no período informado.</div>{% endif %}
+            {% if request.query_params.get("erro") == "indisponivel" %}<div class="alerta-erro">Este armário não está disponível para reserva.</div>{% endif %}
+            {% if request.query_params.get("erro") == "periodo" %}<div class="alerta-erro">A data final deve ser igual ou posterior à data inicial.</div>{% endif %}
+            {% if request.query_params.get("erro") in ["reservadados", "numero"] %}<div class="alerta-erro">Revise os dados informados. O número do armário deve ser único.</div>{% endif %}
+        </div>
+
+        <section class="armarios-panel" data-armarios-panel="reserva" hidden>
+            <div class="panel-heading"><h2>Reservar armário</h2><p>Consulte a disponibilidade e vincule um associado a um período.</p></div>
+            <form action="/armarios/reservas" method="post" class="reserva-form" data-feedback-form>
+                <label>Armário<select name="armario_id" required><option value="">Selecione</option>{% for armario in armarios if armario.status == "disponivel" %}<option value="{{ armario.id }}">Armário {{ armario.numero }}</option>{% endfor %}</select></label>
+                <label>Associado<select name="associado_id" required><option value="">Selecione</option>{% for associado in associados %}<option value="{{ associado.id }}">{{ associado.nome }}{% if associado.matricula %} — {{ associado.matricula }}{% endif %}</option>{% endfor %}</select></label>
+                <label>Semestre<input name="semestre" required placeholder="Ex.: 2026.2" pattern="[0-9]{4}\.[12]"></label>
+                <label>Início<input type="date" name="inicio_em" required></label>
+                <label>Fim<input type="date" name="fim_em" required></label>
+                <button class="btn-primario" type="submit"><i class="fa-solid fa-calendar-check"></i> Confirmar reserva</button>
+            </form>
+        </section>
+
+        <section class="armarios-panel" data-armarios-panel="cadastro" hidden>
+            <div class="panel-heading"><h2>Cadastrar armário</h2><p>Adicione um novo armário à consulta de disponibilidade.</p></div>
+            <form action="/armarios" method="post" class="cadastro-armario-form" data-feedback-form>
+                <label>Número do armário<input type="number" name="numero" min="1" max="9999" required placeholder="Ex.: 51"></label>
+                <button class="btn-primario" type="submit"><i class="fa-solid fa-plus"></i> Cadastrar</button>
+            </form>
+        </section>
+
+        <section class="armarios-panel" data-armarios-panel="historico" hidden>
+            <div class="panel-heading"><h2>Histórico de reservas</h2><p>Pesquise por aluno ou semestre e consulte as reservas realizadas.</p></div>
+            <div class="historico-filtros"><label><i class="fa-solid fa-magnifying-glass"></i><input id="busca-reserva" type="search" placeholder="Buscar por aluno ou matrícula"></label><select id="filtro-semestre"><option value="">Todos os semestres</option>{% for reserva in reservas %}<option value="{{ reserva.semestre }}">{{ reserva.semestre }}</option>{% endfor %}</select></div>
+            <div class="tabela-reservas-wrap"><table class="tabela-reservas"><thead><tr><th>Armário</th><th>Aluno</th><th>Semestre</th><th>Período</th><th>Status</th><th>Ação</th></tr></thead><tbody id="corpo-reservas">{% for reserva in reservas %}<tr data-reserva data-aluno="{{ reserva.associado.nome if reserva.associado else '' }} {{ reserva.associado.matricula if reserva.associado else '' }}" data-semestre="{{ reserva.semestre }}"><td>#{{ reserva.armario.numero }}</td><td>{{ reserva.associado.nome if reserva.associado else 'Associado removido' }}</td><td>{{ reserva.semestre }}</td><td>{{ reserva.inicio_em.strftime('%d/%m/%Y') }} a {{ reserva.fim_em.strftime('%d/%m/%Y') }}</td><td><span class="status-reserva {{ reserva.status }}">{{ reserva.status }}</span></td><td>{% if reserva.status == 'ativa' %}<form action="/armarios/reservas/{{ reserva.id }}/cancelar" method="post" data-confirm="Cancelar esta reserva?"><button class="btn-cancelar-reserva" type="submit">Cancelar</button></form>{% else %}—{% endif %}</td></tr>{% else %}<tr><td colspan="6" class="empty-reservas">Nenhuma reserva registrada.</td></tr>{% endfor %}</tbody></table></div>
+        </section>
+
+        <div data-armarios-panel="disponibilidade">
+        <section class="cards-resumo-container">
+            <div class="card-resumo card-total">
+                <div>
+                    <span>Total de Armarios</span>
+                    <strong>{{ total_armarios }}</strong>
+                </div>
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <div class="card-resumo card-disponivel">
+                <div>
+                    <span>Disponiveis</span>
+                    <strong>{{ armarios_disponiveis }}</strong>
+                </div>
+                <i class="fa-solid fa-lock-open"></i>
+            </div>
+            <div class="card-resumo card-ocupado">
+                <div>
+                    <span>Ocupados</span>
+                    <strong>{{ armarios_ocupados }}</strong>
+                </div>
+                <i class="fa-regular fa-user"></i>
+            </div>
+            <div class="card-resumo card-manutencao">
+                <div>
+                    <span>Manutencao</span>
+                    <strong>{{ armarios_manutencao }}</strong>
+                </div>
+                <i class="fa-solid fa-wrench"></i>
+            </div>
+        </section>
+
+        <section class="filtro-bar">
+            <span>Filtrar:</span>
+            <button type="button" class="btn-filtro active" data-filtro="">Todos</button>
+            <button type="button" class="btn-filtro" data-filtro="disponivel">Disponiveis</button>
+            <button type="button" class="btn-filtro" data-filtro="ocupado">Ocupados</button>
+            <button type="button" class="btn-filtro" data-filtro="manutencao">Manutencao</button>
+        </section>
+
+        {% if request.query_params.get("erro") == "associado" %}
+        <div class="alerta-erro">
+            Selecione um associado ativo para ocupar o armario.
+        </div>
+        {% endif %}
+
+        <section class="legenda-bar">
+            <span>Legenda:</span>
+            <span class="legenda-item"><i class="dot dot-disponivel"></i> Disponivel</span>
+            <span class="legenda-item"><i class="dot dot-ocupado"></i> Ocupado</span>
+            <span class="legenda-item"><i class="dot dot-manutencao"></i> Manutencao</span>
+            <span class="legenda-item"><i class="dot dot-desativado"></i> Desativado</span>
+        </section>
+
+        <section class="grid-shell">
+            <div class="grid-armarios" id="grid-armarios">
+                {% for armario in armarios %}
+                <button
+                    type="button"
+                    class="item-armario status-{{ armario.status }}"
+                    data-armario-card
+                    data-id="{{ armario.id }}"
+                    data-numero="{{ armario.numero }}"
+                    data-status="{{ armario.status }}"
+                    data-associado-id="{{ armario.associado_id or 0 }}"
+                    data-observacoes="{{ armario.observacoes|e }}"
+                    data-nome="{{ armario.associado_nome|e }}"
+                    data-matricula="{{ armario.associado_matricula|e }}"
+                    title="Armario {{ armario.numero }}"
+                >
+                    {% if armario.status == "manutencao" %}
+                    <i class="fa-solid fa-wrench"></i>
+                    {% elif armario.status == "ocupado" %}
+                    <i class="fa-regular fa-user"></i>
+                    {% elif armario.status == "desativado" %}
+                    <i class="fa-solid fa-lock"></i>
+                    {% else %}
+                    <i class="fa-solid fa-lock-open"></i>
+                    {% endif %}
+                    <span>{{ armario.numero|int }}</span>
+                </button>
+                {% endfor %}
+            </div>
+        </section>
+
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modal-armario" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-titulo">Armario</h2>
+                    <p id="modal-subtitulo">Altere o status e vincule um associado</p>
+                </div>
+                <button type="button" class="btn-fechar" id="btn-fechar-modal" aria-label="Fechar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form action="/armarios/alterar-status" method="post" id="form-armario" class="modal-form">
+                <input type="hidden" name="armario_id" id="modal-armario-id">
+
+                <label>
+                    <span>Status</span>
+                    <select name="novo_status" id="modal-status">
+                        <option value="disponivel">Disponivel</option>
+                        <option value="ocupado">Ocupado</option>
+                        <option value="manutencao">Manutencao</option>
+                    </select>
+                </label>
+
+                <label class="campo-usuario">
+                    <span>Associado</span>
+                    <select name="associado_id" id="modal-usuario">
+                        <option value="0">Selecione um associado</option>
+                        {% for associado in associados %}
+                        <option value="{{ associado.id }}">
+                            {{ associado.nome }}{% if associado.matricula %} - {{ associado.matricula }}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if not associados %}
+                    <small>Nenhum associado ativo cadastrado.</small>
+                    {% endif %}
+                </label>
+
+                <label class="campo-observacao">
+                    <span>Observacao da manutencao</span>
+                    <input type="text" name="observacoes" id="modal-observacoes" placeholder="Ex: Fechadura com defeito">
+                </label>
+
+                <div class="modal-info" id="modal-info"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-desativar" id="btn-desativar-armario"><i class="fa-solid fa-power-off"></i> Desativar</button>
+                    <button type="button" class="btn-ativar-armario" id="btn-ativar-armario" hidden><i class="fa-solid fa-power-off"></i> Ativar armário</button>
+                    <button type="button" class="btn-secundario" id="btn-cancelar">Cancelar</button>
+                    <button type="submit" class="btn-primario">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay modal-confirmacao" id="modal-confirmacao" aria-hidden="true">
+        <div class="confirmacao-card" role="dialog" aria-modal="true" aria-labelledby="confirmacao-titulo">
+            <div class="confirmacao-icone"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h2 id="confirmacao-titulo">Confirmar ação</h2>
+            <p id="confirmacao-texto"></p>
+            <form method="post" id="form-confirmacao" class="confirmacao-acoes">
+                <button type="button" class="btn-secundario" id="btn-fechar-confirmacao">Voltar</button>
+                <button type="submit" class="btn-confirmar-perigo" id="btn-confirmar-acao">Confirmar</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>2026 AAPM - SENAI. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="/static/javascript/armarios.js?v=3"></script>
+</body>
+
+</html>
