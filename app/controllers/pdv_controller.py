@@ -19,12 +19,15 @@ from sqlalchemy.orm import Session
 from app.database import Session as SessionLocal, get_db
 from app.models.venda import FechamentoDiario, Venda, ItemVenda
 from app.models.produtos import Produto, EstoqueTamanho, EstoqueVariacao, Tamanho, ordenar_tamanhos
+from app.models.categoria import Categoria
+from app.models.produtos import CATEGORIAS_PDV
 from app.models.filial import EstoqueFilial, FILIAIS
 from app.controllers.estoque_controller import garantir_estoque_filiais
 from app.auth import get_usuario_logado
 
 router = APIRouter(prefix="/pdv", tags=["PDV"])
 templates = Jinja2Templates(directory="app/templates")
+FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite"}
 
 # O Brasil não adota horário de verão desde 2019. Usar UTC-3 evita depender do
 # pacote tzdata, que não vem instalado em algumas instalações do Windows.
@@ -114,13 +117,28 @@ def tela_pdv(
     """
     produtos  = (
         db.query(Produto)
-        .filter(Produto.ativo == True)
+        .join(Categoria, Produto.categoria_id == Categoria.id)
+        .filter(Produto.ativo == True, func.lower(Categoria.nome).in_(CATEGORIAS_PDV))
         .order_by(Produto.nome)
         .all()
     )
     tamanhos = ordenar_tamanhos(db.query(Tamanho).filter(Tamanho.ativo == True).all())
     garantir_estoque_filiais(db)
-    estoque_filiais = {(saldo.produto_id, saldo.filial): saldo.quantidade for saldo in db.query(EstoqueFilial).all()}
+    # Os itens de consumo não têm estoque: exibimos o total vendido no dia.
+    hoje = datetime.now(FUSO_HORARIO).date()
+    inicio_hoje = datetime.combine(hoje, time.min, tzinfo=FUSO_HORARIO).astimezone(timezone.utc).replace(tzinfo=None)
+    inicio_amanha = inicio_hoje + timedelta(days=1)
+    fechamento_de_hoje = db.query(FechamentoDiario).filter(FechamentoDiario.data == hoje).first()
+    # Depois de fechar o dia manualmente, o próximo consumo começa uma nova
+    # contagem, sem apagar o histórico já consolidado.
+    inicio_contagem = fechamento_de_hoje.fechado_em if fechamento_de_hoje else inicio_hoje
+    vendas_hoje = dict(
+        db.query(ItemVenda.produto_id, func.coalesce(func.sum(ItemVenda.quantidade), 0))
+        .join(Venda, ItemVenda.venda_id == Venda.id)
+        .filter(Venda.criado_em >= inicio_contagem, Venda.criado_em < inicio_amanha)
+        .group_by(ItemVenda.produto_id)
+        .all()
+    )
 
     return templates.TemplateResponse(
         request,
@@ -131,7 +149,17 @@ def tela_pdv(
             "produtos":            produtos,
             "tamanhos":            tamanhos,
             "filiais": FILIAIS,
-            "estoque_filiais": estoque_filiais,
+            "estoque_filiais": {
+                (saldo.produto_id, saldo.filial): saldo.quantidade
+                for saldo in (
+                    db.query(EstoqueFilial)
+                    .join(Produto, EstoqueFilial.produto_id == Produto.id)
+                    .join(Categoria, Produto.categoria_id == Categoria.id)
+                    .filter(Produto.ativo == True, func.lower(Categoria.nome) == "cookies")
+                    .all()
+                )
+            },
+            "vendas_hoje": vendas_hoje,
         }
     )
 
@@ -141,6 +169,7 @@ def finalizar_venda(
     request: Request,
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     observacao: str    = Form(""),
+    forma_pagamento: str = Form(""),
     filial: str        = Form("Pinheiros"),
     db: Session        = Depends(get_db),
     usuario            = Depends(get_usuario_logado)
@@ -156,6 +185,8 @@ def finalizar_venda(
     """
     if filial not in FILIAIS:
         return RedirectResponse(url="/pdv?erro=filial", status_code=302)
+    if forma_pagamento not in FORMAS_PAGAMENTO:
+        return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
 
     try:
         itens = json.loads(carrinho_json)
@@ -185,21 +216,19 @@ def finalizar_venda(
         if produto_id <= 0:
             return RedirectResponse(url="/pdv?erro=produto_inexistente", status_code=302)
 
-        produto = db.query(Produto).filter(
-            Produto.id == produto_id,
-            Produto.ativo == True
-        ).with_for_update().first()
+        produto = (
+            db.query(Produto)
+            .join(Categoria, Produto.categoria_id == Categoria.id)
+            .filter(Produto.id == produto_id, Produto.ativo == True, func.lower(Categoria.nome).in_(CATEGORIAS_PDV))
+            .with_for_update()
+            .first()
+        )
 
         if not produto:
             return RedirectResponse(
                 url=f"/pdv?erro=produto_inexistente&id={produto_id}",
                 status_code=302
             )
-
-        garantir_estoque_filiais(db, produto)
-        saldo_filial = db.query(EstoqueFilial).filter(
-            EstoqueFilial.produto_id == produto.id, EstoqueFilial.filial == filial
-        ).with_for_update().first()
 
         try:
             qtd = int(item["quantidade"])
@@ -209,26 +238,29 @@ def finalizar_venda(
         if qtd <= 0:
             return RedirectResponse(url="/pdv?erro=quantidade", status_code=302)
 
-        quantidade_total_produto = quantidades_por_produto.get(produto.id, 0) + qtd
-        if not saldo_filial or quantidade_total_produto > saldo_filial.quantidade:
-            return RedirectResponse(
-                url=f"/pdv?erro=estoque&produto={produto.nome}",
-                status_code=302
-            )
-        quantidades_por_produto[produto.id] = quantidade_total_produto
-
+        saldo_filial = None
+        if not produto.eh_consumo:
+            garantir_estoque_filiais(db, produto)
+            saldo_filial = db.query(EstoqueFilial).filter(
+                EstoqueFilial.produto_id == produto.id,
+                EstoqueFilial.filial == filial,
+            ).with_for_update().first()
+            quantidade_total_produto = quantidades_por_produto.get(produto.id, 0) + qtd
+            if not saldo_filial or quantidade_total_produto > saldo_filial.quantidade:
+                return RedirectResponse(url=f"/pdv?erro=estoque&produto={produto.nome}", status_code=302)
+            quantidades_por_produto[produto.id] = quantidade_total_produto
         try:
             tamanho_id = obter_tamanho_id_item(item)
             cor = obter_cor_item(item)
         except ValueError:
             return RedirectResponse(url="/pdv?erro=variacao", status_code=302)
 
-        if produto.eh_camiseta and (not tamanho_id or not cor):
+        if False and produto.eh_camiseta and (not tamanho_id or not cor):
             return RedirectResponse(url="/pdv?erro=variacao", status_code=302)
 
         estoque_tamanho = None
         estoque_variacao = None
-        if produto.eh_camiseta:
+        if False and produto.eh_camiseta:
             estoque_variacao = db.query(EstoqueVariacao).filter(
                 EstoqueVariacao.produto_id == produto.id,
                 EstoqueVariacao.tamanho_id == tamanho_id,
@@ -251,7 +283,7 @@ def finalizar_venda(
                     return RedirectResponse(url=f"/pdv?erro=estoque_variacao&produto={produto.nome}", status_code=302)
                 quantidades_por_variacao[chave_variacao] = quantidade_total_variacao
 
-        preco_unitario = estoque_variacao.preco if estoque_variacao else produto.preco
+        preco_unitario = produto.preco
         subtotal    = preco_unitario * qtd
         total_bruto += subtotal
 
@@ -278,6 +310,7 @@ def finalizar_venda(
         total_bruto         = round(total_bruto, 2),
         total_liquido       = round(total_liquido, 2),
         observacao          = observacao or None,
+        forma_pagamento     = forma_pagamento,
     )
     db.add(venda)
     db.flush()  # gera o venda.id sem commitar ainda
@@ -293,12 +326,13 @@ def finalizar_venda(
             preco_unitario = item["preco"],
         ))
         # Baixa o estoque do produto
-        item["produto"].estoque_atual -= item["quantidade"]
-        item["saldo_filial"].quantidade -= item["quantidade"]
-        if item["estoque_tamanho"]:
-            item["estoque_tamanho"].estoque_atual -= item["quantidade"]
-        if item["estoque_variacao"]:
-            item["estoque_variacao"].estoque_atual -= item["quantidade"]
+        if item["saldo_filial"]:
+            item["produto"].estoque_atual -= item["quantidade"]
+            item["saldo_filial"].quantidade -= item["quantidade"]
+            if item["estoque_tamanho"]:
+                item["estoque_tamanho"].estoque_atual -= item["quantidade"]
+            if item["estoque_variacao"]:
+                item["estoque_variacao"].estoque_atual -= item["quantidade"]
 
     db.commit()
 

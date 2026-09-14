@@ -27,7 +27,7 @@ async function carregarProdutos() {
                 <td>${produto.categoria_nome || 'Sem categoria'}</td>
                 <td>${produto.estoque_atual}</td>
                 <td>R$ ${parseFloat(produto.preco).toFixed(2)}</td>
-                <td>${produto.estoque_atual <= 5 ? '<span style="color:red; font-weight:bold;">Estoque Baixo</span>' : '<span style="color:green;">Ativo</span>'}</td>
+                <td>${produto.estoque_atual <= 3 ? '<span style="color:red; font-weight:bold;">Estoque Baixo</span>' : '<span style="color:green;">Ativo</span>'}</td>
                 <td style="text-align: center;">
                     <button style="background:none; border:none; color:#1e1b4b; cursor:pointer; margin-right:10px;"><i class="fa-solid fa-pen-to-square"></i></button>
                     <button style="background:none; border:none; color:red; cursor:pointer;"><i class="fa-solid fa-trash"></i></button>
@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // Condições do Filtro
             const bateNome = nomeProduto.includes(textoBusca);
             const bateCategoria = categoriaSelecionada === "" || categoriaTexto.trim() === textoOpcaoCategoria.trim();
-            const bateEstoque = !apenasEstoqueBaixo || estoqueAtual <= 5; // Defina "5" como o seu limite de estoque baixo
+            const bateEstoque = !apenasEstoqueBaixo || estoqueAtual <= 3;
 
             // Decide se mostra ou esconde a linha
             if (bateNome && bateCategoria && bateEstoque) {

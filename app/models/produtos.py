@@ -7,7 +7,14 @@ from app.database import Base
 
 STATIC_DIR = Path(__file__).resolve().parents[1] / "static"
 IMAGEM_PADRAO_URL = "/static/img/produto_padrao.png"
-LIMITE_ESTOQUE_BAIXO = 5
+LIMITE_ESTOQUE_BAIXO = 3
+CATEGORIAS_CONSUMO = frozenset({"abre-alas", "enredo", "maniacos por drink"})
+CATEGORIAS_PDV = CATEGORIAS_CONSUMO | frozenset({"cookies"})
+
+
+def categoria_eh_consumo(nome_categoria: str | None) -> bool:
+    """Indica categorias vendidas por consumo, sem controle de estoque."""
+    return bool(nome_categoria and nome_categoria.strip().casefold() in CATEGORIAS_CONSUMO)
 
 
 def ordenar_tamanhos(tamanhos):
@@ -50,6 +57,10 @@ class Produto(Base):
     def eh_camiseta(self):
         """Compatibilidade com o fluxo antigo de vendas."""
         return self.possui_variacoes_tamanho
+
+    @property
+    def eh_consumo(self):
+        return categoria_eh_consumo(self.categoria.nome if self.categoria else None)
 
     @property
     def preco_exibicao(self):

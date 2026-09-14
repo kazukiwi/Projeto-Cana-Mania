@@ -13,7 +13,7 @@ from sqlalchemy import func
 from app.models.movimentacao import Movimentacao
 
 from app.database import get_db
-from app.models.produtos import Produto, EstoqueTamanho, EstoqueVariacao, Tamanho, condicao_estoque_baixo, ordenar_tamanhos
+from app.models.produtos import Produto, EstoqueTamanho, EstoqueVariacao, Tamanho, categoria_eh_consumo, condicao_estoque_baixo, ordenar_tamanhos
 from app.models.categoria import Categoria
 from app.auth import get_usuario_logado, get_admin
 
@@ -138,6 +138,8 @@ def listar_produtos(
 
 
     categorias  = db.query(Categoria).filter(Categoria.ativo == True).all()
+    produtos_estoque = [produto for produto in produtos if not produto.eh_consumo]
+    produtos_consumo = [produto for produto in produtos if produto.eh_consumo]
 
     return templates.TemplateResponse(
         request,
@@ -146,6 +148,8 @@ def listar_produtos(
             "request":      request,
             "usuario":      usuario,
             "produtos":     produtos,
+            "produtos_estoque": produtos_estoque,
+            "produtos_consumo": produtos_consumo,
             "categorias":   categorias,
             "busca":        busca,
             "categoria_id": categoria_id,
@@ -194,6 +198,10 @@ async def criar_produto(
 ):
     categorias = db.query(Categoria).filter(Categoria.ativo == True).all()
     tamanhos = ordenar_tamanhos(db.query(Tamanho).filter(Tamanho.ativo == True).all())
+    categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first() if categoria_id else None
+    if categoria_eh_consumo(categoria.nome if categoria else None):
+        estoque_atual = 0
+        possui_variacoes_tamanho = False
 
     # Verifica duplicidade de nome
     if db.query(Produto).filter(Produto.nome.ilike(nome)).first():
@@ -328,6 +336,10 @@ async def editar_produto(
     editando   = db.query(Produto).filter(Produto.id == produto_id).first()
     categorias = db.query(Categoria).filter(Categoria.ativo == True).all()
     tamanhos = ordenar_tamanhos(db.query(Tamanho).filter(Tamanho.ativo == True).all())
+    categoria = db.query(Categoria).filter(Categoria.id == categoria_id).first() if categoria_id else None
+    if categoria_eh_consumo(categoria.nome if categoria else None):
+        estoque_atual = 0
+        possui_variacoes_tamanho = False
 
     if not editando:
         return RedirectResponse(url="/produtos", status_code=302)

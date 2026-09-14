@@ -3,6 +3,7 @@ import os
 from fastapi import APIRouter, Depends, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from typing import Optional # <-- Importado para permitir descrição vazia
 
@@ -23,7 +24,20 @@ def listar_categorias(
     db: Session = Depends(get_db),
     admin = Depends(get_admin)
 ):
-    categorias_db = db.query(Categoria).order_by(Categoria.nome).all()
+    # Produtos desativados não entram na quantidade exibida em Categorias.
+    categorias_db = []
+    consulta = (
+        db.query(Categoria, func.count(Produto.id).label("qtd_produtos_ativos"))
+        .outerjoin(
+            Produto,
+            (Produto.categoria_id == Categoria.id) & (Produto.ativo == True),
+        )
+        .group_by(Categoria.id)
+        .order_by(Categoria.nome)
+    )
+    for categoria, quantidade in consulta.all():
+        categoria.qtd_produtos_ativos = quantidade
+        categorias_db.append(categoria)
 
     return templates.TemplateResponse(
         request,
@@ -173,7 +187,7 @@ def toggle_categoria(
         return RedirectResponse("/categorias/", status_code=302)
 
     if categoria.ativo:
-        produtos_ativos = [p for p in categoria.produtos if p.ativa]
+        produtos_ativos = [p for p in categoria.produtos if p.ativo]
 
         if produtos_ativos:
             return RedirectResponse(

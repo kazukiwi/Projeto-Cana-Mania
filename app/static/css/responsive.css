@@ -1,6 +1,7 @@
 /* Camada comum de responsividade para todas as telas do sistema. */
 img, svg { max-width: 100%; }
 button, input, select, textarea { font: inherit; }
+.menu-toggle { display: none; }
 
 @media (max-width: 900px) {
   .dashboard, .produtos-container-main, .clientes-container, .vendas-container-main, .main-content, .page { padding-left: 24px !important; padding-right: 24px !important; }
@@ -26,6 +27,32 @@ button, input, select, textarea { font: inherit; }
   .modal-overlay, .modal-finalizar-dia, .modal-confirmacao-acao { padding: 12px; }
   .modal-card, .modal-content, .modal-content-pdv, .confirmacao-acao-card, .modal-finalizar-dia-card { width: 100% !important; padding: 20px; }
   .form-grid, .form-row, .form-row-split, .pdv-layout-split { grid-template-columns: 1fr !important; flex-direction: column; }
+}
+
+/* Navegação recolhível e painéis fluidos em celulares. */
+@media (max-width: 760px) {
+  .navbar { min-height: 68px !important; padding: 12px 16px !important; flex-direction: row !important; flex-wrap: wrap; gap: 8px !important; }
+  .menu-toggle { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid #dbe5df; border-radius: 10px; background: var(--cana-surface); color: var(--cana-green); font-size: 20px; cursor: pointer; }
+  .menu { display: none !important; width: 100%; order: 3; padding: 10px 0 2px !important; border-top: 1px solid rgba(8,61,44,.12); }
+  .menu.menu-aberto { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px !important; }
+  .menu li { min-width: 0; }
+  .menu a, .menu .theme-toggle { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; padding: 8px !important; text-align: center; }
+  .menu .btn-sair { justify-content: center; }
+  .theme-toggle { margin-inline: auto; }
+  .pdv-layout-split { display: flex !important; flex-direction: column !important; gap: 14px !important; }
+  .pdv-box-cadastro, .pdv-box-carrinho { width: 100%; min-width: 0; padding: 16px !important; }
+  #catalogo-pdv-modal { padding: 10px !important; }
+  #catalogo-pdv-modal section { margin: 0 auto !important; padding: 16px !important; min-height: calc(100vh - 20px); }
+  #grade-catalogo-pdv { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+  .cupom-container { padding: 18px !important; }
+}
+
+@media (max-width: 420px) {
+  .menu.menu-aberto { grid-template-columns: 1fr; }
+  #grade-catalogo-pdv { grid-template-columns: 1fr !important; }
+  .vendas-container-main [style*="justify-content:space-between"] { gap: 10px; flex-wrap: wrap; }
+  .vendas-container-main [style*="display:flex"] { min-width: 0; }
+  .main-footer { padding: 16px 12px; }
 }
 
 @media (max-width: 420px) {

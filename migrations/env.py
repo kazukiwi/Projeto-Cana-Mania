@@ -17,7 +17,7 @@ config = context.config
 config = context.config
 load_dotenv()
 
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
+config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL") or "sqlite:///./estoque.db")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

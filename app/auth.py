@@ -4,13 +4,15 @@ from passlib.context import CryptContext
 from fastapi import Request, HTTPException, status
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-#Carregar as variaveis de ambiente
-load_dotenv()
+# Carrega sempre o .env da raiz do projeto, independentemente do diretório em
+# que o Uvicorn/Python foi iniciado.
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRACAO_MINUTOS = os.getenv("ACCESS_TOKEN_EXPIRACAO_MINUTOS")
+SECRET_KEY = os.getenv("SECRET_KEY", "canamania-chave-local-altere-em-producao")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRACAO_MINUTOS = int(os.getenv("ACCESS_TOKEN_EXPIRACAO_MINUTOS", "60"))
 RESET_TOKEN_EXPIRACAO_MINUTOS = int(os.getenv("RESET_TOKEN_EXPIRACAO_MINUTOS", "30"))
 
 #CryptContent
@@ -31,7 +33,7 @@ def criar_token(data: dict):
     payload = data.copy()
 
     #Define quando o token expira
-    expira = datetime.now(timezone.utc) + timedelta(minutes=int(ACCESS_TOKEN_EXPIRACAO_MINUTOS))
+    expira = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRACAO_MINUTOS)
     payload.update({"exp": expira})
 
     #Criar o token

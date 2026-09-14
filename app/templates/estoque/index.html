@@ -9,16 +9,16 @@
 <body>
 {% include "partials/navbar.html" %}
 <main class="cana-page">
-    <header class="cana-heading"><div><span class="eyebrow">Centro de distribuição</span><h1>Estoque das filiais</h1><p>Envie frozens da fábrica para as lojas e acompanhe os alertas em um só lugar.</p></div></header>
+    <header class="cana-heading"><div><span class="eyebrow">Centro de distribuição</span><h1>Estoque das filiais</h1><p>Envie consumos da fábrica para as lojas e acompanhe os alertas em um só lugar.</p></div></header>
     {% if request.query_params.get('transferido') %}<p class="notice success">Estoque enviado para a filial.</p>{% endif %}
     {% if request.query_params.get('erro') %}<p class="notice error">Não foi possível concluir. Confira produto, origem e quantidade.</p>{% endif %}
     <section class="branch-cards">
-        {% for filial in filiais %}<article class="branch-card"><span>{{ filial }}</span><strong>{{ resumo[filial] }} <small>frozens</small></strong>{% if filial == 'Carrão (Fábrica)' %}<em>Centro de produção</em>{% else %}<em>Loja</em>{% endif %}</article>{% endfor %}
+        {% for filial in filiais %}<article class="branch-card"><span>{{ filial }}</span><strong>{{ resumo[filial] }} <small>consumos</small></strong>{% if filial == 'Carrão (Fábrica)' %}<em>Centro de produção</em>{% else %}<em>Loja</em>{% endif %}</article>{% endfor %}
     </section>
     <section class="stock-grid">
         <article class="surface transfer-card"><h2><i class="fa-solid fa-truck-fast"></i> Enviar estoque</h2><p>Este movimento vai direto para o painel administrativo.</p>
             <form action="/estoque/transferir" method="post" class="transfer-form">
-                <label>Frozen<select name="produto_id" required>{% for produto in produtos %}<option value="{{ produto.id }}">{{ produto.nome }}</option>{% endfor %}</select></label>
+                <label>Consumo<select name="produto_id" required>{% for produto in produtos %}<option value="{{ produto.id }}">{{ produto.nome }}</option>{% endfor %}</select></label>
                 <label>Origem<select name="origem" required>{% for filial in filiais %}<option value="{{ filial }}"{% if filial == 'Carrão (Fábrica)' %} selected{% endif %}>{{ filial }}</option>{% endfor %}</select></label>
                 <label>Destino<select name="destino" required>{% for filial in filiais %}<option value="{{ filial }}"{% if filial == 'Pinheiros' %} selected{% endif %}>{{ filial }}</option>{% endfor %}</select></label>
                 <label>Quantidade<input type="number" name="quantidade" min="1" required placeholder="Ex.: 24"></label>
@@ -26,10 +26,10 @@
             </form>
         </article>
         <article class="surface alert-card"><h2><i class="fa-solid fa-bell"></i> Estoque baixo</h2>
-            {% if alertas %}<ul>{% for alerta in alertas[:8] %}<li><strong>{{ alerta.produto.nome }}</strong><span>{{ alerta.filial }} · {{ alerta.quantidade }} un.</span></li>{% endfor %}</ul>{% else %}<div class="empty-state">Tudo certo: nenhum frozen em alerta.</div>{% endif %}
+            {% if alertas %}<ul>{% for alerta in alertas[:8] %}<li><strong>{{ alerta.produto.nome }}</strong><span>{{ alerta.filial }} · {{ alerta.quantidade }} un.</span></li>{% endfor %}</ul>{% else %}<div class="empty-state">Tudo certo: nenhum consumo em alerta.</div>{% endif %}
         </article>
     </section>
-    <section class="surface stock-table-wrap"><div class="table-title"><h2>Divisão atual</h2><input type="search" id="pesquisa-estoque" placeholder="Pesquisar frozen..."></div><table><thead><tr><th>Frozen</th>{% for filial in filiais %}<th>{{ filial }}</th>{% endfor %}<th>Total</th></tr></thead><tbody>{% for produto in produtos %}<tr><td>{{ produto.nome }}</td>{% for filial in filiais %}<td>{{ por_produto.get((produto.id, filial), 0) }}</td>{% endfor %}<td><strong>{{ produto.estoque_atual }}</strong></td></tr>{% endfor %}</tbody></table></section>
+    <section class="surface stock-table-wrap"><div class="table-title"><h2>Divisão atual</h2><input type="search" id="pesquisa-estoque" placeholder="Pesquisar consumo..."></div><table><thead><tr><th>Consumo</th>{% for filial in filiais %}<th>{{ filial }}</th>{% endfor %}<th>Total</th></tr></thead><tbody>{% for produto in produtos %}<tr><td>{{ produto.nome }}</td>{% for filial in filiais %}<td>{{ por_produto.get((produto.id, filial), 0) }}</td>{% endfor %}<td><strong>{{ produto.estoque_atual }}</strong></td></tr>{% endfor %}</tbody></table></section>
 </main>
 <script>document.querySelector('#pesquisa-estoque')?.addEventListener('input', e => document.querySelectorAll('tbody tr').forEach(row => row.hidden=!row.textContent.toLowerCase().includes(e.target.value.toLowerCase())));</script>
 </body></html>

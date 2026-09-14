@@ -80,17 +80,18 @@
                 <form id="form-add-item-pdv">
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label for="busca-frozen" style="display:block; font-weight:bold; margin-bottom:5px;">Produto</label>
-                        <input id="busca-frozen" type="search" placeholder="Digite para procurar um frozen..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="resultado-busca-frozen" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+                        <input id="busca-frozen" type="search" placeholder="Digite para procurar um consumo..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="resultado-busca-frozen" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
                         <div id="resultado-busca-frozen" class="resultado-busca-frozen" aria-live="polite"></div>
+                        <button type="button" id="abrir-catalogo-pdv" style="width:100%; margin-top:10px; padding:10px; border:1px solid #1e1b4b; border-radius:6px; background:#f5f3ff; color:#1e1b4b; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-images"></i> Escolher produto pelo catálogo</button>
                     </div>
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label for="select-prod" style="display:block; font-weight:bold; margin-bottom:5px;">Selecionar Produto</label>
                         <select id="select-prod" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background-color: white;">
                             <option value="" disabled selected>Escolha um produto...</option>
                             {% for produto in produtos %}
-                                {% if produto.ativo and (estoque_filiais.get((produto.id, 'Pinheiros'), 0) > 0) %}
-                                <option value="{{ produto.id }}" data-nome="{{ produto.nome }}" data-preco="{{ produto.preco_exibicao }}" data-estoque="{{ produto.estoque_atual }}" data-possui-variacoes="{{ 'true' if produto.possui_variacoes_tamanho else 'false' }}"{% for estoque in produto.estoques_tamanho %} data-tamanho-{{ estoque.tamanho_id }}="{{ estoque.estoque_atual }}"{% endfor %}>
-                                    {{ produto.nome }}
+                                {% if produto.ativo %}
+                                <option value="{{ produto.id }}" data-nome="{{ produto.nome }}" data-imagem="{{ produto.imagem_url }}" data-preco="{{ produto.preco_exibicao }}" data-estoque="{{ produto.estoque_atual }}" data-sem-estoque="{{ 'true' if produto.eh_consumo else 'false' }}" data-possui-variacoes="false">
+                                    {{ produto.nome }}{% if produto.eh_consumo %} · {{ vendas_hoje.get(produto.id, 0) }} venda(s) hoje{% endif %}
                                 </option>
                                 {% endif %}
                             {% endfor %}
@@ -156,6 +157,18 @@
                     <input type="hidden" name="carrinho_json" id="carrinho_json_input">
 
                     <div class="form-group" style="margin-bottom:15px;">
+                        <label for="forma_pagamento" style="display:block; font-weight:bold; margin-bottom:5px;">Forma de pagamento</label>
+                        <select name="forma_pagamento" id="forma_pagamento" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background:white;">
+                            <option value="" disabled selected>Selecione a forma de pagamento...</option>
+                            <option value="credito">Cartão de crédito</option>
+                            <option value="debito">Cartão de débito</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="pix">Pix</option>
+                            <option value="convite">Convite</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:15px;">
                         <label for="observacao" style="display:block; font-weight:bold; margin-bottom:5px;">Observações da Venda</label>
                         <input type="text" name="observacao" id="observacao" placeholder="Ex: Venda corporativa, pagamento via Pix..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
                     </div>
@@ -182,9 +195,17 @@
         </div>
     </div>
 
+    <div id="catalogo-pdv-modal" hidden role="dialog" aria-modal="true" aria-labelledby="catalogo-pdv-titulo" style="position:fixed; inset:0; z-index:1000; background:rgba(15,23,42,.6); padding:24px; overflow:auto;">
+        <section style="max-width:860px; margin:30px auto; background:#fff; border-radius:14px; padding:22px; box-shadow:0 20px 50px rgba(0,0,0,.25);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;"><h2 id="catalogo-pdv-titulo" style="margin:0; color:#1e1b4b;">Catálogo de produtos</h2><button type="button" id="fechar-catalogo-pdv" aria-label="Fechar catálogo" style="border:0; background:none; font-size:28px; cursor:pointer;">×</button></div>
+            <input id="busca-catalogo-pdv" type="search" placeholder="Pesquisar produto..." style="width:100%; box-sizing:border-box; margin:18px 0; padding:12px; border:1px solid #cbd5e1; border-radius:8px;">
+            <div id="grade-catalogo-pdv" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;"></div>
+        </section>
+    </div>
+
     <footer class="main-footer">
         <div class="footer-content" style="text-align:center; padding:20px; color:#666;">
-            <p>&copy; 2026 Canamania. Frozen de caldo de cana.</p>
+            <p>&copy; 2026 Canamania. Gestão de consumos.</p>
         </div>
     </footer>
 

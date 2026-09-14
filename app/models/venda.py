@@ -43,6 +43,7 @@ class Venda(Base):
 
     # Observação opcional do operador
     observacao = Column(String(255), nullable=True)
+    forma_pagamento = Column(String(30), nullable=True)
 
     criado_em = Column(DateTime, server_default=func.now())
 

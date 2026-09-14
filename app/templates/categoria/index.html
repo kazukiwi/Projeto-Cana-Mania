@@ -93,8 +93,8 @@
                         <td style="color: #94a3b8;">{{ c.descricao or 'Sem descrição' }}</td>
                         <td>
                             {# Verificamos se a lista de produtos daquela categoria não está vazia #}
-                            {% if c.produtos|length > 0 %}
-                            <span class="badge badge-count">{{ c.produtos|length }}</span>
+                            {% if c.qtd_produtos_ativos > 0 %}
+                            <span class="badge badge-count">{{ c.qtd_produtos_ativos }}</span>
                             {% else %}
                             <span class="text-muted">Nenhum
                                 produto</span>
@@ -124,7 +124,7 @@
 
     <footer class="main-footer">
         <div class="footer-content" style="text-align:center; padding:20px; color:#ffffff;">
-            <p>&copy; 2026 Canamania. Frozen de caldo de cana.</p>
+            <p>&copy; 2026 Canamania. Gestão de consumos.</p>
         </div>
     </footer>
 

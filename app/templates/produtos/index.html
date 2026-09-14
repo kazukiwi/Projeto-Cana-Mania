@@ -108,7 +108,10 @@
                     </tr>
                 </thead>
                 <tbody id="corpo-tabela">
-                    {% for produto in produtos %}
+                    {% for produto in produtos_estoque + produtos_consumo %}
+                    {% if loop.index == (produtos_estoque|length) + 1 %}
+                    <tr><td colspan="7" style="background:#eefbf3; color:#166534; font-weight:800; padding:14px;">Ala de Consumos — Abre-Alas, Enredo e Maníacos por Drink (vendas sem estoque)</td></tr>
+                    {% endif %}
                     {% set possui_preview_variacoes = produto.possui_variacoes_tamanho and produto.estoques_variacoes %}
                     <tr{% if possui_preview_variacoes %} class="produto-com-variacoes" data-produto-variacoes{% endif %}>
                         <td>
@@ -129,7 +132,11 @@
                         </td>
                         <td>{{ produto.categoria.nome if produto.categoria else 'Sem categoria' }}</td>
                         <td>
+                            {% if produto.eh_consumo %}
+                            <strong>Sem estoque</strong><br><small>Contagem diária de vendas no PDV</small>
+                            {% else %}
                             <strong>{{ produto.estoque_atual }} un.</strong>
+                            {% endif %}
                             {% if produto.variacoes_com_estoque_baixo %}
                             <div class="variacoes-estoque-baixo" aria-label="Variações com estoque baixo">
                                 {% for variacao in produto.variacoes_com_estoque_baixo %}
@@ -140,7 +147,9 @@
                         </td>
                         <td>R$ {{ "%.2f"|format(produto.preco_exibicao) }}</td>
                         <td>
-                            {% if produto.estoque_baixo %}
+                            {% if produto.eh_consumo %}
+                                <span class="badge-status ativo"><i class="fa-solid fa-cash-register" aria-hidden="true"></i> Consumo</span>
+                            {% elif produto.estoque_baixo %}
                                 <span class="badge-status baixo-estoque"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Estoque baixo</span>
                                 {% if produto.variacoes_com_estoque_baixo %}
                                 <small class="descricao-estoque-baixo">{{ produto.variacoes_com_estoque_baixo|length }} variaç{{ 'ão' if produto.variacoes_com_estoque_baixo|length == 1 else 'ões' }} em alerta</small>
@@ -298,7 +307,7 @@
 
     <footer class="main-footer">
         <div class="footer-content" style="text-align:center; padding:20px; color:#ffffff;">
-            <p>&copy; 2026 Canamania. Frozen de caldo de cana.</p>
+            <p>&copy; 2026 Canamania. Gestão de consumos.</p>
         </div>
     </footer>
 

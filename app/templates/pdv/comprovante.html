@@ -66,6 +66,9 @@
             <a href="/pdv/historico" class="btn-nova-venda" style="background:#4b5563; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
                 <i class="fa-solid fa-arrow-left"></i> Histórico
             </a>
+            <a href="/pdv/" class="btn-nova-venda" style="background:#10b981; color:white; padding:10px 16px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:bold;">
+                <i class="fa-solid fa-plus"></i> Fazer outra venda
+            </a>
             <button onclick="window.print()" style="padding:10px 20px; background:#1e1b4b; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
                 <i class="fa-solid fa-print"></i> Imprimir Recibo
             </button>
@@ -83,6 +86,7 @@
                 <strong>DATA/HORA:</strong> {{ venda.criado_em.strftime('%d/%m/%Y %H:%M:%S') }}<br>
                 <strong>CLIENTE:</strong> {{ venda.cliente.nome if venda.cliente else "Consumidor Geral" }}<br>
                 <strong>OPERADOR ID:</strong> {{ venda.usuario_id }}
+                {% if venda.forma_pagamento %}<br><strong>PAGAMENTO:</strong> {{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite'}.get(venda.forma_pagamento, venda.forma_pagamento) }}{% endif %}
             </div>
 
             <div style="border-bottom: 1px dashed #ccc; margin: 15px 0;"></div>

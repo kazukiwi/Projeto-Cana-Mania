@@ -2,25 +2,25 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ "Editar frozen" if editando else "Novo frozen" }} | Canamania</title>
+    <title>{{ "Editar consumo" if editando else "Novo consumo" }} | Canamania</title>
     <link rel="stylesheet" href="/static/css/form_produtos.css?v=canamania-1">
     <link rel="stylesheet" href="/static/css/responsive.css?v=1">
 </head>
 <body>
     {% include "partials/navbar.html" %}
     <main class="main-content">
-        <div class="page-header"><h1>{{ "Editar frozen" if editando else "Novo frozen" }}</h1><p>Cadastro simples por unidade, sem variações de tamanho ou cor.</p></div>
+        <div class="page-header"><h1>{{ "Editar consumo" if editando else "Novo consumo" }}</h1><p>Cadastro simples por unidade, sem variações de tamanho ou cor.</p></div>
         {% if erro %}<div class="alert-box">{{ erro }}</div>{% endif %}
         <div class="form-container">
             <form action="{{ '/produtos/' + editando.id|string + '/editar' if editando else '/produtos/novo' }}" method="post" enctype="multipart/form-data">
                 <div class="form-grid">
-                    <div class="form-group full-width"><label for="nome">Nome do frozen</label><input id="nome" name="nome" required autofocus value="{{ editando.nome if editando else (valores.nome if valores else '') }}" placeholder="Ex.: Frozen de caldo de cana com limão"></div>
+                    <div class="form-group full-width"><label for="nome">Nome do consumo</label><input id="nome" name="nome" required autofocus value="{{ editando.nome if editando else (valores.nome if valores else '') }}" placeholder="Ex.: Consumo de caldo de cana com limão"></div>
                     <div class="form-group"><label for="preco">Preço de venda (R$)</label><input id="preco" name="preco" type="number" step="0.01" min="0" required value="{{ editando.preco if editando else (valores.preco if valores else '0.00') }}"></div>
                     <div class="form-group"><label for="estoque_atual">Estoque inicial</label><input id="estoque_atual" name="estoque_atual" type="number" min="0" required value="{{ editando.estoque_atual if editando else (valores.estoque_atual if valores else '0') }}"><small>Depois, distribua o estoque entre as filiais.</small></div>
                     <div class="form-group full-width"><label for="categoria_id">Categoria</label><select id="categoria_id" name="categoria_id"><option value="0">Sem categoria</option>{% for categoria in categorias %}<option value="{{ categoria.id }}" {{ 'selected' if (editando and editando.categoria_id == categoria.id) or (valores and valores.categoria_id == categoria.id) else '' }}>{{ categoria.nome }}</option>{% endfor %}</select></div>
-                    <div class="form-group full-width">{% if editando and editando.imagem_path %}<div class="current-image-container"><img src="{{ editando.imagem_url }}" alt="{{ editando.nome }}" class="current-image-preview"><span>Envie outra imagem somente se quiser substituí-la.</span></div>{% endif %}<label for="imagem">Imagem do frozen</label><input id="imagem" name="imagem" type="file" accept=".jpg,.jpeg,.png,.webp"></div>
+                    <div class="form-group full-width">{% if editando and editando.imagem_path %}<div class="current-image-container"><img src="{{ editando.imagem_url }}" alt="{{ editando.nome }}" class="current-image-preview"><span>Envie outra imagem somente se quiser substituí-la.</span></div>{% endif %}<label for="imagem">Imagem do consumo</label><input id="imagem" name="imagem" type="file" accept=".jpg,.jpeg,.png,.webp"></div>
                 </div>
-                <div class="form-actions"><button class="btn-submit" type="submit">{{ "Salvar alterações" if editando else "Criar frozen" }}</button><a class="btn-cancel" href="/produtos">Cancelar</a></div>
+                <div class="form-actions"><button class="btn-submit" type="submit">{{ "Salvar alterações" if editando else "Criar consumo" }}</button><a class="btn-cancel" href="/produtos">Cancelar</a></div>
             </form>
         </div>
     </main>

@@ -15,6 +15,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const filial = document.getElementById('filial-pdv');
     const buscaFrozen = document.getElementById('busca-frozen');
     const resultadoBusca = document.getElementById('resultado-busca-frozen');
+    const modalCatalogo = document.getElementById('catalogo-pdv-modal');
+    const gradeCatalogo = document.getElementById('grade-catalogo-pdv');
+    const buscaCatalogo = document.getElementById('busca-catalogo-pdv');
+
+    const selecionarProduto = id => {
+        produto.value = String(id);
+        buscaFrozen.value = produto.options[produto.selectedIndex].textContent.trim();
+        resultadoBusca.innerHTML = '';
+        buscaFrozen.setAttribute('aria-expanded', 'false');
+        produto.dispatchEvent(new Event('change'));
+    };
+    const renderizarCatalogo = termo => {
+        if (!gradeCatalogo) return;
+        const filtro = (termo || '').trim().toLocaleLowerCase('pt-BR');
+        gradeCatalogo.innerHTML = '';
+        [...produto.options].filter(opcao => opcao.value && !opcao.hidden && opcao.textContent.toLocaleLowerCase('pt-BR').includes(filtro)).forEach(opcao => {
+            const card = document.createElement('button');
+            card.type = 'button'; card.dataset.produtoId = opcao.value;
+            card.style.cssText = 'border:1px solid #ddd;border-radius:10px;background:#fff;padding:10px;text-align:left;cursor:pointer;display:grid;gap:8px;';
+            const imagem = document.createElement('img');
+            imagem.src = opcao.dataset.imagem || '/static/img/produto_padrao.png'; imagem.alt = ''; imagem.style.cssText = 'width:100%;height:105px;object-fit:cover;border-radius:7px;';
+            const nome = document.createElement('strong'); nome.textContent = opcao.dataset.nome;
+            const detalhe = document.createElement('small'); detalhe.textContent = opcao.dataset.semEstoque === 'true' ? 'Venda sem limite' : `${saldoDaFilial(opcao.value)} un. nesta loja`;
+            card.append(imagem, nome, detalhe); gradeCatalogo.appendChild(card);
+        });
+        if (!gradeCatalogo.children.length) gradeCatalogo.textContent = 'Nenhum produto disponível nesta loja.';
+    };
 
     const opcoes = () => variacoes[produto.value] || [];
     const formatarPreco = preco => `R$ ${Number(preco || 0).toFixed(2).replace('.', ',')}`;
@@ -22,6 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const aplicarFilial = () => {
         [...produto.options].forEach(opcao => {
             if (!opcao.value) return;
+            if (opcao.dataset.semEstoque === 'true') {
+                opcao.hidden = false;
+                opcao.disabled = false;
+                return;
+            }
             const saldo = saldoDaFilial(opcao.value);
             opcao.hidden = saldo <= 0;
             opcao.disabled = saldo <= 0;
@@ -62,9 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (opcao.value) opcao.disabled = !opcoes().some(item => String(item.tamanho_id) === opcao.value && item.estoque_atual > 0);
             });
         } else {
-            const saldo = saldoDaFilial(produto.value);
-            estoque.value = `${saldo} un`;
-            quantidade.max = saldo;
+            if (selecionado.dataset.semEstoque === 'true') {
+                estoque.value = 'Sem limite';
+                quantidade.removeAttribute('max');
+            } else {
+                const saldo = saldoDaFilial(produto.value);
+                estoque.value = `${saldo} un`;
+                quantidade.max = saldo;
+            }
         }
     });
     tamanho?.addEventListener('change', preencherCores);
@@ -80,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const qtd = Number(quantidade.value);
         const saldo = temVariacoes
             ? opcoes().find(item => String(item.tamanho_id) === tamanho.value && item.cor === cor.value)?.estoque_atual
-            : Number(selecionado.dataset.estoque);
+            : (selecionado.dataset.semEstoque === 'true' ? Number.POSITIVE_INFINITY : saldoDaFilial(produto.value));
         if (!qtd || qtd > saldo) return alert('Quantidade excede o estoque disponível.');
         const tamanhoId = temVariacoes ? tamanho.value : null;
         const nomeCor = temVariacoes ? cor.value : null;
@@ -135,23 +172,30 @@ document.addEventListener('DOMContentLoaded', () => {
         [...produto.options].forEach(opcao => {
             if (!opcao.value) return;
             const corresponde = !termo || opcao.textContent.toLocaleLowerCase('pt-BR').includes(termo);
-            opcao.hidden = !corresponde || saldoDaFilial(opcao.value) <= 0;
+            opcao.hidden = !corresponde || (opcao.dataset.semEstoque !== 'true' && saldoDaFilial(opcao.value) <= 0);
         });
         const encontrados = [...produto.options].filter(opcao => opcao.value && !opcao.hidden).slice(0, 6);
         if (resultadoBusca) {
-            resultadoBusca.innerHTML = termo ? encontrados.map(opcao => `<button type="button" data-produto-id="${opcao.value}"><i class="fa-solid fa-cube"></i>${opcao.textContent.trim()} <small>${saldoDaFilial(opcao.value)} un.</small></button>`).join('') || '<p>Nenhum frozen disponível nesta loja.</p>' : '';
+            resultadoBusca.innerHTML = termo ? encontrados.map(opcao => `<button type="button" data-produto-id="${opcao.value}"><i class="fa-solid fa-cube"></i>${opcao.textContent.trim()} <small>${saldoDaFilial(opcao.value)} un.</small></button>`).join('') || '<p>Nenhum consumo disponível nesta loja.</p>' : '';
             buscaFrozen.setAttribute('aria-expanded', String(Boolean(termo)));
         }
     });
     resultadoBusca?.addEventListener('click', evento => {
         const botao = evento.target.closest('[data-produto-id]');
         if (!botao) return;
-        produto.value = botao.dataset.produtoId;
-        buscaFrozen.value = produto.options[produto.selectedIndex].textContent.trim();
-        resultadoBusca.innerHTML = '';
-        buscaFrozen.setAttribute('aria-expanded', 'false');
-        produto.dispatchEvent(new Event('change'));
+        selecionarProduto(botao.dataset.produtoId);
     });
+    document.getElementById('abrir-catalogo-pdv')?.addEventListener('click', () => {
+        aplicarFilial(); renderizarCatalogo(''); modalCatalogo.hidden = false; buscaCatalogo?.focus();
+    });
+    document.getElementById('fechar-catalogo-pdv')?.addEventListener('click', () => { modalCatalogo.hidden = true; });
+    buscaCatalogo?.addEventListener('input', () => renderizarCatalogo(buscaCatalogo.value));
+    gradeCatalogo?.addEventListener('click', evento => {
+        const card = evento.target.closest('[data-produto-id]');
+        if (!card) return;
+        selecionarProduto(card.dataset.produtoId); modalCatalogo.hidden = true;
+    });
+    modalCatalogo?.addEventListener('click', evento => { if (evento.target === modalCatalogo) modalCatalogo.hidden = true; });
     aplicarFilial();
 });
 

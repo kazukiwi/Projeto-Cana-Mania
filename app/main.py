@@ -14,14 +14,16 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import func
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.database import get_db
-from app.models.produtos import Produto, EstoqueVariacao, condicao_estoque_baixo
+from app.database import Base, engine, get_db
+from app.models.produtos import LIMITE_ESTOQUE_BAIXO, Produto, EstoqueVariacao, condicao_estoque_baixo
 from app.models.cliente import Cliente
 from app.models.usuario import Usuario
 from app.models.armario import Armario
 from app.models.reserva_armario import ReservaArmario
 from app.models.venda import ItemVenda, Venda
 from app.models.filial import EstoqueFilial, FILIAIS
+from app.models.categoria import Categoria
+from app.models.produtos import CATEGORIAS_CONSUMO
 
 from app.controllers import (
     auth_controller,
@@ -35,6 +37,11 @@ from app.controllers import (
 )
 
 from app.auth import get_usuario_opcional, get_usuario_logado
+
+
+# Mantém instalações locais que ainda não passaram por todas as migrações
+# utilizáveis, sem alterar nem apagar tabelas e dados já existentes.
+Base.metadata.create_all(bind=engine)
 
 
 async def rotina_fechamento_diario():
@@ -206,9 +213,20 @@ def home(
 
     from app.controllers.estoque_controller import garantir_estoque_filiais
     garantir_estoque_filiais(db)
-    saldos_filiais = db.query(EstoqueFilial).all()
+    # Produtos desativados permanecem no histórico, mas nunca participam dos
+    # totais nem dos alertas exibidos no dashboard.
+    saldos_filiais = (
+        db.query(EstoqueFilial)
+        .join(Produto, EstoqueFilial.produto_id == Produto.id)
+        .join(Categoria, Produto.categoria_id == Categoria.id, isouter=True)
+        .filter(
+            Produto.ativo == True,
+            (Categoria.nome.is_(None)) | (~func.lower(Categoria.nome).in_(CATEGORIAS_CONSUMO)),
+        )
+        .all()
+    )
     estoque_por_filial = {filial: sum(s.quantidade for s in saldos_filiais if s.filial == filial) for filial in FILIAIS}
-    alertas_filiais = [s for s in saldos_filiais if 0 < s.quantidade <= 5]
+    alertas_filiais = [s for s in saldos_filiais if 0 < s.quantidade <= LIMITE_ESTOQUE_BAIXO]
     total_produtos = len(produtos_ativos)
     estoque_baixo = (
         db.query(Produto)
