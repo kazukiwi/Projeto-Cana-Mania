@@ -1,19 +1,26 @@
 /* Camada comum de responsividade para todas as telas do sistema. */
-img, svg { max-width: 100%; }
+html { -webkit-text-size-adjust: 100%; }
+img, svg, video, canvas { max-width: 100%; height: auto; }
 button, input, select, textarea { font: inherit; }
 .menu-toggle { display: none; }
+.table-shell, .table-container, .tabela, .tabela-container,
+.tabela-reservas-wrap, .mini-tabela-wrapper, .stock-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 
 @media (max-width: 900px) {
   .dashboard, .produtos-container-main, .clientes-container, .vendas-container-main, .main-content, .page { padding-left: 24px !important; padding-right: 24px !important; }
   .armarios-page { width: min(100% - 32px, 1180px); }
   .cards-resumo-container, .indicadores-grid, .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-  .table-shell, .tabela-container, .tabela-reservas-wrap, .mini-tabela-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .table-shell table, .tabela-container table, .tabela-reservas, .mini-tabela-pdv { min-width: 680px; }
+  .table-shell table, .table-container table, .tabela table, .tabela-container table, .tabela-reservas, .mini-tabela-pdv { min-width: 680px; }
   .modal-content, .modal-content-pdv, .modal-card { max-height: calc(100vh - 32px); overflow-y: auto; }
 }
 
 @media (max-width: 640px) {
   body { overflow-x: hidden; }
+  main, section, article, form, fieldset { min-width: 0; }
   .dashboard, .produtos-container-main, .clientes-container, .vendas-container-main, .main-content, .page { padding: 22px 16px !important; }
   .armarios-page { width: min(100% - 24px, 1180px); padding-top: 24px; }
   h1, .page-title h1, .header h1, .header-produtos h1 { font-size: clamp(24px, 7vw, 30px) !important; }
@@ -27,12 +34,15 @@ button, input, select, textarea { font: inherit; }
   .modal-overlay, .modal-finalizar-dia, .modal-confirmacao-acao { padding: 12px; }
   .modal-card, .modal-content, .modal-content-pdv, .confirmacao-acao-card, .modal-finalizar-dia-card { width: 100% !important; padding: 20px; }
   .form-grid, .form-row, .form-row-split, .pdv-layout-split { grid-template-columns: 1fr !important; flex-direction: column; }
+  .form-actions, .modal-actions, .feedback-modal-acoes { flex-wrap: wrap; }
+  .form-actions > *, .modal-actions > *, .feedback-modal-acoes > * { flex: 1 1 150px; }
 }
 
 /* Navegação recolhível e painéis fluidos em celulares. */
 @media (max-width: 760px) {
   .navbar { min-height: 68px !important; padding: 12px 16px !important; flex-direction: row !important; flex-wrap: wrap; gap: 8px !important; }
   .menu-toggle { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid #dbe5df; border-radius: 10px; background: var(--cana-surface); color: var(--cana-green); font-size: 20px; cursor: pointer; }
+  .menu-toggle:focus-visible { outline: 3px solid rgba(255,24,119,.28); outline-offset: 2px; }
   .menu { display: none !important; width: 100%; order: 3; padding: 10px 0 2px !important; border-top: 1px solid rgba(8,61,44,.12); }
   .menu.menu-aberto { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px !important; }
   .menu li { min-width: 0; }
@@ -53,9 +63,6 @@ button, input, select, textarea { font: inherit; }
   .vendas-container-main [style*="justify-content:space-between"] { gap: 10px; flex-wrap: wrap; }
   .vendas-container-main [style*="display:flex"] { min-width: 0; }
   .main-footer { padding: 16px 12px; }
-}
-
-@media (max-width: 420px) {
   .menu { gap: 10px 14px; }.menu a { font-size: 14px; }
   .logo img { height: 56px; }
   .btn-novo-produto, .btn-primary, .btn-create, .btn-nova-venda, .btn-finalizar-dia { min-height: 44px; }

@@ -9,7 +9,6 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from fastapi.exception_handlers import http_exception_handler as default_http_exception_handler
 from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import func
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -113,7 +112,30 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
             status_code=404,
             context={"request": request}
         )
-    return await default_http_exception_handler(request, exc)
+    erros_http = {
+        403: ("Acesso não permitido", "Seu usuário não possui permissão para acessar esta área.", "Volte para o início ou entre com uma conta autorizada."),
+        405: ("Ação não permitida", "Esta página não aceita o tipo de solicitação enviado.", "Retorne à tela anterior e tente a ação novamente."),
+        408: ("A solicitação demorou demais", "Não foi possível concluir a comunicação dentro do tempo esperado.", "Verifique sua conexão e tente novamente."),
+        429: ("Muitas tentativas", "Recebemos várias solicitações em um curto período.", "Aguarde alguns instantes antes de tentar novamente."),
+        503: ("Serviço temporariamente indisponível", "O sistema não consegue atender esta solicitação agora.", "Tente novamente em alguns minutos."),
+    }
+    titulo, mensagem, descricao = erros_http.get(
+        exc.status_code,
+        ("Não foi possível concluir", "O sistema encontrou um problema ao processar esta solicitação.", "Volte para uma área segura e tente novamente."),
+    )
+    return templates.TemplateResponse(
+        name="erro_generico.html",
+        request=request,
+        status_code=exc.status_code,
+        context={
+            "request": request,
+            "codigo": exc.status_code,
+            "titulo": titulo,
+            "mensagem": mensagem,
+            "descricao": descricao,
+            "voltar_para": "/",
+        },
+    )
 
 
 @app.exception_handler(RequestValidationError)
@@ -125,8 +147,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=422,
         context={
             "request": request,
-            "mensagem": "Não foi possível aplicar estes filtros. Tente novamente.",
-            "voltar_para": "/produtos/",
+            "codigo": 422,
+            "titulo": "Revise os dados informados",
+            "mensagem": "Alguns campos não foram preenchidos no formato esperado.",
+            "descricao": "Confira os dados e tente enviar o formulário novamente.",
+            "voltar_para": str(request.headers.get("referer") or "/"),
         },
     )
 
@@ -141,7 +166,10 @@ async def unexpected_exception_handler(request: Request, exc: Exception):
         status_code=500,
         context={
             "request": request,
+            "codigo": 500,
+            "titulo": "Algo não saiu como esperado",
             "mensagem": "Ocorreu um erro inesperado ao carregar esta página.",
+            "descricao": "O problema foi registrado. Você pode voltar ao início e tentar novamente.",
             "voltar_para": "/",
         },
     )

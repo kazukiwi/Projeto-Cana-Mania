@@ -6,20 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>Página não encontrada (404) - CanaMania</title>
-    <link rel="stylesheet" href="/static/css/erro.css">
-    <link rel="stylesheet" href="/static/css/responsive.css?v=1">
+    <link rel="stylesheet" href="/static/css/erro.css?v=2">
 </head>
 
 <body>
     <main class="erro-page">
-        <section class="erro-card" aria-labelledby="titulo-erro">
-            <h1 class="erro-codigo">404</h1>
+        <section class="erro-card erro-card--404" aria-labelledby="titulo-erro">
+            <a href="/" class="erro-marca"><span>Cana</span>mania<small>gestão de consumos</small></a>
+            <p class="erro-etiqueta">Erro 404</p>
+            <h1 id="titulo-erro" class="erro-titulo">Página não encontrada</h1>
             
             <div class="robo-wrap">
-                <img src="/static/img/robot-404.png" alt="Ilustração de um robô confuso" class="robo-img">
+                <img src="/static/img/canamania.jpg" alt="CanaMania" class="robo-img">
                 
                 <div class="balao-fala" id="mensagem-erro" aria-live="polite">
-                    <p>Tá indo aonde?? Essa tela não existe!</p>
+                    <p>Não encontramos o endereço que você tentou acessar.</p>
                 </div>
             </div>
 
@@ -28,7 +29,8 @@
             </p>
 
             <div class="erro-acoes">
-                <a href="/" class="btn-voltar">Voltar para o início</a>
+                <button type="button" class="btn-inicio" onclick="history.back()">Voltar</button>
+                <a href="/" class="btn-voltar">Ir para o início</a>
             </div>
         </section>
     </main>

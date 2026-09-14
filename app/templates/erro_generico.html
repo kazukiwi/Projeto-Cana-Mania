@@ -4,19 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
-    <title>Não foi possível concluir - Canamania</title>
-    <link rel="stylesheet" href="/static/css/erro.css">
+    <title>{{ codigo or 500 }} — {{ titulo or 'Não foi possível concluir' }} | CanaMania</title>
+    <link rel="stylesheet" href="/static/css/erro.css?v=2">
 </head>
 <body>
     <main class="erro-page">
-        <section class="erro-card" aria-labelledby="titulo-erro">
-            <h1 class="erro-codigo">Oops!</h1>
+        <section class="erro-card erro-card--{{ codigo or 500 }}" aria-labelledby="titulo-erro">
+            <a href="/" class="erro-marca"><span>Cana</span>mania<small>gestão de consumos</small></a>
+            <p class="erro-etiqueta">Erro {{ codigo or 500 }}</p>
+            <h1 id="titulo-erro" class="erro-titulo">{{ titulo or 'Não foi possível concluir' }}</h1>
             <div class="robo-wrap">
-                <img src="/static/img/robot-404.png" alt="Ilustração de um robô informando um problema" class="robo-img">
+                <img src="/static/img/canamania.jpg" alt="CanaMania" class="robo-img">
                 <div class="balao-fala"><p>{{ mensagem or 'Não foi possível concluir esta ação agora.' }}</p></div>
             </div>
-            <p class="erro-subtexto">Nenhuma alteração foi realizada. Revise os filtros e tente novamente.</p>
-            <div class="erro-acoes"><a href="{{ voltar_para or '/' }}" class="btn-voltar">Voltar e tentar novamente</a></div>
+            <p class="erro-subtexto">{{ descricao or 'Volte para uma área segura e tente novamente.' }}</p>
+            <div class="erro-acoes">
+                <a href="{{ voltar_para or '/' }}" class="btn-voltar">Voltar</a>
+                <a href="/" class="btn-inicio">Ir para o início</a>
+            </div>
         </section>
     </main>
 </body>

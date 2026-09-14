@@ -5,24 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>Sessão não autenticada - AAPM</title>
-    <link rel="stylesheet" href="/static/css/erro.css">
-    <link rel="stylesheet" href="/static/css/responsive.css?v=1">
+    <link rel="stylesheet" href="/static/css/erro.css?v=2">
 </head>
 <body>
     <main class="erro-page">
-        <section class="erro-card" aria-labelledby="titulo-nao-autenticado">
-            <h1 id="titulo-nao-autenticado" class="erro-codigo">401</h1>
+        <section class="erro-card erro-card--401" aria-labelledby="titulo-nao-autenticado">
+            <a href="/" class="erro-marca"><span>Cana</span>mania<small>gestão de consumos</small></a>
+            <p class="erro-etiqueta">Erro 401</p>
+            <h1 id="titulo-nao-autenticado" class="erro-titulo">Sua sessão expirou</h1>
             <div class="robo-wrap">
-                <img src="/static/img/robot-404.png" alt="Ilustração de acesso restrito" class="robo-img">
+                <img src="/static/img/canamania.jpg" alt="CanaMania" class="robo-img">
                 <div class="balao-fala">
-                    <p>Você não está autenticado para acessar esta página.</p>
+                    <p>Faça login novamente para continuar com segurança.</p>
                 </div>
             </div>
             <p class="erro-subtexto">
                 Sua sessão pode ter expirado ou você ainda não fez login.
             </p>
             <div class="erro-acoes">
-                <a href="/" class="btn-voltar">Voltar para o início</a>
+                <a href="/" class="btn-voltar">Ir para o login</a>
             </div>
         </section>
     </main>

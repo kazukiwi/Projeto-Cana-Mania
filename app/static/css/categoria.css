@@ -365,4 +365,20 @@ button:active, a:active {
 }
 
 /* Categorias Canamania */
-.main-content{width:min(1280px,calc(100% - 48px));margin-inline:auto;padding:44px 0 64px}.page-header h1{color:#083d2c;letter-spacing:-.04em}.table-container{border:1px solid #dbead6;border-radius:18px;overflow:hidden;box-shadow:0 15px 32px rgba(8,61,44,.07)}.table-container table thead{background:#083d2c}.table-container table th{color:#fff}.table-container table tbody tr{transition:background .2s}.table-container table tbody tr:hover{background:#fff1f7}.btn-create{background:#ff1877!important;border-radius:11px!important}.btn-create:hover{background:#c9085a!important}html[data-theme="dark"] .main-content{color:#eef5ed}html[data-theme="dark"] .page-header h1{color:#d7fbb3}html[data-theme="dark"] .table-container{border-color:#31513a;box-shadow:none}html[data-theme="dark"] .table-container table thead{background:#061e15}html[data-theme="dark"] .table-container table tbody tr{background:#141d17}html[data-theme="dark"] .table-container table tbody tr:hover{background:#202d23}html[data-theme="dark"] .table-container td{color:#e5ede5!important}
+.main-content{width:min(1280px,calc(100% - 48px));margin-inline:auto;padding:44px 0 64px}.page-header h1{color:#083d2c;letter-spacing:-.04em}.table-container{border:1px solid #dbead6;border-radius:18px;overflow:hidden;box-shadow:0 15px 32px rgba(8,61,44,.07)}.table-container table thead,.table-container table thead th{background:#083d2c;color:#fff}.table-container table thead th{white-space:nowrap;border-bottom-color:#315f50}.table-container table tbody tr{transition:background .2s}.table-container table tbody tr:hover{background:#fff1f7}.btn-create{background:#ff1877!important;border-radius:11px!important}.btn-create:hover{background:#c9085a!important}html[data-theme="dark"] .main-content{color:#eef5ed}html[data-theme="dark"] .page-header h1{color:#d7fbb3}html[data-theme="dark"] .table-container{border-color:#31513a;box-shadow:none}html[data-theme="dark"] .table-container table thead,html[data-theme="dark"] .table-container table thead th{background:#061e15;color:#fff!important}html[data-theme="dark"] .table-container table tbody tr{background:#141d17}html[data-theme="dark"] .table-container table tbody tr:hover{background:#202d23}html[data-theme="dark"] .table-container td{color:#e5ede5!important}
+
+@media (max-width: 640px) {
+    .table-container {
+        border-radius: 12px;
+        overflow-x: auto;
+    }
+
+    .table-container table {
+        min-width: 760px;
+    }
+
+    .table-container th,
+    .table-container td {
+        padding: 14px 16px;
+    }
+}

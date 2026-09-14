@@ -15,13 +15,8 @@
 .vendas-container-main,
 .main-content,
 .armarios-page {
-<<<<<<< HEAD
     width: 100% !important;
     max-width: 1600px !important;
-=======
-    width: 100%;
-    max-width: 1400px;
->>>>>>> 59ab4f9f1cc8fc0b8b39509b34ec383b50cd3878
     margin: 0 auto;
     padding: var(--page-padding-block) var(--page-padding-inline) !important;
 }
