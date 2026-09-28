@@ -36,7 +36,7 @@
                 {% else %}
                     <div class="no-image">
                         <i data-lucide="image-off" style="width: 40px; height: 40px;"></i>
-                        <span>Sem imagem disponÃ­vel</span>
+                        <span>Sem imagem disponível</span>
                     </div>
                 {% endif %}
             </div>
@@ -48,13 +48,13 @@
                         <span class="info-value">
                             {% if produto.categoria %}
                                 <span class="category-badge">{{ produto.categoria.nome }}</span>
-                            {% else %}\n                                <span style="color: #64748b;">â€”</span>
+                            {% else %}\n                                <span style="color: #64748b;">—</span>
                             {% endif %}
                         </span>
                     </div>
 
                     <div class="info-row">
-                        <span class="info-label">{{ 'Maior preÃ§o' if produto.possui_variacoes_tamanho else 'PreÃ§o unitÃ¡rio' }}</span>
+                        <span class="info-label">{{ 'Maior preço' if produto.possui_variacoes_tamanho else 'Preço unitário' }}</span>
                         <span class="info-value price-highlight">R$ {{ "%.2f"|format(produto.preco_exibicao) }}</span>
                     </div>
 
@@ -65,12 +65,12 @@
 
                     {% if produto.possui_variacoes_tamanho and produto.estoques_variacoes %}
                     <div class="info-row">
-                        <span class="info-label">Tamanhos disponÃ­veis</span>
+                        <span class="info-label">Tamanhos disponíveis</span>
                         <div class="tamanhos-lista" aria-label="Estoque por tamanho">
                             {% for estoque in produto.estoques_variacoes %}
                             <span class="tamanho-item">
                                 <strong>{{ estoque.tamanho.nome }} / {{ estoque.cor }}</strong>
-                                <span>{{ estoque.estoque_atual }} un. Â· R$ {{ "%.2f"|format(estoque.preco) }}</span>
+                                <span>{{ estoque.estoque_atual }} un. · R$ {{ "%.2f"|format(estoque.preco) }}</span>
                             </span>
                             {% endfor %}
                         </div>

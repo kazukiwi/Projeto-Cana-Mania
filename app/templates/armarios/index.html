@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
-    <title>MÃ¡quinas | Canamania</title>
+    <title>Máquinas | Canamania</title>
     <link rel="stylesheet" href="/static/css/armarios.css?v=3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="/static/javascript/confirmar_saida.js" defer></script>
@@ -28,9 +28,9 @@
                 <li><a href="/pdv/historico">Vendas</a></li>
                 <li><a href="/mais_vendidos">Mais vendidos</a></li>
                 {% if usuario.role == 'admin' %}
-                <li><a href="/maquinas" class="active">MÃ¡quinas</a></li>
+                <li><a href="/maquinas" class="active">Máquinas</a></li>
 
-                <li><a href="/usuarios" > </i> UsuÃ¡rios
+                <li><a href="/usuarios" > </i> Usuários
                 </a></li>
                 <li><a href="/categorias" ></i> Categorias
                 </a></li>
@@ -43,60 +43,60 @@
 
     <main class="armarios-page">
         <section class="page-title">
-            <h1>Controle de mÃ¡quinas</h1>
-            <p>Acompanhe disponibilidade, operaÃ§Ã£o e manutenÃ§Ã£o das mÃ¡quinas Canamania.</p>
+            <h1>Controle de máquinas</h1>
+            <p>Acompanhe disponibilidade, operação e manutenção das máquinas Canamania.</p>
         </section>
 
-        <nav class="armarios-tabs" aria-label="MÃ³dulos de mÃ¡quinas">
+        <nav class="armarios-tabs" aria-label="Módulos de máquinas">
             <button type="button" class="armarios-tab active" data-armarios-tab="disponibilidade"><i class="fa-solid fa-gears"></i> Disponibilidade</button>
             <button type="button" class="armarios-tab" data-armarios-tab="reserva"><i class="fa-solid fa-calendar-plus"></i> Nova reserva</button>
-            <button type="button" class="armarios-tab" data-armarios-tab="cadastro"><i class="fa-solid fa-plus"></i> Cadastrar mÃ¡quina</button>
-            <button type="button" class="armarios-tab" data-armarios-tab="historico"><i class="fa-solid fa-clock-rotate-left"></i> HistÃ³rico</button>
+            <button type="button" class="armarios-tab" data-armarios-tab="cadastro"><i class="fa-solid fa-plus"></i> Cadastrar máquina</button>
+            <button type="button" class="armarios-tab" data-armarios-tab="historico"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
         </nav>
 
         <div class="feedback-area" aria-live="polite">
             {% if request.query_params.get("reserva") == "ok" %}<div class="alerta-sucesso">Reserva criada com sucesso.</div>{% endif %}
-            {% if request.query_params.get("reserva") == "cancelada" %}<div class="alerta-sucesso">Reserva cancelada e mantida no histÃ³rico.</div>{% endif %}
-            {% if request.query_params.get("armario") == "ok" %}<div class="alerta-sucesso">MÃ¡quina cadastrada com sucesso.</div>{% endif %}
-            {% if request.query_params.get("armario") == "desativado" %}<div class="alerta-sucesso">MÃ¡quina desativada. O histÃ³rico foi preservado.</div>{% endif %}
-            {% if request.query_params.get("armario") == "ativado" %}<div class="alerta-sucesso">MÃ¡quina ativada e disponÃ­vel para uso.</div>{% endif %}
-            {% if request.query_params.get("erro") == "ocupado" %}<div class="alerta-erro">Cancele a reserva ou libere o armÃ¡rio antes de desativÃ¡-lo.</div>{% endif %}
-            {% if request.query_params.get("erro") == "conflito" %}<div class="alerta-erro">JÃ¡ existe uma reserva ativa para este armÃ¡rio no perÃ­odo informado.</div>{% endif %}
-            {% if request.query_params.get("erro") == "indisponivel" %}<div class="alerta-erro">Este armÃ¡rio nÃ£o estÃ¡ disponÃ­vel para reserva.</div>{% endif %}
-            {% if request.query_params.get("erro") == "periodo" %}<div class="alerta-erro">A data final deve ser igual ou posterior Ã  data inicial.</div>{% endif %}
-            {% if request.query_params.get("erro") in ["reservadados", "numero"] %}<div class="alerta-erro">Revise os dados informados. O nÃºmero do armÃ¡rio deve ser Ãºnico.</div>{% endif %}
+            {% if request.query_params.get("reserva") == "cancelada" %}<div class="alerta-sucesso">Reserva cancelada e mantida no histórico.</div>{% endif %}
+            {% if request.query_params.get("armario") == "ok" %}<div class="alerta-sucesso">Máquina cadastrada com sucesso.</div>{% endif %}
+            {% if request.query_params.get("armario") == "desativado" %}<div class="alerta-sucesso">Máquina desativada. O histórico foi preservado.</div>{% endif %}
+            {% if request.query_params.get("armario") == "ativado" %}<div class="alerta-sucesso">Máquina ativada e disponível para uso.</div>{% endif %}
+            {% if request.query_params.get("erro") == "ocupado" %}<div class="alerta-erro">Cancele a reserva ou libere o armário antes de desativá-lo.</div>{% endif %}
+            {% if request.query_params.get("erro") == "conflito" %}<div class="alerta-erro">Já existe uma reserva ativa para este armário no período informado.</div>{% endif %}
+            {% if request.query_params.get("erro") == "indisponivel" %}<div class="alerta-erro">Este armário não está disponível para reserva.</div>{% endif %}
+            {% if request.query_params.get("erro") == "periodo" %}<div class="alerta-erro">A data final deve ser igual ou posterior à data inicial.</div>{% endif %}
+            {% if request.query_params.get("erro") in ["reservadados", "numero"] %}<div class="alerta-erro">Revise os dados informados. O número do armário deve ser único.</div>{% endif %}
         </div>
 
         <section class="armarios-panel" data-armarios-panel="reserva" hidden>
-            <div class="panel-heading"><h2>Reservar mÃ¡quina</h2><p>Informe onde a mÃ¡quina serÃ¡ utilizada e o perÃ­odo da reserva.</p></div>
+            <div class="panel-heading"><h2>Reservar máquina</h2><p>Informe onde a máquina será utilizada e o período da reserva.</p></div>
             <form action="/armarios/reservas" method="post" class="reserva-form" data-feedback-form>
-                <label>MÃ¡quina<select name="armario_id" required><option value="">Selecione</option>{% for armario in armarios if armario.status == "disponivel" %}<option value="{{ armario.id }}">MÃ¡quina {{ armario.numero }}</option>{% endfor %}</select></label>
+                <label>Máquina<select name="armario_id" required><option value="">Selecione</option>{% for armario in armarios if armario.status == "disponivel" %}<option value="{{ armario.id }}">Máquina {{ armario.numero }}</option>{% endfor %}</select></label>
                 <label>Local ou evento<input name="local_evento" required maxlength="150" placeholder="Ex.: Evento na Liberdade"></label>
-                <label>InÃ­cio<input type="date" name="inicio_em" required></label>
+                <label>Início<input type="date" name="inicio_em" required></label>
                 <label>Fim<input type="date" name="fim_em" required></label>
                 <button class="btn-primario" type="submit"><i class="fa-solid fa-calendar-check"></i> Confirmar reserva</button>
             </form>
         </section>
 
         <section class="armarios-panel" data-armarios-panel="cadastro" hidden>
-            <div class="panel-heading"><h2>Cadastrar mÃ¡quina</h2><p>Adicione uma mÃ¡quina ao controle de disponibilidade.</p></div>
+            <div class="panel-heading"><h2>Cadastrar máquina</h2><p>Adicione uma máquina ao controle de disponibilidade.</p></div>
             <form action="/armarios" method="post" class="cadastro-armario-form" data-feedback-form>
-                <label>NÃºmero da mÃ¡quina<input type="number" name="numero" min="1" max="9999" required placeholder="Ex.: 51"></label>
+                <label>Número da máquina<input type="number" name="numero" min="1" max="9999" required placeholder="Ex.: 51"></label>
                 <button class="btn-primario" type="submit"><i class="fa-solid fa-plus"></i> Cadastrar</button>
             </form>
         </section>
 
         <section class="armarios-panel" data-armarios-panel="historico" hidden>
-            <div class="panel-heading"><h2>HistÃ³rico de reservas</h2><p>Pesquise por local ou evento e consulte as reservas realizadas.</p></div>
+            <div class="panel-heading"><h2>Histórico de reservas</h2><p>Pesquise por local ou evento e consulte as reservas realizadas.</p></div>
             <div class="historico-filtros"><label><i class="fa-solid fa-magnifying-glass"></i><input id="busca-reserva" type="search" placeholder="Buscar por local ou evento"></label><select id="filtro-semestre"><option value="">Todos os eventos</option>{% for reserva in reservas %}<option value="{{ reserva.semestre }}">{{ reserva.semestre }}</option>{% endfor %}</select></div>
-            <div class="tabela-reservas-wrap"><table class="tabela-reservas"><thead><tr><th>ArmÃ¡rio</th><th>Aluno</th><th>Semestre</th><th>PerÃ­odo</th><th>Status</th><th>AÃ§Ã£o</th></tr></thead><tbody id="corpo-reservas">{% for reserva in reservas %}<tr data-reserva data-aluno="{{ reserva.associado.nome if reserva.associado else '' }} {{ reserva.associado.matricula if reserva.associado else '' }}" data-semestre="{{ reserva.semestre }}"><td>#{{ reserva.armario.numero }}</td><td>{{ reserva.associado.nome if reserva.associado else 'Associado removido' }}</td><td>{{ reserva.semestre }}</td><td>{{ reserva.inicio_em.strftime('%d/%m/%Y') }} a {{ reserva.fim_em.strftime('%d/%m/%Y') }}</td><td><span class="status-reserva {{ reserva.status }}">{{ reserva.status }}</span></td><td>{% if reserva.status == 'ativa' %}<form action="/armarios/reservas/{{ reserva.id }}/cancelar" method="post" data-confirm="Cancelar esta reserva?"><button class="btn-cancelar-reserva" type="submit">Cancelar</button></form>{% else %}â€”{% endif %}</td></tr>{% else %}<tr><td colspan="6" class="empty-reservas">Nenhuma reserva registrada.</td></tr>{% endfor %}</tbody></table></div>
+            <div class="tabela-reservas-wrap"><table class="tabela-reservas"><thead><tr><th>Armário</th><th>Aluno</th><th>Semestre</th><th>Período</th><th>Status</th><th>Ação</th></tr></thead><tbody id="corpo-reservas">{% for reserva in reservas %}<tr data-reserva data-aluno="{{ reserva.associado.nome if reserva.associado else '' }} {{ reserva.associado.matricula if reserva.associado else '' }}" data-semestre="{{ reserva.semestre }}"><td>#{{ reserva.armario.numero }}</td><td>{{ reserva.associado.nome if reserva.associado else 'Associado removido' }}</td><td>{{ reserva.semestre }}</td><td>{{ reserva.inicio_em.strftime('%d/%m/%Y') }} a {{ reserva.fim_em.strftime('%d/%m/%Y') }}</td><td><span class="status-reserva {{ reserva.status }}">{{ reserva.status }}</span></td><td>{% if reserva.status == 'ativa' %}<form action="/armarios/reservas/{{ reserva.id }}/cancelar" method="post" data-confirm="Cancelar esta reserva?"><button class="btn-cancelar-reserva" type="submit">Cancelar</button></form>{% else %}—{% endif %}</td></tr>{% else %}<tr><td colspan="6" class="empty-reservas">Nenhuma reserva registrada.</td></tr>{% endfor %}</tbody></table></div>
         </section>
 
         <div data-armarios-panel="disponibilidade">
         <section class="cards-resumo-container">
             <div class="card-resumo card-total">
                 <div>
-                    <span>Total de mÃ¡quinas</span>
+                    <span>Total de máquinas</span>
                     <strong>{{ total_armarios }}</strong>
                 </div>
                 <i class="fa-solid fa-lock"></i>
@@ -160,7 +160,7 @@
                     data-observacoes="{{ armario.observacoes|e }}"
                     data-nome="{{ armario.associado_nome|e }}"
                     data-matricula="{{ armario.associado_matricula|e }}"
-                    title="MÃ¡quina {{ armario.numero }}"
+                    title="Máquina {{ armario.numero }}"
                 >
                     {% if armario.status == "manutencao" %}
                     <i class="fa-solid fa-wrench"></i>
@@ -184,8 +184,8 @@
         <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
             <div class="modal-header">
                 <div>
-                    <h2 id="modal-titulo">MÃ¡quina</h2>
-                    <p id="modal-subtitulo">Altere o status da mÃ¡quina</p>
+                    <h2 id="modal-titulo">Máquina</h2>
+                    <p id="modal-subtitulo">Altere o status da máquina</p>
                 </div>
                 <button type="button" class="btn-fechar" id="btn-fechar-modal" aria-label="Fechar">
                     <i class="fa-solid fa-xmark"></i>
@@ -228,7 +228,7 @@
 
                 <div class="modal-actions">
                     <button type="button" class="btn-desativar" id="btn-desativar-armario"><i class="fa-solid fa-power-off"></i> Desativar</button>
-                    <button type="button" class="btn-ativar-armario" id="btn-ativar-armario" hidden><i class="fa-solid fa-power-off"></i> Ativar armÃ¡rio</button>
+                    <button type="button" class="btn-ativar-armario" id="btn-ativar-armario" hidden><i class="fa-solid fa-power-off"></i> Ativar armário</button>
                     <button type="button" class="btn-secundario" id="btn-cancelar">Cancelar</button>
                     <button type="submit" class="btn-primario">Salvar</button>
                 </div>
@@ -239,7 +239,7 @@
     <div class="modal-overlay modal-confirmacao" id="modal-confirmacao" aria-hidden="true">
         <div class="confirmacao-card" role="dialog" aria-modal="true" aria-labelledby="confirmacao-titulo">
             <div class="confirmacao-icone"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <h2 id="confirmacao-titulo">Confirmar aÃ§Ã£o</h2>
+            <h2 id="confirmacao-titulo">Confirmar ação</h2>
             <p id="confirmacao-texto"></p>
             <form method="post" id="form-confirmacao" class="confirmacao-acoes">
                 <button type="button" class="btn-secundario" id="btn-fechar-confirmacao">Voltar</button>
@@ -248,7 +248,7 @@
         </div>
     </div>
 
-    <footer class="main-footer"><p>&copy; 2026 Canamania. GestÃ£o de consumos.</p></footer>
+    <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 
     <script src="/static/javascript/armarios.js?v=3"></script>
 </body>

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
-    <title>Gerenciamento de UsuÃ¡rios</title>
+    <title>Gerenciamento de Usuários</title>
     <link rel="stylesheet" href="/static/css/usuarios.css">
     <link rel="stylesheet" href="/static/css/listagem.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -88,10 +88,10 @@
                 <li><a href="/pdv/historico">Vendas</a></li>
                 <li><a href="/mais_vendidos">Mais vendidos</a></li>
                 {% if usuario.role == 'admin' %}
-                <li><a href="/armarios">ArmÃ¡rios</a></li>
+                <li><a href="/armarios">Armários</a></li>
 
                 <li><a href="/usuarios"class="active">
-                     UsuÃ¡rios
+                     Usuários
                 </a></li>
                 <li><a href="/categorias">
                     Categorias
@@ -107,11 +107,11 @@
     <main class="produtos-container-main">
 
         <div class="page-header header-produtos">
-            <h1>FuncionÃ¡rios</h1>
-            <p class="beneficio-funcionario">BenefÃ­cio Canamania: 15% de desconto em consumos.</p>
+            <h1>Funcionários</h1>
+            <p class="beneficio-funcionario">Benefício Canamania: 15% de desconto em consumos.</p>
             <a href="/usuarios/novo" class="btn-create">
                 <i data-lucide="user-plus" style="width: 18px; height: 18px;"></i>
-                Novo usuÃ¡rio
+                Novo usuário
             </a>
         </div>
 
@@ -119,28 +119,28 @@
         {% if request.query_params.get('criado') == 'ok' %}
         <div class="alert-box alert-success">
             <i data-lucide="check-circle"></i>
-            <span>UsuÃ¡rio criado com sucesso!</span>
+            <span>Usuário criado com sucesso!</span>
         </div>
         {% endif %}
 
         {% if request.query_params.get('editado') == 'ok' %}
         <div class="alert-box alert-success">
             <i data-lucide="check-circle"></i>
-            <span>UsuÃ¡rio atualizado com sucesso!</span>
+            <span>Usuário atualizado com sucesso!</span>
         </div>
         {% endif %}
 
         {% if request.query_params.get('erro') == 'autoproprio' %}
         <div class="alert-box alert-error">
             <i data-lucide="alert-triangle"></i>
-            <span>VocÃª nÃ£o pode desativar sua prÃ³pria conta.</span>
+            <span>Você não pode desativar sua própria conta.</span>
         </div>
         {% endif %}
 
         <div class="filtros-container">
             <div class="busca-wrapper">
                 <i data-lucide="search" class="icone-busca"></i>
-                <input type="text" id="inputBusca" placeholder="Buscar usuÃ¡rio por nome ou email...">
+                <input type="text" id="inputBusca" placeholder="Buscar usuário por nome ou email...">
             </div>
 
             <div class="select-wrapper">
@@ -150,7 +150,7 @@
                     <option value="admin" {% if request.query_params.get('role')=='admin' %}selected{% endif %}>
                         Administrador</option>
                     <option value="funcionario" {% if request.query_params.get('role')=='funcionario' %}selected{% endif
-                        %}>FuncionÃ¡rio</option>
+                        %}>Funcionário</option>
                 </select>
             </div>
 
@@ -159,7 +159,7 @@
                 <span>Mostrar apenas ativos</span>
             </label>
         </div>
-        <div class="listagem-acoes"><span>Pesquisa e filtros aplicados na tabela.</span><label>Ordenar <select id="ordem-usuarios" class="listagem-ordem"><option value="asc">Nome: Aâ€“Z</option><option value="desc">Nome: Zâ€“A</option></select></label></div>
+        <div class="listagem-acoes"><span>Pesquisa e filtros aplicados na tabela.</span><label>Ordenar <select id="ordem-usuarios" class="listagem-ordem"><option value="asc">Nome: A–Z</option><option value="desc">Nome: Z–A</option></select></label></div>
 
         <div class="tabela-container">
             <table class="tabela-produtos" data-listagem data-busca="#inputBusca" data-ordem="#ordem-usuarios" data-por-pagina="8">
@@ -169,7 +169,7 @@
                         <th>E-mail</th>
                         <th>Perfil</th>
                         <th>Status</th>
-                        <th>AÃ§Ãµes</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -189,16 +189,16 @@
                         </td>
                         <td>
                             <div class="user-actions-wrapper">
-                                <form action="/usuarios/{{ u.id }}/toggle-ativo" method="post" style="display:inline" data-confirm="Alterar o status deste usuÃ¡rio?">
+                                <form action="/usuarios/{{ u.id }}/toggle-ativo" method="post" style="display:inline" data-confirm="Alterar o status deste usuário?">
                                     {% if u.ativo %}
-                                    <button type="submit" class="btn-acao excluir" title="Desativar UsuÃ¡rio"
+                                    <button type="submit" class="btn-acao excluir" title="Desativar Usuário"
                                         style="font-size: 15px;">
                                         <i data-lucide="user-x"
                                             style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
                                         Desativar
                                     </button>
                                     {% else %}
-                                    <button type="submit" class="btn-acao ver" title="Ativar UsuÃ¡rio"
+                                    <button type="submit" class="btn-acao ver" title="Ativar Usuário"
                                         style="font-size: 15px;">
                                         <i data-lucide="user-check"
                                             style="width: 16px; height: 16px; display: inline-block; vertical-align: middle;"></i>
@@ -215,11 +215,11 @@
         </div>
     </main>
 
-    <footer class="main-footer"><p>&copy; 2026 Canamania. GestÃ£o de consumos.</p></footer>
+    <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 
     <script src="/static/javascript/listagem.js?v=4"></script>
     <script>
-        // Renderiza os Ã­cones do Lucide do seu projeto
+        // Renderiza os ícones do Lucide do seu projeto
         lucide.createIcons();
     </script>
 </body>

@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
-    <title>{{ codigo or 500 }} â€” {{ titulo or 'NÃ£o foi possÃ­vel concluir' }} | CanaMania</title>
+    <title>{{ codigo or 500 }} — {{ titulo or 'Não foi possível concluir' }} | CanaMania</title>
     <link rel="stylesheet" href="/static/css/erro.css?v=2">
     <link rel="stylesheet" href="/static/css/theme-accents.css?v=global-theme-3">
 </head>
 <body>
     <main class="erro-page">
         <section class="erro-card erro-card--{{ codigo or 500 }}" aria-labelledby="titulo-erro">
-            <a href="/" class="erro-marca"><span>Cana</span>mania<small>gestÃ£o de consumos</small></a>
+            <a href="/" class="erro-marca"><span>Cana</span>mania<small>gestão de consumos</small></a>
             <p class="erro-etiqueta">Erro {{ codigo or 500 }}</p>
-            <h1 id="titulo-erro" class="erro-titulo">{{ titulo or 'NÃ£o foi possÃ­vel concluir' }}</h1>
+            <h1 id="titulo-erro" class="erro-titulo">{{ titulo or 'Não foi possível concluir' }}</h1>
             <div class="robo-wrap">
                 <img src="/static/img/canamania.jpg" alt="CanaMania" class="robo-img">
-                <div class="balao-fala"><p>{{ mensagem or 'NÃ£o foi possÃ­vel concluir esta aÃ§Ã£o agora.' }}</p></div>
+                <div class="balao-fala"><p>{{ mensagem or 'Não foi possível concluir esta ação agora.' }}</p></div>
             </div>
-            <p class="erro-subtexto">{{ descricao or 'Volte para uma Ã¡rea segura e tente novamente.' }}</p>
+            <p class="erro-subtexto">{{ descricao or 'Volte para uma área segura e tente novamente.' }}</p>
             <div class="erro-acoes">
                 <a href="{{ voltar_para or '/' }}" class="btn-voltar">Voltar</a>
-                <a href="/" class="btn-inicio">Ir para o inÃ­cio</a>
+                <a href="/" class="btn-inicio">Ir para o início</a>
             </div>
         </section>
     </main>

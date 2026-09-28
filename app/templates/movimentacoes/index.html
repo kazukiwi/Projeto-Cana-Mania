@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MovimentaÃ§Ãµes - AAPM</title>
+  <title>Movimentações - AAPM</title>
   <link rel="stylesheet" href="/static/css/listagem.css">
   <link rel="stylesheet" href="/static/css/responsive.css?v=1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -11,10 +11,10 @@
 </head>
 <body>
   <main class="page">
-    <div class="topo"><div><h1>MovimentaÃ§Ãµes</h1><p>HistÃ³rico de entradas, saÃ­das e ajustes de estoque.</p></div><a href="/movimentacoes/nova"><i class="fa-solid fa-plus"></i> Nova movimentaÃ§Ã£o</a></div>
-    <form class="filtros" method="get"><input id="busca-movimentacoes" type="search" placeholder="Buscar produto, tipo ou observaÃ§Ã£o"><select name="produto_id"><option value="">Todos os produtos</option>{% for produto in produtos %}<option value="{{ produto.id }}" {% if produto_id == produto.id %}selected{% endif %}>{{ produto.nome }}</option>{% endfor %}</select><select name="tipo"><option value="">Todos os tipos</option><option value="entrada" {% if tipo == 'entrada' %}selected{% endif %}>Entrada</option><option value="saida" {% if tipo == 'saida' %}selected{% endif %}>SaÃ­da</option><option value="ajuste" {% if tipo == 'ajuste' %}selected{% endif %}>Ajuste</option></select><button><i class="fa-solid fa-filter"></i> Filtrar</button></form>
-    <div class="listagem-acoes"><span>Busca instantÃ¢nea e paginaÃ§Ã£o.</span><label>Ordenar <select id="ordem-movimentacoes" class="listagem-ordem"><option value="desc">Mais recentes</option><option value="asc">Mais antigos</option></select></label></div>
-    <div class="tabela"><table data-listagem data-busca="#busca-movimentacoes" data-ordem="#ordem-movimentacoes" data-por-pagina="10"><thead><tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Quantidade</th><th>ObservaÃ§Ã£o</th></tr></thead><tbody>{% for movimentacao in movimentacoes %}<tr><td>{{ movimentacao.criado_em.strftime('%d/%m/%Y %H:%M') }}</td><td>{{ movimentacao.produto.nome if movimentacao.produto else 'Produto removido' }}</td><td class="{{ movimentacao.tipo }}">{{ movimentacao.tipo }}</td><td>{{ movimentacao.quantidade }}</td><td>{{ movimentacao.observacao or 'â€”' }}</td></tr>{% else %}<tr><td colspan="5">Nenhuma movimentaÃ§Ã£o encontrada.</td></tr>{% endfor %}</tbody></table></div>
+    <div class="topo"><div><h1>Movimentações</h1><p>Histórico de entradas, saídas e ajustes de estoque.</p></div><a href="/movimentacoes/nova"><i class="fa-solid fa-plus"></i> Nova movimentação</a></div>
+    <form class="filtros" method="get"><input id="busca-movimentacoes" type="search" placeholder="Buscar produto, tipo ou observação"><select name="produto_id"><option value="">Todos os produtos</option>{% for produto in produtos %}<option value="{{ produto.id }}" {% if produto_id == produto.id %}selected{% endif %}>{{ produto.nome }}</option>{% endfor %}</select><select name="tipo"><option value="">Todos os tipos</option><option value="entrada" {% if tipo == 'entrada' %}selected{% endif %}>Entrada</option><option value="saida" {% if tipo == 'saida' %}selected{% endif %}>Saída</option><option value="ajuste" {% if tipo == 'ajuste' %}selected{% endif %}>Ajuste</option></select><button><i class="fa-solid fa-filter"></i> Filtrar</button></form>
+    <div class="listagem-acoes"><span>Busca instantânea e paginação.</span><label>Ordenar <select id="ordem-movimentacoes" class="listagem-ordem"><option value="desc">Mais recentes</option><option value="asc">Mais antigos</option></select></label></div>
+    <div class="tabela"><table data-listagem data-busca="#busca-movimentacoes" data-ordem="#ordem-movimentacoes" data-por-pagina="10"><thead><tr><th>Data</th><th>Produto</th><th>Tipo</th><th>Quantidade</th><th>Observação</th></tr></thead><tbody>{% for movimentacao in movimentacoes %}<tr><td>{{ movimentacao.criado_em.strftime('%d/%m/%Y %H:%M') }}</td><td>{{ movimentacao.produto.nome if movimentacao.produto else 'Produto removido' }}</td><td class="{{ movimentacao.tipo }}">{{ movimentacao.tipo }}</td><td>{{ movimentacao.quantidade }}</td><td>{{ movimentacao.observacao or '—' }}</td></tr>{% else %}<tr><td colspan="5">Nenhuma movimentação encontrada.</td></tr>{% endfor %}</tbody></table></div>
   </main>
   <script src="/static/javascript/listagem.js?v=3"></script>
 <script src="/static/javascript/theme.js?v=global-theme-1"></script>
