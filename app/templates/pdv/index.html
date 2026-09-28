@@ -203,11 +203,7 @@
         </section>
     </div>
 
-    <footer class="main-footer">
-        <div class="footer-content" style="text-align:center; padding:20px; color:#666;">
-            <p>&copy; 2026 Canamania. Gestão de consumos.</p>
-        </div>
-    </footer>
+    <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
