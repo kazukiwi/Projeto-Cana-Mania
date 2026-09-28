@@ -27,10 +27,10 @@
                 <li><a href="/pdv/historico" class="active">Vendas</a></li>
                 <li><a href="/mais_vendidos">Mais vendidos</a></li>
                 {% if usuario.role == 'admin' %}
-                <li><a href="/armarios">Armários</a></li>
+                <li><a href="/armarios">ArmÃ¡rios</a></li>
 
                 <li><a href="/usuarios" >
-                </i> Usuários
+                </i> UsuÃ¡rios
                 </a></li>
                 <li><a href="/categorias" >
                     </i> Categorias
@@ -46,10 +46,10 @@
         <div class="header-vendas">
             <div>
                 <h1><i class="fa-solid fa-cash-register"></i> Ponto de Venda</h1>
-                <p>Monte o carrinho e fature uma nova venda diretamente no balcão</p>
+                <p>Monte o carrinho e fature uma nova venda diretamente no balcÃ£o</p>
             </div>
             <a href="/pdv/historico" class="btn-voltar-historico" style="background-color: #4b5563; text-decoration: none; color: white; padding: 10px 15px; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px;">
-                <i class="fa-solid fa-arrow-left"></i> Voltar ao Histórico
+                <i class="fa-solid fa-arrow-left"></i> Voltar ao HistÃ³rico
             </a>
         </div>
 
@@ -59,7 +59,7 @@
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label for="select-cliente" style="display:block; font-weight:bold; margin-bottom:5px;">Cliente</label>
                     <select id="select-cliente" name="cliente_id" form="form-finalizar-real" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background-color: white;">
-                        <option value="0">Venda Balcão (Sem identificação)</option>
+                        <option value="0">Venda BalcÃ£o (Sem identificaÃ§Ã£o)</option>
                         {% for cliente in clientes %}
                         <option value="{{ cliente.id }}" data-associado="{{ 'true' if cliente.is_associado else 'false' }}">
                             {{ cliente.nome }} {% if cliente.is_associado %}(Associado -{{ desconto_associado }}%){% endif %}
@@ -82,7 +82,7 @@
                         <label for="busca-frozen" style="display:block; font-weight:bold; margin-bottom:5px;">Produto</label>
                         <input id="busca-frozen" type="search" placeholder="Digite para procurar um consumo..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="resultado-busca-frozen" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
                         <div id="resultado-busca-frozen" class="resultado-busca-frozen" aria-live="polite"></div>
-                        <button type="button" id="abrir-catalogo-pdv" style="width:100%; margin-top:10px; padding:10px; border:1px solid #1e1b4b; border-radius:6px; background:#f5f3ff; color:#1e1b4b; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-images"></i> Escolher produto pelo catálogo</button>
+                        <button type="button" id="abrir-catalogo-pdv" style="width:100%; margin-top:10px; padding:10px; border:1px solid #1e1b4b; border-radius:6px; background:#f5f3ff; color:#1e1b4b; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-images"></i> Escolher produto pelo catÃ¡logo</button>
                     </div>
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label for="select-prod" style="display:block; font-weight:bold; margin-bottom:5px;">Selecionar Produto</label>
@@ -91,7 +91,7 @@
                             {% for produto in produtos %}
                                 {% if produto.ativo %}
                                 <option value="{{ produto.id }}" data-nome="{{ produto.nome }}" data-imagem="{{ produto.imagem_url }}" data-preco="{{ produto.preco_exibicao }}" data-estoque="{{ produto.estoque_atual }}" data-sem-estoque="{{ 'true' if produto.eh_consumo else 'false' }}" data-possui-variacoes="false">
-                                    {{ produto.nome }}{% if produto.eh_consumo %} · {{ vendas_hoje.get(produto.id, 0) }} venda(s) hoje{% endif %}
+                                    {{ produto.nome }}{% if produto.eh_consumo %} Â· {{ vendas_hoje.get(produto.id, 0) }} venda(s) hoje{% endif %}
                                 </option>
                                 {% endif %}
                             {% endfor %}
@@ -124,7 +124,7 @@
                     </div>
 
                     <div class="form-group" style="margin-bottom: 20px;">
-                        <label for="pdv-preco" style="display:block; font-weight:bold; margin-bottom:5px;">Preço Unitário</label>
+                        <label for="pdv-preco" style="display:block; font-weight:bold; margin-bottom:5px;">PreÃ§o UnitÃ¡rio</label>
                         <input type="text" id="pdv-preco" readonly placeholder="R$ 0,00" class="input-readonly field-destaque" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background:#f3f4f6; font-weight:bold;">
                     </div>
 
@@ -160,8 +160,8 @@
                         <label for="forma_pagamento" style="display:block; font-weight:bold; margin-bottom:5px;">Forma de pagamento</label>
                         <select name="forma_pagamento" id="forma_pagamento" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background:white;">
                             <option value="" disabled selected>Selecione a forma de pagamento...</option>
-                            <option value="credito">Cartão de crédito</option>
-                            <option value="debito">Cartão de débito</option>
+                            <option value="credito">CartÃ£o de crÃ©dito</option>
+                            <option value="debito">CartÃ£o de dÃ©bito</option>
                             <option value="dinheiro">Dinheiro</option>
                             <option value="pix">Pix</option>
                             <option value="convite">Convite</option>
@@ -169,7 +169,7 @@
                     </div>
 
                     <div class="form-group" style="margin-bottom:15px;">
-                        <label for="observacao" style="display:block; font-weight:bold; margin-bottom:5px;">Observações da Venda</label>
+                        <label for="observacao" style="display:block; font-weight:bold; margin-bottom:5px;">ObservaÃ§Ãµes da Venda</label>
                         <input type="text" name="observacao" id="observacao" placeholder="Ex: Venda corporativa, pagamento via Pix..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
                     </div>
 
@@ -197,13 +197,13 @@
 
     <div id="catalogo-pdv-modal" hidden role="dialog" aria-modal="true" aria-labelledby="catalogo-pdv-titulo" style="position:fixed; inset:0; z-index:1000; background:rgba(15,23,42,.6); padding:24px; overflow:auto;">
         <section style="max-width:860px; margin:30px auto; background:#fff; border-radius:14px; padding:22px; box-shadow:0 20px 50px rgba(0,0,0,.25);">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;"><h2 id="catalogo-pdv-titulo" style="margin:0; color:#1e1b4b;">Catálogo de produtos</h2><button type="button" id="fechar-catalogo-pdv" aria-label="Fechar catálogo" style="border:0; background:none; font-size:28px; cursor:pointer;">×</button></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;"><h2 id="catalogo-pdv-titulo" style="margin:0; color:#1e1b4b;">CatÃ¡logo de produtos</h2><button type="button" id="fechar-catalogo-pdv" aria-label="Fechar catÃ¡logo" style="border:0; background:none; font-size:28px; cursor:pointer;">Ã—</button></div>
             <input id="busca-catalogo-pdv" type="search" placeholder="Pesquisar produto..." style="width:100%; box-sizing:border-box; margin:18px 0; padding:12px; border:1px solid #cbd5e1; border-radius:8px;">
             <div id="grade-catalogo-pdv" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;"></div>
         </section>
     </div>
 
-    <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
+    <footer class="main-footer"><p>&copy; 2026 Canamania. GestÃ£o de consumos.</p></footer>
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
@@ -211,7 +211,7 @@
     <script type="application/x-disabled">
         let carrinho = [];
 
-        // Atualiza campos de preço e estoque ao mudar o produto selecionado
+        // Atualiza campos de preÃ§o e estoque ao mudar o produto selecionado
         const selectProd = document.getElementById('select-prod');
         const grupoTamanho = document.getElementById('grupo-tamanho');
         const selectTamanho = document.getElementById('pdv-tamanho');
@@ -287,13 +287,13 @@
 
                 if (itemExistente) {
                     if (itemExistente.quantidade + qtd > estoqueMax) {
-                        alert("Quantidade excede o limite disponível em estoque!");
+                        alert("Quantidade excede o limite disponÃ­vel em estoque!");
                         return;
                     }
                     itemExistente.quantidade += qtd;
                 } else {
                     if (qtd > estoqueMax) {
-                        alert("Quantidade excede o limite disponível em estoque!");
+                        alert("Quantidade excede o limite disponÃ­vel em estoque!");
                         return;
                     }
                     carrinho.push({
@@ -308,7 +308,7 @@
 
                 atualizarTabelaCarrinho();
                 
-                // Reseta o formulário de inserção
+                // Reseta o formulÃ¡rio de inserÃ§Ã£o
                 select.value = "";
                 document.getElementById('pdv-estoque').value = "--";
                 document.getElementById('pdv-preco').value = "R$ 0,00";
@@ -370,13 +370,13 @@
             }
         }
 
-        // Função global de remoção
+        // FunÃ§Ã£o global de remoÃ§Ã£o
         window.removerDoCarrinho = function(idx) {
             carrinho.splice(idx, 1);
             atualizarTabelaCarrinho();
         }
 
-        // Vincula a alteração do cliente
+        // Vincula a alteraÃ§Ã£o do cliente
         document.getElementById('select-cliente').addEventListener('change', function () {
             atualizarTabelaCarrinho();
         });

@@ -32,10 +32,10 @@
                 <li><a href="/pdv/historico">Vendas</a></li>
                 <li><a href="/mais_vendidos">Mais vendidos</a></li>
                 {% if usuario.role == 'admin' %}
-                <li><a href="/armarios">Armários</a></li>
+                <li><a href="/armarios">ArmÃ¡rios</a></li>
 
                 <li><a href="/usuarios" >
-                    </i> Usuários
+                    </i> UsuÃ¡rios
                 </a></li>
                 <li><a href="/categorias" >
                     </i> Categorias
@@ -92,7 +92,7 @@
                 <span>Apenas estoque baixo</span>
             </label>
         </form>
-        <div class="listagem-acoes"><span>Use os filtros para refinar a lista.</span><label>Ordenar <select id="ordem-produtos" class="listagem-ordem"><option value="asc">Nome: A–Z</option><option value="desc">Nome: Z–A</option></select></label></div>
+        <div class="listagem-acoes"><span>Use os filtros para refinar a lista.</span><label>Ordenar <select id="ordem-produtos" class="listagem-ordem"><option value="asc">Nome: Aâ€“Z</option><option value="desc">Nome: Zâ€“A</option></select></label></div>
 
         <div class="tabela-container">
             <table class="tabela-produtos" data-listagem data-busca="#input-busca" data-ordem="#ordem-produtos" data-ordem-coluna="1" data-por-pagina="8">
@@ -102,15 +102,15 @@
                         <th>NOME</th>
                         <th>CATEGORIA</th>
                         <th>ESTOQUE</th>
-                        <th>PREÇO</th>
+                        <th>PREÃ‡O</th>
                         <th>STATUS</th>
-                        <th style="text-align: center;">AÇÕES</th>
+                        <th style="text-align: center;">AÃ‡Ã•ES</th>
                     </tr>
                 </thead>
                 <tbody id="corpo-tabela">
                     {% for produto in produtos_estoque + produtos_consumo %}
                     {% if loop.index == (produtos_estoque|length) + 1 %}
-                    <tr><td colspan="7" style="background:#eefbf3; color:#166534; font-weight:800; padding:14px;">Ala de Consumos — Abre-Alas, Enredo e Maníacos por Drink (vendas sem estoque)</td></tr>
+                    <tr><td colspan="7" style="background:#eefbf3; color:#166534; font-weight:800; padding:14px;">Ala de Consumos â€” Abre-Alas, Enredo e ManÃ­acos por Drink (vendas sem estoque)</td></tr>
                     {% endif %}
                     {% set possui_preview_variacoes = produto.possui_variacoes_tamanho and produto.estoques_variacoes %}
                     <tr{% if possui_preview_variacoes %} class="produto-com-variacoes" data-produto-variacoes{% endif %}>
@@ -126,21 +126,21 @@
                             </a>
                             {% if possui_preview_variacoes %}
                             <button type="button" class="btn-visualizar-variacoes" aria-expanded="false" aria-controls="variacoes-produto-{{ produto.id }}">
-                                <i class="fa-solid fa-layer-group" aria-hidden="true"></i> Ver variações
+                                <i class="fa-solid fa-layer-group" aria-hidden="true"></i> Ver variaÃ§Ãµes
                             </button>
                             {% endif %}
                         </td>
                         <td>{{ produto.categoria.nome if produto.categoria else 'Sem categoria' }}</td>
                         <td>
                             {% if produto.eh_consumo %}
-                            <strong>Sem estoque</strong><br><small>Contagem diária de vendas no PDV</small>
+                            <strong>Sem estoque</strong><br><small>Contagem diÃ¡ria de vendas no PDV</small>
                             {% else %}
                             <strong>{{ produto.estoque_atual }} un.</strong>
                             {% endif %}
                             {% if produto.variacoes_com_estoque_baixo %}
-                            <div class="variacoes-estoque-baixo" aria-label="Variações com estoque baixo">
+                            <div class="variacoes-estoque-baixo" aria-label="VariaÃ§Ãµes com estoque baixo">
                                 {% for variacao in produto.variacoes_com_estoque_baixo %}
-                                <span>{{ variacao.tamanho.nome if variacao.tamanho else 'Tam.' }} · {{ variacao.cor }}: {{ variacao.estoque_atual }} un.</span>
+                                <span>{{ variacao.tamanho.nome if variacao.tamanho else 'Tam.' }} Â· {{ variacao.cor }}: {{ variacao.estoque_atual }} un.</span>
                                 {% endfor %}
                             </div>
                             {% endif %}
@@ -152,7 +152,7 @@
                             {% elif produto.estoque_baixo %}
                                 <span class="badge-status baixo-estoque"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Estoque baixo</span>
                                 {% if produto.variacoes_com_estoque_baixo %}
-                                <small class="descricao-estoque-baixo">{{ produto.variacoes_com_estoque_baixo|length }} variaç{{ 'ão' if produto.variacoes_com_estoque_baixo|length == 1 else 'ões' }} em alerta</small>
+                                <small class="descricao-estoque-baixo">{{ produto.variacoes_com_estoque_baixo|length }} variaÃ§{{ 'Ã£o' if produto.variacoes_com_estoque_baixo|length == 1 else 'Ãµes' }} em alerta</small>
                                 {% endif %}
                                 {% else %}
                                 <span class="badge-status ativo"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Ativo</span>
@@ -169,7 +169,7 @@
 
                                 <form action="/produtos/{{ produto.id }}/desativar" method="POST"
                                     data-confirmacao data-titulo="Desativar produto?"
-                                    data-mensagem="{{ produto.nome }} deixará de aparecer nas vendas e na lista de produtos ativos."
+                                    data-mensagem="{{ produto.nome }} deixarÃ¡ de aparecer nas vendas e na lista de produtos ativos."
                                     data-confirmar="Desativar produto"
                                     style="margin: 0; padding: 0; display: inline-flex; align-items: center;">
                                     <button type="submit"
@@ -178,7 +178,7 @@
                                     </button>
                                 </form>
                                 {% else %}
-                                <span style="color: #9ca3af; font-size: 0.9em; font-style: italic;">Sem permissão</span>
+                                <span style="color: #9ca3af; font-size: 0.9em; font-style: italic;">Sem permissÃ£o</span>
                                 {% endif %}
 
                             </div>
@@ -187,18 +187,18 @@
                     {% if possui_preview_variacoes %}
                     <tr class="variacoes-preview-row" data-variacoes-preview aria-hidden="true">
                         <td colspan="7">
-                            <section class="variacoes-preview-panel" id="variacoes-produto-{{ produto.id }}" aria-label="Variações de {{ produto.nome }}">
+                            <section class="variacoes-preview-panel" id="variacoes-produto-{{ produto.id }}" aria-label="VariaÃ§Ãµes de {{ produto.nome }}">
                                 <div class="variacoes-preview-resumo">
                                     <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" class="variacoes-preview-imagem" loading="lazy" onerror="this.onerror=null; this.src='/static/img/produto_padrao.png';">
                                     <div>
                                         <h3>{{ produto.nome }}</h3>
                                         <p>{{ produto.categoria.nome if produto.categoria else 'Sem categoria' }}</p>
-                                        <div class="variacoes-preview-metricas"><span><strong>Estoque total:</strong> {{ produto.estoque_atual }} un.</span><span><strong>Maior preço:</strong> R$ {{ "%.2f"|format(produto.preco_exibicao) }}</span></div>
+                                        <div class="variacoes-preview-metricas"><span><strong>Estoque total:</strong> {{ produto.estoque_atual }} un.</span><span><strong>Maior preÃ§o:</strong> R$ {{ "%.2f"|format(produto.preco_exibicao) }}</span></div>
                                     </div>
                                 </div>
                                 <div class="variacoes-preview-lista">
-                                    <h4>Variações</h4>
-                                    <div class="variacoes-preview-cabecalho"><span>Variação</span><span>Estoque</span><span>Preço</span><span>Status</span></div>
+                                    <h4>VariaÃ§Ãµes</h4>
+                                    <div class="variacoes-preview-cabecalho"><span>VariaÃ§Ã£o</span><span>Estoque</span><span>PreÃ§o</span><span>Status</span></div>
                                     <div class="variacoes-preview-itens">
                                         {% for variacao in produto.estoques_variacoes %}
                                         <div class="variacao-preview-item">
@@ -208,7 +208,7 @@
                                             {% if variacao in produto.variacoes_com_estoque_baixo %}
                                             <span class="badge-status baixo-estoque"><i class="fa-solid fa-circle" aria-hidden="true"></i> Estoque baixo</span>
                                             {% else %}
-                                            <span class="badge-status ativo"><i class="fa-solid fa-circle" aria-hidden="true"></i> Disponível</span>
+                                            <span class="badge-status ativo"><i class="fa-solid fa-circle" aria-hidden="true"></i> DisponÃ­vel</span>
                                             {% endif %}
                                         </div>
                                         {% endfor %}
@@ -247,7 +247,7 @@
                 <div class="form-group" style="margin-bottom: 15px;">
                     <label for="nome" style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Nome
                         do Produto</label>
-                    <input type="text" id="nome" name="nome" placeholder="Ex: Cadeira Ergonômica" required
+                    <input type="text" id="nome" name="nome" placeholder="Ex: Cadeira ErgonÃ´mica" required
                         style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
                 </div>
 
@@ -281,7 +281,7 @@
                     </div>
                     <div class="form-group" style="flex: 1;">
                         <label for="preco"
-                            style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Preço Unitário
+                            style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">PreÃ§o UnitÃ¡rio
                             (R$)</label>
                         <input type="number" id="preco" name="preco" value="0.00" step="0.01" min="0" required
                             style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;">
@@ -300,18 +300,18 @@
     <div class="modal-confirmacao-acao" id="modal-confirmacao-acao" aria-hidden="true">
         <div class="confirmacao-acao-card" role="dialog" aria-modal="true" aria-labelledby="confirmacao-acao-titulo">
             <div class="confirmacao-acao-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-            <h2 id="confirmacao-acao-titulo">Confirmar ação</h2><p id="confirmacao-acao-texto"></p>
+            <h2 id="confirmacao-acao-titulo">Confirmar aÃ§Ã£o</h2><p id="confirmacao-acao-texto"></p>
             <form method="post" id="form-confirmacao-acao" class="confirmacao-acao-botoes"><button type="button" class="confirmacao-acao-cancelar" id="confirmacao-acao-cancelar">Voltar</button><button type="button" class="confirmacao-acao-confirmar" id="confirmacao-acao-confirmar">Confirmar</button></form>
         </div>
     </div>
 
-    <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
+    <footer class="main-footer"><p>&copy; 2026 Canamania. GestÃ£o de consumos.</p></footer>
 
 
     <script src="/static/javascript/listagem.js?v=5"></script>
     <script src="/static/javascript/produto_variacoes_preview.js?v=1"></script>
     <script>
-        // Submete o formulário de filtros ao alterar categoria ou estoque baixo
+        // Submete o formulÃ¡rio de filtros ao alterar categoria ou estoque baixo
         (function () {
             const form = document.getElementById('form-filtros');
             const selectCategoria = document.getElementById('select-categoria');

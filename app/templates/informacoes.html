@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
-    <title>{% if pagina == 'termos' %}Termos de Uso{% elif pagina == 'privacidade' %}Política de Privacidade{% else %}Suporte{% endif %} - AAPM</title>
+    <title>{% if pagina == 'termos' %}Termos de Uso{% elif pagina == 'privacidade' %}PolÃ­tica de Privacidade{% else %}Suporte{% endif %} - AAPM</title>
     <style>
         :root { --azul: #100e74; --texto: #1e293b; --borda: #e2e8f0; }
         * { box-sizing: border-box; }
@@ -18,36 +18,38 @@
         ul { padding-left: 22px; }
     </style>
     <link rel="stylesheet" href="/static/css/responsive.css?v=1">
+    <link rel="stylesheet" href="/static/css/theme-accents.css?v=global-theme-3">
 </head>
 <body>
     <main>
-        <a class="voltar" href="/">← Voltar para a tela inicial</a>
+        <a class="voltar" href="/">â† Voltar para a tela inicial</a>
         <article>
             {% if pagina == 'termos' %}
                 <h1>Termos de Uso</h1>
-                <p>O sistema AAPM é destinado ao gerenciamento de produtos, vendas, clientes e armários da instituição.</p>
-                <h2>Uso responsável</h2>
-                <p>Utilize sua conta apenas para atividades autorizadas e mantenha seus dados de acesso em segurança.</p>
-                <h2>Atualizações</h2>
+                <p>O sistema AAPM Ã© destinado ao gerenciamento de produtos, vendas, clientes e armÃ¡rios da instituiÃ§Ã£o.</p>
+                <h2>Uso responsÃ¡vel</h2>
+                <p>Utilize sua conta apenas para atividades autorizadas e mantenha seus dados de acesso em seguranÃ§a.</p>
+                <h2>AtualizaÃ§Ãµes</h2>
                 <p>Estes termos podem ser atualizados para acompanhar melhorias no sistema e nas rotinas administrativas.</p>
             {% elif pagina == 'privacidade' %}
-                <h1>Política de Privacidade</h1>
-                <p>Os dados cadastrados no sistema são usados exclusivamente para as atividades administrativas da AAPM.</p>
+                <h1>PolÃ­tica de Privacidade</h1>
+                <p>Os dados cadastrados no sistema sÃ£o usados exclusivamente para as atividades administrativas da AAPM.</p>
                 <h2>Dados tratados</h2>
-                <p>Podem ser armazenados dados de produtos, vendas, clientes e usuários necessários para operar o sistema.</p>
-                <h2>Proteção dos dados</h2>
-                <p>O acesso às informações é restrito a usuários autorizados, de acordo com seu perfil de acesso.</p>
+                <p>Podem ser armazenados dados de produtos, vendas, clientes e usuÃ¡rios necessÃ¡rios para operar o sistema.</p>
+                <h2>ProteÃ§Ã£o dos dados</h2>
+                <p>O acesso Ã s informaÃ§Ãµes Ã© restrito a usuÃ¡rios autorizados, de acordo com seu perfil de acesso.</p>
             {% else %}
                 <h1>Suporte</h1>
-                <p>Se precisar de ajuda para usar o sistema ou identificar algum problema, procure a administração responsável pela AAPM.</p>
+                <p>Se precisar de ajuda para usar o sistema ou identificar algum problema, procure a administraÃ§Ã£o responsÃ¡vel pela AAPM.</p>
                 <h2>Antes de solicitar suporte</h2>
                 <ul>
                     <li>Descreva o que ocorreu e em qual tela.</li>
                     <li>Informe os passos realizados antes do problema.</li>
-                    <li>Envie uma captura de tela, se possível.</li>
+                    <li>Envie uma captura de tela, se possÃ­vel.</li>
                 </ul>
             {% endif %}
         </article>
     </main>
+<script src="/static/javascript/theme.js?v=global-theme-1"></script>
 </body>
 </html>
