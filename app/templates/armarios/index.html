@@ -54,6 +54,7 @@
         </nav>
 
         <div class="feedback-area" aria-live="polite">
+            {% if request.query_params.get("erro") == "reservaativa" %}<div class="alerta-erro">Cancele a reserva ativa no histórico antes de alterar a filial ou liberar a máquina.</div>{% endif %}
             {% if request.query_params.get("reserva") == "ok" %}<div class="alerta-sucesso">Reserva criada com sucesso.</div>{% endif %}
             {% if request.query_params.get("reserva") == "cancelada" %}<div class="alerta-sucesso">Reserva cancelada e mantida no histórico.</div>{% endif %}
             {% if request.query_params.get("armario") == "ok" %}<div class="alerta-sucesso">Máquina cadastrada com sucesso.</div>{% endif %}
@@ -67,10 +68,10 @@
         </div>
 
         <section class="armarios-panel" data-armarios-panel="reserva" hidden>
-            <div class="panel-heading"><h2>Reservar máquina</h2><p>Informe onde a máquina será utilizada e o período da reserva.</p></div>
+            <div class="panel-heading"><h2>Reservar máquina</h2><p>Escolha a filial que utilizará a máquina e o período da reserva.</p></div>
             <form action="/armarios/reservas" method="post" class="reserva-form" data-feedback-form>
                 <label>Máquina<select name="armario_id" required><option value="">Selecione</option>{% for armario in armarios if armario.status == "disponivel" %}<option value="{{ armario.id }}">Máquina {{ armario.numero }}</option>{% endfor %}</select></label>
-                <label>Local ou evento<input name="local_evento" required maxlength="150" placeholder="Ex.: Evento na Liberdade"></label>
+                <label>Filial<select name="filial" required><option value="">Selecione uma filial</option>{% for filial in filiais %}<option value="{{ filial }}">{{ filial }}</option>{% endfor %}</select></label>
                 <label>Início<input type="date" name="inicio_em" required></label>
                 <label>Fim<input type="date" name="fim_em" required></label>
                 <button class="btn-primario" type="submit"><i class="fa-solid fa-calendar-check"></i> Confirmar reserva</button>
@@ -86,9 +87,13 @@
         </section>
 
         <section class="armarios-panel" data-armarios-panel="historico" hidden>
-            <div class="panel-heading"><h2>Histórico de reservas</h2><p>Pesquise por local ou evento e consulte as reservas realizadas.</p></div>
-            <div class="historico-filtros"><label><i class="fa-solid fa-magnifying-glass"></i><input id="busca-reserva" type="search" placeholder="Buscar por local ou evento"></label><select id="filtro-semestre"><option value="">Todos os eventos</option>{% for reserva in reservas %}<option value="{{ reserva.semestre }}">{{ reserva.semestre }}</option>{% endfor %}</select></div>
-            <div class="tabela-reservas-wrap"><table class="tabela-reservas"><thead><tr><th>Armário</th><th>Aluno</th><th>Semestre</th><th>Período</th><th>Status</th><th>Ação</th></tr></thead><tbody id="corpo-reservas">{% for reserva in reservas %}<tr data-reserva data-aluno="{{ reserva.associado.nome if reserva.associado else '' }} {{ reserva.associado.matricula if reserva.associado else '' }}" data-semestre="{{ reserva.semestre }}"><td>#{{ reserva.armario.numero }}</td><td>{{ reserva.associado.nome if reserva.associado else 'Associado removido' }}</td><td>{{ reserva.semestre }}</td><td>{{ reserva.inicio_em.strftime('%d/%m/%Y') }} a {{ reserva.fim_em.strftime('%d/%m/%Y') }}</td><td><span class="status-reserva {{ reserva.status }}">{{ reserva.status }}</span></td><td>{% if reserva.status == 'ativa' %}<form action="/armarios/reservas/{{ reserva.id }}/cancelar" method="post" data-confirmacao><button class="btn-cancelar-reserva" type="submit">Cancelar</button></form>{% else %}—{% endif %}</td></tr>{% else %}<tr><td colspan="6" class="empty-reservas">Nenhuma reserva registrada.</td></tr>{% endfor %}</tbody></table></div>
+            <div class="panel-heading"><h2>Histórico de reservas</h2><p>Pesquise por filial e consulte as reservas realizadas.</p></div>
+            <div class="historico-filtros"><label><i class="fa-solid fa-magnifying-glass"></i><input id="busca-reserva" type="search" placeholder="Buscar por filial"></label><select id="filtro-filial"><option value="">Todas as filiais</option>{% for filial in filiais %}<option value="{{ filial }}">{{ filial }}</option>{% endfor %}</select></div>
+            <div class="tabela-reservas-wrap"><table class="tabela-reservas"><thead><tr><th>Máquina</th><th>Filial / destino</th><th>Período</th><th>Status</th><th>Ação</th></tr></thead><tbody id="corpo-reservas">
+            {% for reserva in reservas %}{% set destino = reserva.local_evento or (reserva.associado.nome if reserva.associado else 'Reserva antiga') %}
+            <tr data-reserva data-destino="{{ destino }}" data-filial="{{ reserva.local_evento or '' }}"><td>#{{ reserva.armario.numero }}</td><td>{{ destino }}</td><td>{{ reserva.inicio_em.strftime('%d/%m/%Y') }} a {{ reserva.fim_em.strftime('%d/%m/%Y') }}</td><td><span class="status-reserva {{ reserva.status }}">{{ reserva.status }}</span></td><td>{% if reserva.status == 'ativa' %}<form action="/armarios/reservas/{{ reserva.id }}/cancelar" method="post" data-confirmacao data-sem-processando><button class="btn-cancelar-reserva" type="submit">Cancelar</button></form>{% else %}—{% endif %}</td></tr>
+            {% else %}<tr><td colspan="5" class="empty-reservas">Nenhuma reserva registrada.</td></tr>{% endfor %}
+            </tbody></table></div>
         </section>
 
         <div data-armarios-panel="disponibilidade">
@@ -131,9 +136,9 @@
             <button type="button" class="btn-filtro" data-filtro="manutencao">Manutencao</button>
         </section>
 
-        {% if request.query_params.get("erro") == "associado" %}
+        {% if request.query_params.get("erro") == "filial" %}
         <div class="alerta-erro">
-            Selecione um associado ativo para ocupar o armario.
+            Selecione uma filial válida para reservar a máquina.
         </div>
         {% endif %}
 
@@ -155,7 +160,7 @@
                     data-id="{{ armario.id }}"
                     data-numero="{{ armario.numero }}"
                     data-status="{{ armario.status }}"
-                    data-associado-id="{{ armario.associado_id or 0 }}"
+                    data-filial="{{ armario.associado_nome if armario.associado_nome in filiais else '' }}"
                     data-observacoes="{{ armario.observacoes|e }}"
                     data-nome="{{ armario.associado_nome|e }}"
                     data-matricula="{{ armario.associado_matricula|e }}"
@@ -198,24 +203,17 @@
                     <span>Status</span>
                     <select name="novo_status" id="modal-status">
                         <option value="disponivel">Disponivel</option>
-                        <option value="ocupado">Ocupado</option>
+                        <option value="ocupado">Reservada para filial</option>
                         <option value="manutencao">Manutencao</option>
                     </select>
                 </label>
 
-                <label class="campo-usuario">
-                    <span>Associado</span>
-                    <select name="associado_id" id="modal-usuario">
-                        <option value="0">Selecione um associado</option>
-                        {% for associado in associados %}
-                        <option value="{{ associado.id }}">
-                            {{ associado.nome }}{% if associado.matricula %} - {{ associado.matricula }}{% endif %}
-                        </option>
-                        {% endfor %}
+                <label class="campo-filial">
+                    <span>Filial da reserva</span>
+                    <select name="filial" id="modal-filial">
+                        <option value="">Selecione uma filial</option>
+                        {% for filial in filiais %}<option value="{{ filial }}">{{ filial }}</option>{% endfor %}
                     </select>
-                    {% if not associados %}
-                    <small>Nenhum associado ativo cadastrado.</small>
-                    {% endif %}
                 </label>
 
                 <label class="campo-observacao">
@@ -249,7 +247,7 @@
 
     <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 
-    <script src="/static/javascript/armarios.js?v=3"></script>
+    <script src="/static/javascript/armarios.js?v=filiais-4"></script>
 </body>
 
 </html>

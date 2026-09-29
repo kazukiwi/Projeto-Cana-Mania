@@ -8,16 +8,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalInfo = document.getElementById("modal-info");
     const inputArmarioId = document.getElementById("modal-armario-id");
     const selectStatus = document.getElementById("modal-status");
-    const selectUsuario = document.getElementById("modal-usuario");
+    const selectFilial = document.getElementById("modal-filial");
     const inputObservacoes = document.getElementById("modal-observacoes");
-    const campoUsuario = document.querySelector(".campo-usuario");
+    const campoFilial = document.querySelector(".campo-filial");
     const campoObservacao = document.querySelector(".campo-observacao");
     const btnFechar = document.getElementById("btn-fechar-modal");
     const btnCancelar = document.getElementById("btn-cancelar");
     const tabs = Array.from(document.querySelectorAll("[data-armarios-tab]"));
     const panels = Array.from(document.querySelectorAll("[data-armarios-panel]"));
     const buscaReserva = document.getElementById("busca-reserva");
-    const filtroSemestre = document.getElementById("filtro-semestre");
+    const filtroFilial = document.getElementById("filtro-filial");
     const btnDesativarArmario = document.getElementById("btn-desativar-armario");
     const modalConfirmacao = document.getElementById("modal-confirmacao");
     const formConfirmacao = document.getElementById("form-confirmacao");
@@ -32,10 +32,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function filtrarReservas() {
         const termo = (buscaReserva ? buscaReserva.value : "").toLocaleLowerCase("pt-BR");
-        const semestre = filtroSemestre ? filtroSemestre.value : "";
+        const filial = filtroFilial ? filtroFilial.value : "";
         document.querySelectorAll("[data-reserva]").forEach(function (linha) {
-            const aluno = (linha.dataset.aluno || "").toLocaleLowerCase("pt-BR");
-            linha.hidden = !(aluno.includes(termo) && (!semestre || linha.dataset.semestre === semestre));
+            const destino = (linha.dataset.destino || "").toLocaleLowerCase("pt-BR");
+            linha.hidden = !(destino.includes(termo) && (!filial || linha.dataset.filial === filial));
         });
     }
 
@@ -49,12 +49,12 @@ document.addEventListener("DOMContentLoaded", function () {
     function atualizarCamposModal() {
         const status = selectStatus ? selectStatus.value : "";
 
-        if (campoUsuario) {
-            campoUsuario.style.display = status === "ocupado" ? "" : "none";
+        if (campoFilial) {
+            campoFilial.style.display = status === "ocupado" ? "" : "none";
         }
 
-        if (selectUsuario) {
-            selectUsuario.required = status === "ocupado";
+        if (selectFilial) {
+            selectFilial.required = status === "ocupado";
         }
 
         if (campoObservacao) {
@@ -69,19 +69,19 @@ document.addEventListener("DOMContentLoaded", function () {
     function abrirModal(card) {
         const numero = card.getAttribute("data-numero") || "";
         const status = card.getAttribute("data-status") || "disponivel";
-        const associadoId = card.getAttribute("data-associado-id") || "0";
+        const filial = card.getAttribute("data-filial") || "";
         const observacoes = card.getAttribute("data-observacoes") || "";
         const nome = card.getAttribute("data-nome") || "";
         const matricula = card.getAttribute("data-matricula") || "";
 
-        if (modalTitulo) modalTitulo.textContent = "Armario #" + numero;
+        if (modalTitulo) modalTitulo.textContent = "Máquina #" + numero;
         if (modalSubtitulo) modalSubtitulo.textContent = "Status atual: " + status;
         if (modalInfo) {
-            modalInfo.textContent = nome ? (nome + (matricula ? " - " + matricula : "")) : "Sem associado vinculado.";
+            modalInfo.textContent = filial ? "Filial: " + filial : (nome ? "Destino anterior: " + nome : "Sem filial vinculada.");
         }
         if (inputArmarioId) inputArmarioId.value = card.getAttribute("data-id") || "";
         if (selectStatus) selectStatus.value = status;
-        if (selectUsuario) selectUsuario.value = associadoId;
+        if (selectFilial) selectFilial.value = filial;
         if (inputObservacoes) inputObservacoes.value = observacoes;
 
         atualizarCamposModal();
@@ -138,9 +138,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (form) {
         form.addEventListener("submit", function (event) {
-            if (selectStatus && selectStatus.value === "ocupado" && selectUsuario && selectUsuario.value === "0") {
+            if (selectStatus && selectStatus.value === "ocupado" && selectFilial && !selectFilial.value) {
                 event.preventDefault();
-                alert("Selecione um associado cadastrado para ocupar o armario.");
+                alert("Selecione uma filial para reservar a máquina.");
             }
         });
     }
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (btnDesativarArmario) {
         btnDesativarArmario.addEventListener("click", function () {
             const id = inputArmarioId?.value;
-            const numero = modalTitulo?.textContent.replace("Armario #", "") || "";
+            const numero = modalTitulo?.textContent.replace("Máquina #", "") || "";
             if (id) abrirConfirmacao(`/armarios/${id}/desativar`, "Desativar armário?", `O armário #${numero} deixará de aparecer como disponível. O histórico de reservas será mantido.`, "Desativar armário");
         });
     }
@@ -164,15 +164,15 @@ document.addEventListener("DOMContentLoaded", function () {
         tab.addEventListener("click", function () { abrirAba(tab.dataset.armariosTab); });
     });
     if (buscaReserva) buscaReserva.addEventListener("input", filtrarReservas);
-    if (filtroSemestre) filtroSemestre.addEventListener("change", filtrarReservas);
+    if (filtroFilial) filtroFilial.addEventListener("change", filtrarReservas);
 
     document.querySelectorAll("[data-confirmacao]").forEach(function (formulario) {
         formulario.addEventListener("submit", function (event) {
             event.preventDefault();
             const linha = formulario.closest("tr");
             const armario = linha?.cells[0]?.textContent || "este armário";
-            const aluno = linha?.cells[1]?.textContent || "o associado";
-            abrirConfirmacao(formulario.action, "Cancelar reserva?", `A reserva de ${aluno} para ${armario} será cancelada. Esta ação será registrada no histórico.`, "Cancelar reserva");
+            const destino = linha?.cells[1]?.textContent || "a filial";
+            abrirConfirmacao(formulario.action, "Cancelar reserva?", `A reserva de ${destino} para ${armario} será cancelada. Esta ação será registrada no histórico.`, "Cancelar reserva");
         });
     });
     if (btnFecharConfirmacao) btnFecharConfirmacao.addEventListener("click", fecharConfirmacao);

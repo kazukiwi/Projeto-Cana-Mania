@@ -478,7 +478,13 @@ def listar_armarios(
     for reserva in reservas_ativas:
         if reserva.armario and reserva.armario.status == "disponivel":
             reserva.armario.status = "ocupado"
-            if reserva.associado:
+            if reserva.local_evento:
+                reserva.armario.associado_id = None
+                reserva.armario.associado_nome = reserva.local_evento
+                reserva.armario.associado_email = ""
+                reserva.armario.associado_telefone = ""
+                reserva.armario.associado_matricula = ""
+            elif reserva.associado:
                 reserva.armario.associado_id = reserva.associado.id
                 reserva.armario.associado_nome = reserva.associado.nome
                 reserva.armario.associado_telefone = reserva.associado.telefone or ""
@@ -492,15 +498,6 @@ def listar_armarios(
     ocupados = db.query(Armario).filter(Armario.status == "ocupado").count()
     manutencao = db.query(Armario).filter(Armario.status == "manutencao").count()
     armarios = db.query(Armario).order_by(Armario.id).all()
-    associados = (
-        db.query(Cliente)
-        .filter(
-            Cliente.ativo == True,
-            Cliente.is_associado == True
-        )
-        .order_by(Cliente.nome)
-        .all()
-    )
     reservas = (
         db.query(ReservaArmario)
         .order_by(ReservaArmario.inicio_em.desc(), ReservaArmario.id.desc())
@@ -518,7 +515,7 @@ def listar_armarios(
             "armarios_disponiveis": disponiveis,
             "armarios_ocupados": ocupados,
             "armarios_manutencao": manutencao,
-            "associados": associados,
+            "filiais": FILIAIS,
             "reservas": reservas,
         }
     )
@@ -529,34 +526,32 @@ def listar_armarios(
 def alterar_status_armario(
     armario_id: int = Form(...),
     novo_status: str = Form(...),
-    associado_id: int = Form(0),
+    filial: str = Form(""),
     observacoes: str = Form(None),
     usuario=Depends(get_usuario_opcional),
     db: Session = Depends(get_db)
 ):
     armario = db.query(Armario).filter(Armario.id == armario_id).first()
     if not armario:
-        return RedirectResponse(url="/armarios?erro=armario", status_code=303)
+        return RedirectResponse(url="/maquinas?erro=armario", status_code=303)
+
+    reserva_ativa = db.query(ReservaArmario).filter_by(armario_id=armario.id, status="ativa").first()
+    if reserva_ativa and (novo_status != "ocupado" or filial != reserva_ativa.local_evento):
+        return RedirectResponse(url="/maquinas?erro=reservaativa", status_code=303)
+    if novo_status not in ("disponivel", "ocupado", "manutencao"):
+        return RedirectResponse(url="/maquinas?erro=status", status_code=303)
 
     if novo_status == "ocupado":
-        associado = None
-        if associado_id:
-            associado = db.query(Cliente).filter(
-                Cliente.id == associado_id,
-                Cliente.ativo == True,
-                Cliente.is_associado == True
-            ).first()
-
-        if not associado:
-            return RedirectResponse(url="/armarios?erro=associado", status_code=303)
+        if filial not in FILIAIS:
+            return RedirectResponse(url="/maquinas?erro=filial", status_code=303)
 
         armario.status = novo_status
-        armario.associado_id = associado.id
-        armario.associado_nome = associado.nome
+        armario.associado_id = None
+        armario.associado_nome = filial
         armario.associado_email = ""
-        armario.associado_telefone = associado.telefone or ""
-        armario.associado_matricula = associado.matricula or ""
-        armario.atribuido_em = "04/03/2026"
+        armario.associado_telefone = ""
+        armario.associado_matricula = ""
+        armario.atribuido_em = datetime.now().strftime("%d/%m/%Y")
         armario.observacoes = ""
     elif novo_status == "manutencao":
         armario.status = novo_status
@@ -579,7 +574,7 @@ def alterar_status_armario(
 
     db.commit()
             
-    return RedirectResponse(url="/armarios", status_code=303)
+    return RedirectResponse(url="/maquinas", status_code=303)
 
 
 @app.post("/armarios")
@@ -643,7 +638,7 @@ def ativar_armario(
 @app.post("/armarios/reservas")
 def criar_reserva_armario(
     armario_id: int = Form(...),
-    local_evento: str = Form(...),
+    filial: str = Form(...),
     inicio_em: date = Form(...),
     fim_em: date = Form(...),
     db: Session = Depends(get_db),
@@ -651,15 +646,16 @@ def criar_reserva_armario(
 ):
     """Registra uma reserva e impede sobreposição para o mesmo armário."""
     if fim_em < inicio_em:
-        return RedirectResponse(url="/armarios?erro=periodo", status_code=303)
+        return RedirectResponse(url="/maquinas?erro=periodo", status_code=303)
 
     armario = db.query(Armario).filter(Armario.id == armario_id).first()
-    local_evento = local_evento.strip()
-    if not armario or not local_evento:
-        return RedirectResponse(url="/armarios?erro=reservadados", status_code=303)
+    if filial not in FILIAIS:
+        return RedirectResponse(url="/maquinas?erro=filial", status_code=303)
+    if not armario:
+        return RedirectResponse(url="/maquinas?erro=reservadados", status_code=303)
 
     if armario.status != "disponivel":
-        return RedirectResponse(url="/armarios?erro=indisponivel", status_code=303)
+        return RedirectResponse(url="/maquinas?erro=indisponivel", status_code=303)
 
     inicio = datetime.combine(inicio_em, datetime.min.time())
     fim = datetime.combine(fim_em, datetime.max.time())
@@ -670,13 +666,13 @@ def criar_reserva_armario(
         ReservaArmario.fim_em >= inicio,
     ).first()
     if conflito:
-        return RedirectResponse(url="/armarios?erro=conflito", status_code=303)
+        return RedirectResponse(url="/maquinas?erro=conflito", status_code=303)
 
     db.add(ReservaArmario(
         armario_id=armario.id,
         associado_id=None,
-        local_evento=local_evento,
-        semestre=local_evento,
+        local_evento=filial,
+        semestre=filial,
         inicio_em=inicio,
         fim_em=fim,
         status="ativa",
@@ -685,13 +681,14 @@ def criar_reserva_armario(
     # módulos sincronizados para que uma reserva não apareça como disponível.
     armario.status = "ocupado"
     armario.associado_id = None
-    armario.associado_nome = local_evento
+    armario.associado_nome = filial
+    armario.associado_email = ""
     armario.associado_telefone = ""
     armario.associado_matricula = ""
     armario.atribuido_em = inicio_em.strftime("%d/%m/%Y")
     armario.observacoes = ""
     db.commit()
-    return RedirectResponse(url="/armarios?reserva=ok", status_code=303)
+    return RedirectResponse(url="/maquinas?reserva=ok", status_code=303)
 
 
 @app.post("/armarios/reservas/{reserva_id}/cancelar")
@@ -718,4 +715,4 @@ def cancelar_reserva_armario(
             reserva.armario.atribuido_em = ""
             reserva.armario.observacoes = ""
         db.commit()
-    return RedirectResponse(url="/armarios?reserva=cancelada", status_code=303)
+    return RedirectResponse(url="/maquinas?reserva=cancelada", status_code=303)
