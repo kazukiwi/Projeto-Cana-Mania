@@ -34,16 +34,17 @@ def enviar_email_redefinicao(destinatario: str, link: str):
     usuario = os.getenv("SMTP_USER")
     senha = os.getenv("SMTP_PASSWORD")
     usar_ssl = os.getenv("SMTP_USE_SSL", "false").lower() == "true"
+    timeout_smtp = int(os.getenv("SMTP_TIMEOUT_SECONDS", "60"))
 
     if not host or not remetente:
         raise RuntimeError("SMTP não configurado")
 
     mensagem = EmailMessage()
-    mensagem["Subject"] = "Redefinição de senha - AAPM"
+    mensagem["Subject"] = "Redefinição de senha - Canamania"
     mensagem["From"] = remetente
     mensagem["To"] = destinatario
     mensagem.set_content(
-        "Recebemos uma solicitação para redefinir sua senha no sistema AAPM.\n\n"
+        "Recebemos uma solicitação para redefinir sua senha no sistema Canamania.\n\n"
         f"Acesse o link abaixo em até 30 minutos:\n{link}\n\n"
         "Se você não solicitou essa alteração, ignore este e-mail."
     )
@@ -63,38 +64,38 @@ def enviar_email_redefinicao(destinatario: str, link: str):
     }}
   </style>
 </head>
-<body style="margin:0; padding:0; background:#eef0fb; font-family:Arial, Helvetica, sans-serif; color:#17205f;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#eef0fb; padding:40px 16px;">
+<body style="margin:0; padding:0; background:#fffafd; font-family:Arial, Helvetica, sans-serif; color:#083d2c;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#fffafd; padding:40px 16px;">
     <tr>
       <td align="center">
-        <table class="email-card" role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:600px; max-width:100%; overflow:hidden; background:#ffffff; border-radius:24px; box-shadow:0 10px 30px rgba(9,20,92,0.16);">
+        <table class="email-card" role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:600px; max-width:100%; overflow:hidden; background:#ffffff; border-radius:24px; box-shadow:0 10px 30px rgba(8,61,44,0.16);">
           <tr>
-            <td style="padding:30px 42px; background:#09145c; text-align:center;">
-              <p style="margin:0; color:#ffffff; font-family:Georgia, 'Times New Roman', serif; font-size:42px; font-weight:700; letter-spacing:2px;">AAPM</p>
-              <p style="margin:7px 0 0; color:#d9ddff; font-size:13px; letter-spacing:1px; text-transform:uppercase;">Sistema de Gestão</p>
+            <td style="padding:30px 42px; background:#083d2c; text-align:center;">
+              <p style="margin:0; color:#ffffff; font-size:42px; font-weight:800; letter-spacing:-2px;"><span style="color:#baf57a;">Cana</span>mania</p>
+              <p style="margin:7px 0 0; color:#d9ffc0; font-size:13px; letter-spacing:1px; text-transform:uppercase;">Gestão de consumos</p>
             </td>
           </tr>
           <tr>
             <td class="email-content" style="padding:42px;">
-              <div style="width:54px; height:54px; margin:0 auto 22px; border-radius:50%; background:#e7e9ff; text-align:center; line-height:54px; font-size:26px;">🔐</div>
-              <h1 class="email-title" style="margin:0 0 16px; color:#09145c; font-size:32px; line-height:1.2; text-align:center;">Redefinição de senha</h1>
-              <p style="margin:0 0 18px; color:#4b5275; font-size:16px; line-height:1.65; text-align:center;">Recebemos uma solicitação para criar uma nova senha para sua conta AAPM.</p>
-              <p style="margin:0 0 30px; color:#4b5275; font-size:16px; line-height:1.65; text-align:center;">Clique no botão abaixo para continuar. O link é válido por <strong style="color:#09145c;">30 minutos</strong>.</p>
+              <div style="width:54px; height:54px; margin:0 auto 22px; border-radius:50%; background:#fff0f6; text-align:center; line-height:54px; font-size:26px;">🔐</div>
+              <h1 class="email-title" style="margin:0 0 16px; color:#083d2c; font-size:32px; line-height:1.2; text-align:center;">Redefinição de senha</h1>
+              <p style="margin:0 0 18px; color:#526257; font-size:16px; line-height:1.65; text-align:center;">Recebemos uma solicitação para criar uma nova senha para sua conta Canamania.</p>
+              <p style="margin:0 0 30px; color:#526257; font-size:16px; line-height:1.65; text-align:center;">Clique no botão abaixo para continuar. O link é válido por <strong style="color:#083d2c;">30 minutos</strong>.</p>
               <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
                 <tr>
-                  <td style="border-radius:12px; background:#09145c;">
+                  <td style="border-radius:12px; background:#ff1877;">
                     <a href="{link_seguro}" style="display:inline-block; padding:16px 28px; color:#ffffff; font-size:16px; font-weight:700; text-decoration:none;">Redefinir minha senha</a>
                   </td>
                 </tr>
               </table>
-              <div style="margin:34px 0 0; padding:17px; border-radius:12px; background:#f4f5ff;">
-                <p style="margin:0; color:#596080; font-size:13px; line-height:1.55; text-align:center;">Se você não solicitou a redefinição, não é necessário fazer nada. Sua senha continuará segura.</p>
+              <div style="margin:34px 0 0; padding:17px; border-radius:12px; background:#effce9;">
+                <p style="margin:0; color:#42604b; font-size:13px; line-height:1.55; text-align:center;">Se você não solicitou a redefinição, não é necessário fazer nada. Sua senha continuará segura.</p>
               </div>
             </td>
           </tr>
           <tr>
-            <td style="padding:22px 30px; background:#f7f8ff; border-top:1px solid #e5e7f6;">
-              <p style="margin:0; color:#737995; font-size:12px; line-height:1.5; text-align:center;">Este é um e-mail automático. Por favor, não responda.</p>
+            <td style="padding:22px 30px; background:#f7fbf7; border-top:1px solid #e2eee4;">
+              <p style="margin:0; color:#66796b; font-size:12px; line-height:1.5; text-align:center;">Este é um e-mail automático. Por favor, não responda.</p>
             </td>
           </tr>
         </table>
@@ -109,9 +110,9 @@ def enviar_email_redefinicao(destinatario: str, link: str):
 
     contexto_ssl = ssl.create_default_context()
     if usar_ssl:
-        conexao = smtplib.SMTP_SSL(host, porta, timeout=25, context=contexto_ssl)
+        conexao = smtplib.SMTP_SSL(host, porta, timeout=timeout_smtp, context=contexto_ssl)
     else:
-        conexao = smtplib.SMTP(host, porta, timeout=25)
+        conexao = smtplib.SMTP(host, porta, timeout=timeout_smtp)
 
     with conexao as servidor:
         if not usar_ssl and os.getenv("SMTP_USE_TLS", "true").lower() == "true":
