@@ -25,8 +25,8 @@
                 <p class="eyebrow">Área da equipe</p>
                 <h2>Bem-vindo de volta</h2>
                 <p class="login-lead">Entre para cuidar das lojas Canamania.</p><label>E-mail<input type="email"
-                        name="email" placeholder="voce@canamania.com" required></label><label>Senha<input
-                        type="password" name="senha" placeholder="Sua senha" required></label>{% if erro %}<p
+                        name="email" placeholder="voce@canamania.com" required></label><label>Senha<span class="password-field"><input
+                        type="password" name="senha" placeholder="Sua senha" required><button class="password-eye" type="button" aria-label="Mostrar senha" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i></button></span></label>{% if erro %}<p
                     class="login-feedback login-feedback--error">{{ erro }}</p>{% endif %}{% if
                 request.query_params.get('senha_redefinida') %}<p class="login-feedback login-feedback--success">Senha
                     redefinida com sucesso.</p>{% endif %}<button type="submit">Entrar <i
@@ -36,6 +36,7 @@
         </section>
     </main>
 <script src="/static/javascript/theme.js?v=global-theme-1"></script>
+<script src="/static/javascript/password_visibility.js?v=1"></script>
 </body>
 
 </html>

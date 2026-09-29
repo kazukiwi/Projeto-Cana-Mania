@@ -46,11 +46,13 @@
                     <div class="input-box">
                         <i class="fa-solid fa-lock"></i>
                         <input type="password" name="senha" id="senha" placeholder="Digite a nova senha" autocomplete="new-password" minlength="8" required>
+                        <button class="password-eye" type="button" aria-label="Mostrar senha" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>
                     </div>
                     <label for="confirmar_senha">Confirmar nova senha</label>
                     <div class="input-box">
                         <i class="fa-solid fa-shield-halved"></i>
                         <input type="password" name="confirmar_senha" id="confirmar_senha" placeholder="Repita a nova senha" autocomplete="new-password" minlength="8" required>
+                        <button class="password-eye" type="button" aria-label="Mostrar senha" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i></button>
                     </div>
                     <button type="submit">Redefinir senha</button>
                 </form>
@@ -61,5 +63,6 @@
 
     <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 <script src="/static/javascript/theme.js?v=global-theme-1"></script>
+<script src="/static/javascript/password_visibility.js?v=1"></script>
 </body>
 </html>

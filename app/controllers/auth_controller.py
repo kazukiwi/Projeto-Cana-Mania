@@ -1,3 +1,4 @@
+import logging
 import os
 import smtplib
 import ssl
@@ -24,6 +25,7 @@ from app.auth import (
 router = APIRouter(prefix="/auth", tags=["Autenticação"])
 
 templates = Jinja2Templates(directory="app/templates")
+logger = logging.getLogger(__name__)
 
 
 def enviar_email_redefinicao(destinatario: str, link: str):
@@ -153,7 +155,12 @@ def solicitar_redefinicao_senha(
         link = str(request.url_for("tela_redefinir_senha", token=token))
         try:
             enviar_email_redefinicao(usuario.email, link)
-        except (OSError, smtplib.SMTPException, RuntimeError):
+        except (OSError, smtplib.SMTPException, RuntimeError) as exc:
+            # Avoid logging the recipient, reset link, or SMTP credentials.
+            logger.exception(
+                "Falha ao enviar e-mail de redefinição de senha (%s)",
+                type(exc).__name__,
+            )
             return templates.TemplateResponse(
                 request,
                 "auth/esqueci_senha.html",

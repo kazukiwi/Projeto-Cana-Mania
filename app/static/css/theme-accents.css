@@ -2,6 +2,47 @@
 body {
     isolation: isolate;
 }
+.password-field,
+.input-box {
+    position: relative;
+}
+.password-field { display: block; }
+.password-field input { padding-right: 46px !important; }
+.input-box { padding-right: 42px !important; }
+.input-box input { min-width: 0; }
+.password-eye {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 34px !important;
+    height: 34px;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #526257;
+    cursor: pointer;
+}
+.password-eye:hover { color: #ff1877; }
+.password-eye:focus-visible { outline: 2px solid #ff1877; outline-offset: 2px; }
+.password-eye i { pointer-events: none; }
+.login-card .password-eye {
+    transform: translateY(-50%) !important;
+    background: transparent !important;
+    color: #526257 !important;
+}
+.login-card .password-eye:hover { color: #ff1877 !important; }
+.recovery-card .password-eye,
+.recovery-card .password-eye:hover {
+    transform: translateY(-50%) !important;
+    transition: none !important;
+}
+.recovery-card .password-eye i { width: 19px; text-align: center; }
 body::before {
     content: "";
     position: fixed;
