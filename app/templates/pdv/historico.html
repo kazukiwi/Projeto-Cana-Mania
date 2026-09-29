@@ -293,11 +293,7 @@
         </div>
     </div>
 
-    <footer class="main-footer">
-        <div class="footer-content">
-            <p>&copy; 2026 AAPM - SENAI. Todos os direitos reservados.</p>
-        </div>
-    </footer>
+    <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script src="{{ url_for('static', path='javascript/vendas.js') }}?v=preco-variacao-1"></script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Estoque por loja | Canamania</title>
-    <link rel="stylesheet" href="/static/css/canamania.css">
+    <link rel="stylesheet" href="/static/css/canamania.css?v=stock-theme-2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
@@ -31,5 +31,6 @@
     </section>
     <section class="surface stock-table-wrap"><div class="table-title"><h2>Divisão atual</h2><input type="search" id="pesquisa-estoque" placeholder="Pesquisar consumo..."></div><table><thead><tr><th>Consumo</th>{% for filial in filiais %}<th>{{ filial }}</th>{% endfor %}<th>Total</th></tr></thead><tbody>{% for produto in produtos %}<tr><td>{{ produto.nome }}</td>{% for filial in filiais %}<td>{{ por_produto.get((produto.id, filial), 0) }}</td>{% endfor %}<td><strong>{{ produto.estoque_atual }}</strong></td></tr>{% endfor %}</tbody></table></section>
 </main>
+<footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 <script>document.querySelector('#pesquisa-estoque')?.addEventListener('input', e => document.querySelectorAll('tbody tr').forEach(row => row.hidden=!row.textContent.toLowerCase().includes(e.target.value.toLowerCase())));</script>
 </body></html>

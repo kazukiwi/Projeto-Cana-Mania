@@ -9,7 +9,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background-image: url('/static/img/seu_background.jpg');
+    background-image: radial-gradient(circle at 0 0, #ffb7d5 0, transparent 34rem), radial-gradient(circle at 100% 18%, #d4f5a5 0, transparent 34rem);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -229,7 +229,7 @@ body.dashboard-navigating {
 
 .filiais-dashboard{margin-top:28px;padding:22px;border:1px solid #baf57a;border-radius:18px;background:linear-gradient(130deg,#fff 0%,#f3ffe6 100%);box-shadow:0 12px 25px rgba(8,61,44,.07)}.filiais-heading{display:flex;align-items:center;justify-content:space-between;gap:18px}.filiais-heading h2{margin:0;color:#083d2c}.filiais-heading p{margin:5px 0 0;color:#567064}.filiais-heading a{padding:10px 13px;border-radius:10px;background:#ff1877;color:#fff;text-decoration:none;font-weight:800;white-space:nowrap}.filiais-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.filiais-grid article{display:grid;gap:7px;padding:16px;border-radius:13px;background:#fff;border:1px solid #e5f6d3}.filiais-grid span{font-size:.85rem;font-weight:800;color:#083d2c}.filiais-grid strong{font-size:1.75rem;color:#ff1877}.filiais-grid small{font-size:.8rem;color:#64748b}.filiais-grid em{font-size:.75rem;font-style:normal;color:#64748b}.alerta-filial{margin-top:15px;padding:12px;border-radius:10px;background:#fff0f7;color:#a40043;font-weight:700}.alerta-filial a{color:#a40043}@media(max-width:620px){.filiais-heading{align-items:flex-start;flex-direction:column}.filiais-grid{grid-template-columns:1fr}}
 /* acabamento Canamania */
-.dashboard{background:radial-gradient(circle at 0 0,#ffe1ef 0,transparent 30rem),radial-gradient(circle at 100% 18%,#efffdc 0,transparent 30rem)}.header h1{font-size:clamp(2.4rem,5vw,4rem);letter-spacing:-.07em;color:#083d2c}.cards{gap:16px}.card{min-height:154px;border-radius:22px;border:1px solid #dcebd4}.card h3{font-size:2.45rem}.azul{border-color:#f7b1d1;color:#d90864}.verde{border-color:#baf57a;color:#0c6a42}.vermelho{border-color:#ffc1d9;color:#c9085a}.roxo{border-color:#b6e890;color:#23704b}.panel{border-color:#dcebd4;border-radius:18px}.filiais-dashboard{background:linear-gradient(120deg,#fff 0%,#f0ffdf 100%);border-color:#baf57a}.filiais-grid article{transition:transform .25s ease,box-shadow .25s ease}.filiais-grid article:hover{transform:translateY(-4px);box-shadow:0 13px 24px rgba(8,61,44,.12)}html[data-theme="dark"] .dashboard{background:radial-gradient(circle at 0 0,#3a142a 0,transparent 28rem),radial-gradient(circle at 100% 16%,#17321d 0,transparent 27rem)}html[data-theme="dark"] .header h1,html[data-theme="dark"] .filiais-heading h2{color:#d7fbb3}html[data-theme="dark"] .card{background:linear-gradient(145deg,#16231a,#101712)!important;border-color:#2d5939}html[data-theme="dark"] .filiais-dashboard{background:linear-gradient(120deg,#152218,#102115)!important;border-color:#3c7146}html[data-theme="dark"] .filiais-grid article{background:#101a13;border-color:#31513a}html[data-theme="dark"] .filiais-grid span{color:#d7fbb3}html[data-theme="dark"] .filiais-heading p,html[data-theme="dark"] .filiais-grid em{color:#b4c5b7}
+.dashboard{background:transparent}.header h1{font-size:clamp(2.4rem,5vw,4rem);letter-spacing:-.07em;color:#083d2c}.cards{gap:16px}.card{min-height:154px;border-radius:22px;border:1px solid #dcebd4}.card h3{font-size:2.45rem}.azul{border-color:#f7b1d1;color:#d90864}.verde{border-color:#baf57a;color:#0c6a42}.vermelho{border-color:#ffc1d9;color:#c9085a}.roxo{border-color:#b6e890;color:#23704b}.panel{border-color:#dcebd4;border-radius:18px}.filiais-dashboard{background:linear-gradient(120deg,#fff 0%,#f0ffdf 100%);border-color:#baf57a}.filiais-grid article{transition:transform .25s ease,box-shadow .25s ease}.filiais-grid article:hover{transform:translateY(-4px);box-shadow:0 13px 24px rgba(8,61,44,.12)}html[data-theme="dark"] body{background-color:#0b100d;background-image:radial-gradient(circle at 0 0,#3a142a 0,transparent 28rem),radial-gradient(circle at 100% 16%,#17321d 0,transparent 27rem)}html[data-theme="dark"] .header h1,html[data-theme="dark"] .filiais-heading h2{color:#d7fbb3}html[data-theme="dark"] .card{background:linear-gradient(145deg,#16231a,#101712)!important;border-color:#2d5939}html[data-theme="dark"] .filiais-dashboard{background:linear-gradient(120deg,#152218,#102115)!important;border-color:#3c7146}html[data-theme="dark"] .filiais-grid article{background:#101a13;border-color:#31513a}html[data-theme="dark"] .filiais-grid span{color:#d7fbb3}html[data-theme="dark"] .filiais-heading p,html[data-theme="dark"] .filiais-grid em{color:#b4c5b7}
 
 .produtos-categoria-area,
 .mais-vendidos-area { width: 100%; min-width: 0; display: flex; flex-direction: column; }
@@ -387,13 +387,15 @@ body.dashboard-navigating {
    ============================================================ */
 .main-footer { 
     width: 100%; 
-    background-color: #09145c; 
+    background-color: #083d2c;
     padding: 20px; 
     text-align: center; 
     color: rgb(255, 255, 255); 
     font-size: 13px; 
     margin-top: auto; 
 }
+.main-footer .footer-content { padding:0!important; color:inherit!important; }
+html[data-theme="dark"] .main-footer { background:#061e15; }
 
 
 /* RESPONSIVO */
@@ -538,3 +540,6 @@ body.dashboard-navigating {
 
 /* Contraste do painel Canamania no modo escuro. */
 html[data-theme="dark"] .dashboard :is(.panel,.podium-panel,.produtos-categoria-panel){background:#142019!important;border-color:#385b41!important;color:#edf7eb!important}html[data-theme="dark"] .dashboard :is(.podium-info strong,.podium-receita,.podium-percentual,.seletor-categoria label){color:#edf7eb!important}html[data-theme="dark"] .dashboard :is(.produto-vitrine,.seletor-categoria select){background:#101913!important;border-color:#416847!important;color:#edf7eb!important}html[data-theme="dark"] .dashboard .produto-vitrine-nome{color:#edf7eb!important}html[data-theme="dark"] .dashboard .card-link i{background:rgba(255,255,255,.1)!important;box-shadow:inset 0 0 0 1px rgba(186,245,122,.16)}html[data-theme="dark"] .dashboard .azul{color:#ff70ad!important}html[data-theme="dark"] .dashboard .verde{color:#baf57a!important}html[data-theme="dark"] .dashboard .vermelho{color:#ff7fb6!important}html[data-theme="dark"] .dashboard .roxo{color:#9ef078!important}html[data-theme="dark"] .dashboard .card-link span{color:#d7e7d7!important}
+
+.estado-vazio-categoria { padding:15px; color:#64748b; }
+html[data-theme="dark"] .dashboard .estado-vazio-categoria { color:#c2d0c4; }
