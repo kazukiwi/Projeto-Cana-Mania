@@ -213,6 +213,7 @@ function atualizarTabelaCarrinho() {
     document.getElementById('pdv-total-geral').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
     document.getElementById('btn-salvar-venda-banco').disabled = !carrinho.length;
+    document.dispatchEvent(new Event('pdv:carrinho-alterado'));
 }
 
 window.removerDoCarrinho = indice => { carrinho.splice(indice, 1); atualizarTabelaCarrinho(); };

@@ -10,3 +10,4 @@ passlib[bcrypt]
 python-jose[cryptography]
 psycopg2
 psycopg2-binary
+qrcode==8.2

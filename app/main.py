@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request, Depends, Form
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import func
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -98,6 +98,11 @@ def suporte(request: Request):
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if request.url.path.rstrip("/") == "/pdv/pix":
+        return JSONResponse(
+            {"detail": exc.detail}, status_code=exc.status_code,
+            headers={**(exc.headers or {}), "Cache-Control": "no-store"},
+        )
     if exc.status_code == 401:
         return templates.TemplateResponse(
             name="auth/nao_autenticado.html",
@@ -141,6 +146,11 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Evita expor uma resposta técnica quando um filtro ou formulário é inválido."""
+    if request.url.path.rstrip("/") == "/pdv/pix":
+        return JSONResponse(
+            {"detail": "Confira os itens e a loja selecionada e tente novamente."},
+            status_code=422, headers={"Cache-Control": "no-store"},
+        )
     return templates.TemplateResponse(
         name="erro_generico.html",
         request=request,
@@ -160,6 +170,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def unexpected_exception_handler(request: Request, exc: Exception):
     """Mostra uma tela clara ao usuário e preserva o detalhe técnico no log."""
     logger.exception("Erro não tratado em %s", request.url.path, exc_info=exc)
+    if request.url.path.rstrip("/") == "/pdv/pix":
+        return JSONResponse(
+            {"detail": "Não foi possível gerar o Pix. Tente novamente; se persistir, consulte o suporte."},
+            status_code=500, headers={"Cache-Control": "no-store"},
+        )
     return templates.TemplateResponse(
         name="erro_generico.html",
         request=request,

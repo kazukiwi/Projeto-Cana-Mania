@@ -167,6 +167,21 @@
                         </select>
                     </div>
 
+
+                    <section id="pix-painel" hidden style="margin-bottom:15px; padding:15px; border:1px solid #d1d5db; border-radius:6px;" aria-labelledby="pix-titulo">
+                        <h3 id="pix-titulo">Pagamento via Pix</h3>
+                        <button type="button" id="pix-gerar" style="padding:10px; cursor:pointer;">Gerar QR Code Pix</button>
+                        <p id="pix-mensagem" role="status" aria-live="polite"></p>
+                        <div id="pix-resultado" hidden>
+                            <p>Valor: <strong id="pix-valor"></strong></p>
+                            <img id="pix-imagem" alt="QR Code para pagamento via Pix" width="280" height="280" style="max-width:100%; height:auto; background:white;">
+                            <label for="pix-codigo" style="display:block;">Pix copia e cola</label>
+                            <textarea id="pix-codigo" readonly rows="3" style="width:100%; box-sizing:border-box;"></textarea>
+                            <button type="button" id="pix-copiar" style="padding:10px; cursor:pointer;">Copiar código Pix</button>
+                        </div>
+                        <p>Confira o recebimento no banco antes de finalizar a venda. O sistema não confirma o pagamento automaticamente.</p>
+                    </section>
+
                     <div class="form-group" style="margin-bottom:15px;">
                         <label for="observacao" style="display:block; font-weight:bold; margin-bottom:5px;">Observações da Venda</label>
                         <input type="text" name="observacao" id="observacao" placeholder="Ex: Venda corporativa, pagamento via Pix..." style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
@@ -206,7 +221,8 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=preco-variacao-1"></script>
+    <script src="/static/javascript/vendas.js?v=pix-1"></script>
+    <script src="/static/javascript/pix.js?v=2"></script>
     <script type="application/x-disabled">
         let carrinho = [];
 

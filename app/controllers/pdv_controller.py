@@ -9,9 +9,10 @@
 # ============================================================
 
 import json
+from decimal import Decimal, InvalidOperation
 from datetime import date, datetime, time, timedelta, timezone
-from fastapi import APIRouter, Depends, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, Depends, Request, Form, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -23,6 +24,7 @@ from app.models.categoria import Categoria
 from app.models.produtos import CATEGORIAS_PDV
 from app.models.filial import EstoqueFilial, FILIAIS
 from app.controllers.estoque_controller import garantir_estoque_filiais
+from app.pix import gerar_pix
 from app.auth import get_usuario_logado
 
 router = APIRouter(prefix="/pdv", tags=["PDV"])
@@ -162,6 +164,59 @@ def tela_pdv(
             "vendas_hoje": vendas_hoje,
         }
     )
+
+
+@router.post("/pix")
+def gerar_pix_carrinho(
+    carrinho_json: str = Form(..., max_length=100000),
+    filial: str = Form(...),
+    db: Session = Depends(get_db),
+    usuario = Depends(get_usuario_logado),
+):
+    """Gera uma solicitação de pagamento; não registra venda nem confirma pagamento."""
+    if filial not in FILIAIS:
+        raise HTTPException(status_code=400, detail="Loja inválida.")
+    try:
+        itens = json.loads(carrinho_json)
+        if not isinstance(itens, list) or not 1 <= len(itens) <= 500:
+            raise ValueError()
+        quantidades = {}
+        for item in itens:
+            if not isinstance(item, dict):
+                raise ValueError()
+            produto_id, quantidade = item.get("produto_id"), item.get("quantidade")
+            if type(produto_id) is not int or type(quantidade) is not int or produto_id <= 0 or not 1 <= quantidade <= 100000:
+                raise ValueError()
+            quantidades[produto_id] = quantidades.get(produto_id, 0) + quantidade
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="Carrinho inválido. Confira os itens e quantidades.") from None
+
+    total = Decimal("0")
+    for produto_id, quantidade in quantidades.items():
+        produto = (
+            db.query(Produto).join(Categoria, Produto.categoria_id == Categoria.id)
+            .filter(Produto.id == produto_id, Produto.ativo == True, func.lower(Categoria.nome).in_(CATEGORIAS_PDV))
+            .first()
+        )
+        if not produto:
+            raise HTTPException(status_code=400, detail="Um produto não está mais disponível.")
+        if not produto.eh_consumo:
+            saldo = db.query(EstoqueFilial).filter(
+                EstoqueFilial.produto_id == produto_id, EstoqueFilial.filial == filial,
+            ).first()
+            if not saldo or saldo.quantidade < quantidade:
+                raise HTTPException(status_code=400, detail="Estoque insuficiente na loja selecionada.")
+        try:
+            preco = Decimal(str(produto.preco))
+        except InvalidOperation:
+            raise HTTPException(status_code=400, detail="Produto sem preço válido.") from None
+        if not preco.is_finite() or preco < 0:
+            raise HTTPException(status_code=400, detail="Produto com preço inválido.")
+        total += preco * quantidade
+    try:
+        return JSONResponse(gerar_pix(total), headers={"Cache-Control": "no-store"})
+    except ValueError as erro:
+        raise HTTPException(status_code=400, detail=str(erro)) from None
 
 
 @router.post("/finalizar")
