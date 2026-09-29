@@ -543,3 +543,5 @@ html[data-theme="dark"] .dashboard :is(.panel,.podium-panel,.produtos-categoria-
 
 .estado-vazio-categoria { padding:15px; color:#64748b; }
 html[data-theme="dark"] .dashboard .estado-vazio-categoria { color:#c2d0c4; }
+
+.dashboard-cardapio{display:inline-flex;gap:12px;align-items:center;margin-top:14px;padding:11px 17px;border-radius:10px;background:#ff1877;color:#fff!important;text-decoration:none;font-weight:700;font-size:14px}.dashboard-cardapio:hover{background:#c9085a}.dashboard-cardapio:focus-visible{outline:3px solid #baf57a;outline-offset:3px}

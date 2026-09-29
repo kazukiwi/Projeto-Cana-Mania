@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block titulo %}Gestão{% endblock %} · Canamania</title><link rel="icon" href="/static/img/image.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"><link rel="stylesheet" href="/static/css/comercial.css?v=3"></head>
+<body class="gestao-pagina">{% include "partials/navbar.html" %}
+<main class="gestao">
+{% set pagina_atual = request.url.path %}
+<nav class="gestao-abas" aria-label="Gestão comercial"><a href="/pdv/">Nova venda</a><a href="/relatorios" {% if pagina_atual.startswith('/relatorios') %}class="active" aria-current="page"{% endif %}>Relatórios</a><a href="/caixa" {% if pagina_atual.startswith('/caixa') %}class="active" aria-current="page"{% endif %}>Caixa</a>{% if usuario.role == 'admin' %}<a href="/auditoria" {% if pagina_atual.startswith('/auditoria') %}class="active" aria-current="page"{% endif %}>Histórico de alterações</a>{% endif %}<a href="/cardapio" target="_blank" rel="noopener">Ver cardápio ↗</a></nav>
+{% block conteudo %}{% endblock %}
+</main></body></html>

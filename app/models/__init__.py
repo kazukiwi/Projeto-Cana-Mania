@@ -7,3 +7,5 @@ from app.models import cliente
 from app.models import armario
 from app.models import reserva_armario
 from app.models import filial
+
+from app.models import comercial

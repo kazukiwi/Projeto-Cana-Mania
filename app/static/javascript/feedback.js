@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (evento) => {
             const destino = link.getAttribute('href');
             if (evento.defaultPrevented || !destino || destino.startsWith('#') || link.target === '_blank' || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) return;
-            if (link.classList.contains('btn-sair')) return;
+            if (link.classList.contains('btn-sair') || link.hasAttribute('download') || link.dataset.semProcessando !== undefined) return;
             mostrarProcessando('Carregando a página solicitada.');
         });
     });

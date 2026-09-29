@@ -1,3 +1,4 @@
+from decimal import Decimal
 # ============================================================
 # controllers/movimentacao_controller.py
 # ============================================================
@@ -100,7 +101,7 @@ def registrar_movimentacao(
     produto_id: int     = Form(...),
     tipo: str           = Form(...),
     quantidade: int     = Form(...),
-    preco_unitario: float = Form(...),
+    preco_unitario: Decimal = Form(..., ge=0, max_digits=14, decimal_places=2),
     observacao: str     = Form(""),
     db: Session         = Depends(get_db),
     usuario             = Depends(get_usuario_logado)

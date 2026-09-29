@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>PDV - Nova Venda</title>
-    <link rel="stylesheet" href="/static/css/vendas.css">
+    <link rel="stylesheet" href="/static/css/vendas.css?v=gestao-1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
@@ -52,6 +52,8 @@
             </a>
         </div>
 
+        <p id="pdv-status" role="status" aria-live="polite"></p>
+        <p class="pdv-atalhos">F2: buscar produto &middot; F4: abrir cat&aacute;logo &middot; F8: pagamento &middot; F9: finalizar</p>
         <div class="pdv-layout-split" style="display: flex; gap: 20px; margin-top: 20px;">
             <div class="pdv-box-cadastro" style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
 
@@ -76,7 +78,7 @@
                     </select>
                 </div>
 
-                <form id="form-add-item-pdv">
+                <form id="form-add-item-pdv" data-sem-processando>
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label for="busca-frozen" style="display:block; font-weight:bold; margin-bottom:5px;">Produto</label>
                         <input id="busca-frozen" type="search" placeholder="Digite para procurar um consumo..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="resultado-busca-frozen" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
@@ -152,7 +154,8 @@
                     </div>
                 </div>
 
-                <form id="form-finalizar-real" action="/pdv/finalizar" method="POST">
+                <form id="form-finalizar-real" data-sem-processando data-operador="{{ usuario.id }}" action="/pdv/finalizar" method="POST">
+                    <input type="hidden" name="pedido_token" id="pedido_token" value="{{ pedido_token }}">
                     <input type="hidden" name="carrinho_json" id="carrinho_json_input">
 
                     <div class="form-group" style="margin-bottom:15px;">
@@ -168,18 +171,25 @@
                     </div>
 
 
-                    <section id="pix-painel" hidden style="margin-bottom:15px; padding:15px; border:1px solid #d1d5db; border-radius:6px;" aria-labelledby="pix-titulo">
-                        <h3 id="pix-titulo">Pagamento via Pix</h3>
-                        <button type="button" id="pix-gerar" style="padding:10px; cursor:pointer;">Gerar QR Code Pix</button>
-                        <p id="pix-mensagem" role="status" aria-live="polite"></p>
-                        <div id="pix-resultado" hidden>
-                            <p>Valor: <strong id="pix-valor"></strong></p>
-                            <img id="pix-imagem" alt="QR Code para pagamento via Pix" width="280" height="280" style="max-width:100%; height:auto; background:white;">
-                            <label for="pix-codigo" style="display:block;">Pix copia e cola</label>
-                            <textarea id="pix-codigo" readonly rows="3" style="width:100%; box-sizing:border-box;"></textarea>
-                            <button type="button" id="pix-copiar" style="padding:10px; cursor:pointer;">Copiar código Pix</button>
+                    <section id="pix-painel" class="pix-painel" hidden aria-labelledby="pix-titulo">
+                        <div class="pix-cabecalho">
+                            <span class="pix-icone" aria-hidden="true"><i class="fa-brands fa-pix"></i></span>
+                            <div><h3 id="pix-titulo">Pagamento via Pix</h3><p>Prático para pagar, simples para receber.</p></div>
                         </div>
-                        <p>Confira o recebimento no banco antes de finalizar a venda. O sistema não confirma o pagamento automaticamente.</p>
+                        <button type="button" id="pix-gerar" class="pix-botao pix-botao-gerar"><i class="fa-solid fa-qrcode" aria-hidden="true"></i> Gerar QR Code Pix</button>
+                        <p id="pix-mensagem" class="pix-mensagem" role="status" aria-live="polite"></p>
+                        <div id="pix-resultado" class="pix-resultado" hidden>
+                            <div class="pix-valor-container"><span>Total a pagar</span><strong id="pix-valor"></strong></div>
+                            <div class="pix-qr-moldura">
+                                <img id="pix-imagem" alt="QR Code para pagamento via Pix" width="280" height="280">
+                            </div>
+                            <p class="pix-instrucao">Abra o app do seu banco, escolha <strong>Pix</strong><br>e aponte a câmera para o código.</p>
+                            <div class="pix-separador"><span>ou use o copia e cola</span></div>
+                            <label for="pix-codigo" class="pix-codigo-label">Código Pix</label>
+                            <textarea id="pix-codigo" class="pix-codigo" readonly rows="2" spellcheck="false"></textarea>
+                            <button type="button" id="pix-copiar" class="pix-botao pix-botao-copiar"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar código Pix</button>
+                        </div>
+                        <div class="pix-aviso"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>Confira o recebimento no banco antes de finalizar a venda. A confirmação é manual.</p></div>
                     </section>
 
                     <div class="form-group" style="margin-bottom:15px;">
@@ -221,7 +231,8 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=pix-1"></script>
+    <script src="/static/javascript/vendas.js?v=gestao-1"></script>
+    <script src="/static/javascript/pdv-recuperacao.js?v=1"></script>
     <script src="/static/javascript/pix.js?v=2"></script>
     <script type="application/x-disabled">
         let carrinho = [];

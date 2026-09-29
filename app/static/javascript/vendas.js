@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const adicionarAoCarrinho = evento => {
         evento?.preventDefault();
+        if (window.pdvEnviando) return;
         if (!document.getElementById('form-add-item-pdv').reportValidity()) return;
         if (!produto.value) return;
         const selecionado = produto.options[produto.selectedIndex];
@@ -118,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const saldo = temVariacoes
             ? opcoes().find(item => String(item.tamanho_id) === tamanho.value && item.cor === cor.value)?.estoque_atual
             : (selecionado.dataset.semEstoque === 'true' ? Number.POSITIVE_INFINITY : saldoDaFilial(produto.value));
-        if (!qtd || qtd > saldo) return alert('Quantidade excede o estoque disponível.');
+        if (!Number.isInteger(qtd) || qtd <= 0 || qtd > saldo) return alert('Quantidade excede o estoque disponível.');
         const tamanhoId = temVariacoes ? tamanho.value : null;
         const nomeCor = temVariacoes ? cor.value : null;
         const existente = carrinho.find(item => item.produto_id === Number(produto.value) && item.tamanho_id === tamanhoId && item.cor === nomeCor);
@@ -144,27 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-adicionar-carrinho')?.addEventListener('click', adicionarAoCarrinho);
     document.getElementById('form-add-item-pdv')?.addEventListener('submit', adicionarAoCarrinho);
 
-    document.getElementById('form-finalizar-real')?.addEventListener('submit', evento => {
-        if (!carrinho.length) {
-            evento.preventDefault();
-            return;
-        }
-
-        evento.preventDefault();
-        const formulario = evento.currentTarget;
-        const botao = document.getElementById('btn-salvar-venda-banco');
-        if (formulario.dataset.enviando === 'true') return;
-
-        formulario.dataset.enviando = 'true';
-        botao.disabled = true;
-        botao.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Realizando venda...';
-
-        const card = document.createElement('div');
-        card.className = 'pdv-processando-venda';
-        card.innerHTML = '<div class="pdv-processando-venda-card" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><h2>Realizando venda...</h2><p>Registrando os itens e atualizando o estoque.</p></div>';
-        document.body.appendChild(card);
-        window.setTimeout(() => formulario.submit(), 150);
-    });
+    document.getElementById('form-finalizar-real')?.addEventListener('submit', evento => window.enviarVenda(evento));
     document.getElementById('select-cliente')?.addEventListener('change', atualizarTabelaCarrinho);
     filial?.addEventListener('change', aplicarFilial);
     buscaFrozen?.addEventListener('input', () => {
@@ -202,18 +183,20 @@ document.addEventListener('DOMContentLoaded', () => {
 function atualizarTabelaCarrinho() {
     const corpo = document.getElementById('corpo-carrinho-pdv');
     if (!corpo) return;
+    const escapar = valor => { const span = document.createElement('span'); span.textContent = valor; return span.innerHTML; };
     let total = 0;
     corpo.innerHTML = carrinho.map((item, indice) => {
-        const subtotal = item.preco * item.quantidade;
+        const subtotal = Math.round(item.preco * 100) * item.quantidade;
         total += subtotal;
         const variacao = item.tamanho ? ` (Tam: ${item.tamanho} | Cor: ${item.cor})` : '';
-        return `<tr><td><strong>${item.nome}${variacao}</strong></td><td>${item.quantidade}x</td><td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td><td><button type="button" onclick="removerDoCarrinho(${indice})">Remover</button></td></tr>`;
+        return `<tr><td><strong>${escapar(item.nome)}${escapar(variacao)}</strong></td><td>${item.quantidade}x</td><td>R$ ${(subtotal / 100).toFixed(2).replace('.', ',')}</td><td><button type="button" onclick="removerDoCarrinho(${indice})">Remover</button></td></tr>`;
     }).join('');
-    document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-    document.getElementById('pdv-total-geral').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
+    document.getElementById('pdv-total-bruto').textContent = `R$ ${(total / 100).toFixed(2).replace('.', ',')}`;
+    document.getElementById('pdv-total-geral').textContent = `R$ ${(total / 100).toFixed(2).replace('.', ',')}`;
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
     document.getElementById('btn-salvar-venda-banco').disabled = !carrinho.length;
+    document.getElementById('btn-salvar-venda-banco').style.opacity = carrinho.length ? '1' : '0.6';
     document.dispatchEvent(new Event('pdv:carrinho-alterado'));
 }
 
-window.removerDoCarrinho = indice => { carrinho.splice(indice, 1); atualizarTabelaCarrinho(); };
+window.removerDoCarrinho = indice => { if (window.pdvEnviando) return; carrinho.splice(indice, 1); atualizarTabelaCarrinho(); };

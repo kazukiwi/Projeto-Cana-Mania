@@ -1,3 +1,5 @@
+from decimal import Decimal
+from app.money import dinheiro
 # controllers/produto_controller.py — CRUD produtos AAPM SENAI
 import os
 import shutil
@@ -77,11 +79,11 @@ async def _obter_variacoes(request: Request, db: Session) -> list[dict]:
             tamanho_id = int(variacao.get("tamanho_id"))
             cor = str(variacao.get("cor", "")).strip()
             estoque = int(variacao.get("estoque_atual"))
-            preco = float(variacao.get("preco"))
+            preco = dinheiro(variacao.get("preco"))
         except (AttributeError, TypeError, ValueError):
             raise ValueError("variações inválidas")
         chave = (tamanho_id, cor.casefold())
-        if tamanho_id not in tamanho_ids_validos or not cor or len(cor) > 50 or estoque < 0 or not math.isfinite(preco) or preco < 0 or chave in combinacoes:
+        if tamanho_id not in tamanho_ids_validos or not cor or len(cor) > 50 or estoque < 0 or not preco.is_finite() or preco < 0 or chave in combinacoes:
             raise ValueError("variações inválidas")
         combinacoes.add(chave)
         resultado.append({"tamanho_id": tamanho_id, "cor": cor, "estoque_atual": estoque, "preco": preco})
@@ -188,7 +190,7 @@ def form_novo_produto(
 async def criar_produto(
     request: Request,
     nome: str          = Form(...),
-    preco: float       = Form(...),
+    preco: Decimal     = Form(..., ge=0, max_digits=14, decimal_places=2),
     estoque_atual: int = Form(0),
     possui_variacoes_tamanho: bool = Form(False),
     categoria_id: int  = Form(0),   # 0 = sem categoria
@@ -325,7 +327,7 @@ async def editar_produto(
     produto_id: int,
     request: Request,
     nome: str          = Form(...),
-    preco: float       = Form(...),
+    preco: Decimal     = Form(..., ge=0, max_digits=14, decimal_places=2),
     estoque_atual: int = Form(0),
     possui_variacoes_tamanho: bool = Form(False),
     categoria_id: int  = Form(0),

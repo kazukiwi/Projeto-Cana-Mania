@@ -1,3 +1,4 @@
+from app.money import Dinheiro
 # models/venda.py — Cabeçalho da venda e itens
 # ============================================================
 # Uma Venda tem um cabeçalho (quem comprou, quando, desconto)
@@ -34,16 +35,19 @@ class Venda(Base):
 
     # Percentual de desconto aplicado — 0.0 ou 10.0
     # Guardamos o valor histórico para não depender do cadastro do cliente
-    desconto_percentual = Column(Float, nullable=False, default=0.0)
+    desconto_percentual = Column(Float, nullable=False, default=0)
 
     # Valores calculados e persistidos para histórico imutável
     # (mesmo que o preço do produto mude, a venda permanece correta)
-    total_bruto  = Column(Float, nullable=False, default=0.0)
-    total_liquido = Column(Float, nullable=False, default=0.0)
+    total_bruto  = Column(Dinheiro(), nullable=False, default=0)
+    total_liquido = Column(Dinheiro(), nullable=False, default=0)
 
     # Observação opcional do operador
     observacao = Column(String(255), nullable=True)
     forma_pagamento = Column(String(30), nullable=True)
+    filial = Column(String(40), nullable=True, index=True)
+    pedido_token = Column(String(36), nullable=True, unique=True, index=True)
+    pedido_hash = Column(String(64), nullable=True)
 
     criado_em = Column(DateTime, server_default=func.now())
 
@@ -72,7 +76,7 @@ class FechamentoDiario(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     data = Column(Date, nullable=False, unique=True, index=True)
-    total_vendido = Column(Float, nullable=False, default=0.0)
+    total_vendido = Column(Dinheiro(), nullable=False, default=0)
     quantidade_vendas = Column(Integer, nullable=False, default=0)
     fechado_em = Column(DateTime, nullable=False, server_default=func.now())
     fechado_automaticamente = Column(Boolean, nullable=False, default=False)
@@ -102,7 +106,7 @@ class ItemVenda(Base):
     tamanho        = Column(String(10), nullable=True)
     cor            = Column(String(50), nullable=True)
     quantidade     = Column(Integer, nullable=False)
-    preco_unitario = Column(Float, nullable=False)   # preço no momento da venda
+    preco_unitario = Column(Dinheiro(), nullable=False)   # preço no momento da venda
 
     @property
     def subtotal(self) -> float:

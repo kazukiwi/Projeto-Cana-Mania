@@ -1,3 +1,4 @@
+from app.money import Dinheiro
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -14,7 +15,7 @@ class Movimentacao(Base):
     id = Column(Integer, primary_key=True, autoincrement=True, index=True)
     tipo = Column(Enum(Tipo_de_movimentacao), nullable=False)
     quantidade = Column(Integer, nullable=False)
-    preco_unitario = Column(Float, nullable=False, default=0.0)
+    preco_unitario = Column(Dinheiro(), nullable=False, default=0)
     observacao = Column(String(255), nullable=True)
     criado_em = Column(DateTime, server_default=func.now())
 

@@ -1,3 +1,4 @@
+from app.money import Dinheiro
 from pathlib import Path
 import re
 
@@ -37,7 +38,7 @@ class Produto(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String(200), unique=True, index=True)
-    preco = Column(Float)
+    preco = Column(Dinheiro())
     estoque_atual = Column(Integer, nullable=False, default=0)
     possui_variacoes_tamanho = Column(Boolean, nullable=False, default=False, server_default="false")
     ativo = Column(Boolean, default=True)
@@ -162,7 +163,7 @@ class EstoqueVariacao(Base):
     tamanho_id = Column(Integer, ForeignKey("tamanhos.id", ondelete="RESTRICT"), nullable=False)
     cor = Column(String(50), nullable=False)
     estoque_atual = Column(Integer, nullable=False, default=0)
-    preco = Column(Float, nullable=False, default=0.0)
+    preco = Column(Dinheiro(), nullable=False, default=0)
 
     produto = relationship("Produto", back_populates="estoques_variacoes")
     tamanho = relationship("Tamanho")

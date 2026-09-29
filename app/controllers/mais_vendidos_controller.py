@@ -1,3 +1,5 @@
+from app.money import Dinheiro
+from sqlalchemy import type_coerce
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -17,7 +19,7 @@ def mais_vendidos(db: Session = Depends(get_db)):
             ItemVenda.produto_id,
             ItemVenda.produto_nome.label("nome"),
             func.sum(ItemVenda.quantidade).label("vendas"),
-            func.sum(ItemVenda.quantidade * ItemVenda.preco_unitario).label("receita"),
+            func.sum(type_coerce(ItemVenda.quantidade * ItemVenda.preco_unitario, Dinheiro())).label("receita"),
         )
         .group_by(ItemVenda.produto_id, ItemVenda.produto_nome)
         .all()

@@ -661,3 +661,124 @@ body {
     background-color: #4f46e5;
     color: white;
 }
+
+/* Pagamento Pix no PDV */
+.pix-painel {
+    margin-bottom: 20px;
+    padding: 22px;
+    border: 1px solid #cce8e1;
+    border-radius: 18px;
+    background: linear-gradient(150deg, #f0fdfa 0%, #ffffff 65%);
+    box-shadow: 0 6px 20px rgba(15, 118, 110, .06);
+    color: #183b38;
+    min-width: 0;
+}
+.pix-painel[hidden], .pix-resultado[hidden] { display: none; }
+.pix-cabecalho { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.pix-icone {
+    display: grid; place-items: center; flex: 0 0 44px; height: 44px;
+    border-radius: 13px; background: #ccfbf1; color: #0f766e; font-size: 25px;
+}
+.pix-cabecalho h3 { margin: 0; font-size: 18px; color: #134e4a; }
+.pix-cabecalho p { margin: 5px 0 0; font-size: 12px; line-height: 1.5; color: #526c68; }
+.pix-botao {
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    width: 100%; min-height: 46px; padding: 12px 16px; border-radius: 10px;
+    font: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background-color .18s, box-shadow .18s;
+}
+.pix-botao-gerar { background: #fff; border: 1px solid #99cfc4; color: #0f766e; }
+.pix-botao-gerar:hover:not(:disabled) { background: #e6f8f3; }
+.pix-botao-copiar { background: #0f766e; border: 1px solid #0f766e; color: #fff; margin-top: 10px; }
+.pix-botao-copiar:hover:not(:disabled) { background: #115e59; }
+.pix-botao:disabled { opacity: .5; cursor: not-allowed; }
+.pix-botao:focus-visible, .pix-codigo:focus-visible { outline: 3px solid #0f766e; outline-offset: 3px; }
+.pix-mensagem { margin: 14px 0 0; padding: 11px 13px; border-radius: 8px; background: #e6f4f0; color: #244c45; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.pix-mensagem:empty { display: none; }
+.pix-resultado { margin-top: 22px; }
+.pix-valor-container { text-align: center; margin-bottom: 18px; }
+.pix-valor-container span { display: block; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #526c68; }
+.pix-valor-container strong { display: block; margin-top: 5px; font-size: clamp(26px, 4vw, 36px); line-height: 1.25; color: #134e4a; overflow-wrap: anywhere; }
+.pix-qr-moldura {
+    width: min(100%, 280px); box-sizing: border-box; margin: 0 auto;
+    padding: 10px; border: 1px solid #dce9e5; border-radius: 16px;
+    background: #fff; box-shadow: 0 8px 24px rgba(19, 78, 74, .08);
+}
+.pix-qr-moldura img { display: block; width: 100%; height: auto; background: #fff; }
+.pix-instrucao { text-align: center; color: #526c68; font-size: 13px; line-height: 1.7; margin: 16px 0 20px; }
+.pix-separador { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; color: #647873; font-size: 12px; }
+.pix-separador::before, .pix-separador::after { content: ""; flex: 1; height: 1px; background: #dce9e5; }
+.pix-codigo-label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 600; color: #526c68; }
+.pix-painel .pix-codigo {
+    display: block; width: 100%; box-sizing: border-box; min-height: 64px; padding: 12px;
+    border: 1px solid #dce9e5; border-radius: 9px; background: #f8faf9; color: #526c68;
+    font: 11px/1.6 ui-monospace, Consolas, monospace; resize: vertical; overflow-wrap: anywhere;
+}
+.pix-aviso { display: flex; align-items: flex-start; gap: 9px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #dce9e5; color: #647873; }
+.pix-aviso > i { margin-top: 3px; font-size: 13px; }
+.pix-aviso p { margin: 0; font-size: 12px; line-height: 1.6; }
+@media (max-width: 640px) {
+    .pix-painel { padding: 16px; border-radius: 14px; }
+    .pix-cabecalho h3 { font-size: 16px; }
+    .pix-separador { gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pix-botao { transition: none; }
+}
+
+/* Pix acompanha o seletor de tema do sistema. */
+html[data-theme="dark"] .pix-painel {
+    background: linear-gradient(150deg, #16352d 0%, #141d17 70%);
+    border-color: #365b49;
+    color: #e5f5ed;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .22);
+}
+html[data-theme="dark"] .pix-painel .pix-icone { background: #224c3e; color: #a7f3d0; }
+html[data-theme="dark"] .pix-painel .pix-cabecalho h3,
+html[data-theme="dark"] .pix-painel .pix-valor-container strong { color: #d7fbb3; }
+html[data-theme="dark"] .pix-painel :is(.pix-cabecalho p, .pix-valor-container span, .pix-instrucao, .pix-separador, .pix-codigo-label, .pix-aviso, .pix-aviso p) { color: #bdd2c6; }
+html[data-theme="dark"] .pix-painel .pix-mensagem {
+    background: #223e31;
+    color: #ddf7e7;
+}
+html[data-theme="dark"] .pix-painel .pix-aviso { border-color: #365b49; }
+html[data-theme="dark"] .pix-painel .pix-separador::before,
+html[data-theme="dark"] .pix-painel .pix-separador::after { background: #365b49; }
+html[data-theme="dark"] .pix-painel .pix-codigo {
+    background: #0e1913 !important;
+    color: #d8e9df !important;
+    border-color: #41644f !important;
+}
+html[data-theme="dark"] .pix-painel .pix-botao-gerar {
+    background: #203d30 !important;
+    color: #d7fbb3 !important;
+    border-color: #52745c !important;
+    box-shadow: none !important;
+}
+html[data-theme="dark"] .pix-painel .pix-botao-gerar:hover:not(:disabled) {
+    background: #2a503c !important;
+    color: #efffe2 !important;
+}
+html[data-theme="dark"] .pix-painel .pix-botao-copiar {
+    background: #baf57a !important;
+    color: #10251a !important;
+    border-color: #baf57a !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .18) !important;
+}
+html[data-theme="dark"] .pix-painel .pix-botao-copiar:hover:not(:disabled) {
+    background: #d7fbb3 !important;
+    color: #10251a !important;
+}
+html[data-theme="dark"] .pix-painel :is(.pix-botao, .pix-codigo):focus-visible { outline-color: #baf57a; }
+/* Preserva o contraste do codigo para a camera do banco. */
+html[data-theme="dark"] .pix-painel .pix-qr-moldura {
+    background: #fff;
+    border-color: #fff;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+}
+html[data-theme="dark"] .pix-painel .pix-qr-moldura img { background: #fff; }
+
+#pdv-status:not(:empty) { padding: 12px 16px; border: 1px solid #acc9b6; border-radius: 10px; background: #eef8ef; color: #244c36; line-height: 1.6; }
+.pdv-atalhos { font-size: 12px; color: #526c68; line-height: 1.7; }
+html[data-theme="dark"] #pdv-status:not(:empty) { background: #1b3427; color: #d7fbb3; border-color: #52745c; }
+html[data-theme="dark"] .pdv-atalhos { color: #bdd2c6; }

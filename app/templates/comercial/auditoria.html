@@ -1,0 +1,6 @@
+{% extends "comercial/base.html" %}
+{% block titulo %}Histórico de alterações{% endblock %}
+{% block conteudo %}
+<header class="gestao-titulo"><div><span class="sobretitulo">Rastreabilidade</span><h1>Preços e estoque</h1><p>Alterações registradas a partir da implantação deste histórico.</p></div></header>
+<section class="painel"><div class="gestao-tabela"><table><thead><tr><th>Data</th><th>Responsável</th><th>Produto / estoque</th><th>Campo</th><th>Anterior</th><th>Novo</th><th>Origem</th></tr></thead><tbody>{% for a, nome in registros %}<tr><td>{{ a.criado_em|local }}</td><td>{{ nome or 'Sistema' }}</td><td>{{ a.descricao }}<small>{{ a.entidade }} #{{ a.entidade_id or 'novo' }}</small></td><td>{{ a.campo }}</td><td>{{ a.anterior or '—' }}</td><td>{{ a.novo or '—' }}</td><td>{{ a.origem }}</td></tr>{% else %}<tr><td colspan="7">Ainda não há alterações registradas.</td></tr>{% endfor %}</tbody></table></div><nav class="paginacao">{% if pagina > 1 %}<a href="?pagina={{ pagina-1 }}">← Anterior</a>{% endif %}<span>Página {{ pagina }} de {{ paginas }}</span>{% if pagina < paginas %}<a href="?pagina={{ pagina+1 }}">Próxima →</a>{% endif %}</nav></section>
+{% endblock %}

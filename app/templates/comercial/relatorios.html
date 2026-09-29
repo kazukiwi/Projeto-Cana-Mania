@@ -1,0 +1,17 @@
+{% extends "comercial/base.html" %}
+{% block titulo %}Relatórios de vendas{% endblock %}
+{% block conteudo %}
+<header class="gestao-titulo"><div><span class="sobretitulo">Visão do negócio</span><h1>Relatórios de vendas</h1><p>Consulte o período e exporte todas as vendas filtradas.</p></div><a class="acao" href="{{ exportar }}" download="vendas.csv">Exportar CSV · Excel</a></header>
+<form class="gestao-filtros painel" method="get">
+<label>De<input type="date" name="inicio" value="{{ f.inicio }}" required></label>
+<label>Até<input type="date" name="fim" value="{{ f.fim }}" required></label>
+<label>Loja<select name="filial"><option value="">Todas</option><option value="legado" {% if f.filial == 'legado' %}selected{% endif %}>Loja não informada</option>{% for loja in filiais %}<option {% if f.filial == loja %}selected{% endif %}>{{ loja }}</option>{% endfor %}</select></label>
+{% if usuario.role == 'admin' %}<label>Operador<select name="operador"><option value="0">Todos</option>{% for operador in operadores %}<option value="{{ operador.id }}" {% if f.operador == operador.id %}selected{% endif %}>{{ operador.nome }}</option>{% endfor %}</select></label>{% endif %}
+<label>Pagamento<select name="pagamento"><option value="">Todos</option>{% for codigo, nome in rotulos.items() %}<option value="{{ codigo }}" {% if f.pagamento == codigo %}selected{% endif %}>{{ nome }}</option>{% endfor %}</select></label><button type="submit">Aplicar filtros</button>
+</form>
+<div class="gestao-cards"><article class="painel"><span>Total vendido</span><strong>R$ {{ total|brl }}</strong></article><article class="painel"><span>Vendas no período</span><strong>{{ quantidade }}</strong></article><article class="painel"><span>Ticket médio</span><strong>R$ {{ ticket|brl }}</strong></article></div>
+<div class="gestao-duas"><section class="painel"><h2>Por pagamento</h2>{% for codigo, valor in pagamentos.items() %}<div class="linha-resumo"><span>{{ rotulos[codigo] }}</span><strong>R$ {{ valor|brl }}</strong></div>{% endfor %}</section><section class="painel"><h2>Por loja e operador</h2>{% for chave, valor in grupos.items() %}<div class="linha-resumo"><span>{{ chave[0] }}<small>{{ chave[1] }}</small></span><strong>R$ {{ valor|brl }}</strong></div>{% else %}<p>Nenhuma venda neste período.</p>{% endfor %}</section></div>
+<section class="painel"><h2>Vendas registradas</h2><p>As vendas antigas podem não ter loja informada. Horários de Brasília.</p><div class="gestao-tabela"><table><thead><tr><th>Venda</th><th>Data</th><th>Loja</th><th>Operador</th><th>Pagamento</th><th>Total</th></tr></thead><tbody>
+{% for v in vendas %}<tr><td><a href="/pdv/venda/{{ v.id }}">#{{ v.id }}</a></td><td>{{ v.criado_em|local }}</td><td>{{ v.filial or 'Loja não informada' }}</td><td>{{ v.usuario.nome if v.usuario else 'Não informado' }}</td><td>{{ rotulos.get(v.forma_pagamento, 'Não informado') }}</td><td>R$ {{ v.total_liquido|brl }}</td></tr>{% else %}<tr><td colspan="6">Nenhuma venda encontrada com esses filtros.</td></tr>{% endfor %}
+</tbody></table></div><nav class="paginacao" aria-label="Páginas">{% if f.pagina > 1 %}<a href="{{ request.url.include_query_params(pagina=f.pagina-1) }}">← Anterior</a>{% endif %}<span>Página {{ f.pagina }} de {{ paginas }}</span>{% if f.pagina < paginas %}<a href="{{ request.url.include_query_params(pagina=f.pagina+1) }}">Próxima →</a>{% endif %}</nav></section>
+{% endblock %}

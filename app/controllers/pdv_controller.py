@@ -1,3 +1,6 @@
+from uuid import uuid4
+from app.money import dinheiro, ZERO
+from app.services.vendas import registrar_venda, validar_token
 # ============================================================
 # controllers/pdv_controller.py — Ponto de Venda
 # ============================================================
@@ -59,7 +62,7 @@ def fechar_dia(db: Session, data_referencia: date, automatico: bool = False) -> 
         fechamento = FechamentoDiario(data=data_referencia)
         db.add(fechamento)
 
-    fechamento.total_vendido = round(float(total or 0.0), 2)
+    fechamento.total_vendido = dinheiro(total or ZERO)
     fechamento.quantidade_vendas = int(quantidade or 0)
     fechamento.fechado_em = datetime.now(FUSO_HORARIO).replace(tzinfo=None)
     fechamento.fechado_automaticamente = fechamento.fechado_automaticamente or automatico
@@ -133,7 +136,7 @@ def tela_pdv(
     fechamento_de_hoje = db.query(FechamentoDiario).filter(FechamentoDiario.data == hoje).first()
     # Depois de fechar o dia manualmente, o próximo consumo começa uma nova
     # contagem, sem apagar o histórico já consolidado.
-    inicio_contagem = fechamento_de_hoje.fechado_em if fechamento_de_hoje else inicio_hoje
+    inicio_contagem = inicio_hoje
     vendas_hoje = dict(
         db.query(ItemVenda.produto_id, func.coalesce(func.sum(ItemVenda.quantidade), 0))
         .join(Venda, ItemVenda.venda_id == Venda.id)
@@ -162,6 +165,7 @@ def tela_pdv(
                 )
             },
             "vendas_hoje": vendas_hoje,
+            "pedido_token": str(uuid4()),
         }
     )
 
@@ -221,180 +225,22 @@ def gerar_pix_carrinho(
 
 @router.post("/finalizar")
 def finalizar_venda(
-    request: Request,
-    carrinho_json: str = Form(...),  # JSON serializado pelo JS
-    observacao: str    = Form(""),
-    forma_pagamento: str = Form(""),
-    filial: str        = Form("Pinheiros"),
-    db: Session        = Depends(get_db),
-    usuario            = Depends(get_usuario_logado)
+    request: Request, carrinho_json: str = Form(..., max_length=100000),
+    pedido_token: str = Form(...), observacao: str = Form("", max_length=255),
+    forma_pagamento: str = Form(...), filial: str = Form(...),
+    db: Session = Depends(get_db), usuario=Depends(get_usuario_logado),
 ):
-    """
-    Recebe o carrinho como JSON, valida e persiste a venda.
+    venda = registrar_venda(db, usuario["id"], pedido_token, carrinho_json, filial, forma_pagamento, observacao)
+    if "application/json" in request.headers.get("accept", ""):
+        return JSONResponse({"venda_id": venda.id}, headers={"Cache-Control": "no-store"})
+    return RedirectResponse(url=f"/pdv/venda/{venda.id}?sucesso=ok", status_code=303)
 
-    Formato esperado do carrinho_json:
-    [
-        {"produto_id": 1, "nome": "Caneta", "preco": 2.50, "quantidade": 3},
-        {"produto_id": 2, "nome": "Caderno", "preco": 15.00, "quantidade": 1}
-    ]
-    """
-    if filial not in FILIAIS:
-        return RedirectResponse(url="/pdv?erro=filial", status_code=302)
-    if forma_pagamento not in FORMAS_PAGAMENTO:
-        return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
 
-    try:
-        itens = json.loads(carrinho_json)
-    except (json.JSONDecodeError, ValueError):
-        return RedirectResponse(url="/pdv?erro=json", status_code=302)
-
-    if not isinstance(itens, list) or not itens:
-        return RedirectResponse(url="/pdv?erro=vazio", status_code=302)
-
-    desconto_percentual = 0.0
-
-    # ── Valida estoque e calcula totais ──────────────────────
-    total_bruto = 0.0
-    itens_validados = []
-    quantidades_por_produto = {}
-    quantidades_por_variacao = {}
-
-    for item in itens:
-        if not isinstance(item, dict):
-            return RedirectResponse(url="/pdv?erro=json", status_code=302)
-
-        try:
-            produto_id = int(item.get("produto_id"))
-        except (TypeError, ValueError):
-            return RedirectResponse(url="/pdv?erro=produto_inexistente", status_code=302)
-
-        if produto_id <= 0:
-            return RedirectResponse(url="/pdv?erro=produto_inexistente", status_code=302)
-
-        produto = (
-            db.query(Produto)
-            .join(Categoria, Produto.categoria_id == Categoria.id)
-            .filter(Produto.id == produto_id, Produto.ativo == True, func.lower(Categoria.nome).in_(CATEGORIAS_PDV))
-            .with_for_update()
-            .first()
-        )
-
-        if not produto:
-            return RedirectResponse(
-                url=f"/pdv?erro=produto_inexistente&id={produto_id}",
-                status_code=302
-            )
-
-        try:
-            qtd = int(item["quantidade"])
-        except (KeyError, TypeError, ValueError):
-            return RedirectResponse(url="/pdv?erro=quantidade", status_code=302)
-
-        if qtd <= 0:
-            return RedirectResponse(url="/pdv?erro=quantidade", status_code=302)
-
-        saldo_filial = None
-        if not produto.eh_consumo:
-            garantir_estoque_filiais(db, produto)
-            saldo_filial = db.query(EstoqueFilial).filter(
-                EstoqueFilial.produto_id == produto.id,
-                EstoqueFilial.filial == filial,
-            ).with_for_update().first()
-            quantidade_total_produto = quantidades_por_produto.get(produto.id, 0) + qtd
-            if not saldo_filial or quantidade_total_produto > saldo_filial.quantidade:
-                return RedirectResponse(url=f"/pdv?erro=estoque&produto={produto.nome}", status_code=302)
-            quantidades_por_produto[produto.id] = quantidade_total_produto
-        try:
-            tamanho_id = obter_tamanho_id_item(item)
-            cor = obter_cor_item(item)
-        except ValueError:
-            return RedirectResponse(url="/pdv?erro=variacao", status_code=302)
-
-        if False and produto.eh_camiseta and (not tamanho_id or not cor):
-            return RedirectResponse(url="/pdv?erro=variacao", status_code=302)
-
-        estoque_tamanho = None
-        estoque_variacao = None
-        if False and produto.eh_camiseta:
-            estoque_variacao = db.query(EstoqueVariacao).filter(
-                EstoqueVariacao.produto_id == produto.id,
-                EstoqueVariacao.tamanho_id == tamanho_id,
-                EstoqueVariacao.cor == cor,
-            ).with_for_update().first()
-            if estoque_variacao:
-                chave_variacao = (produto.id, tamanho_id, cor)
-                quantidade_total_variacao = quantidades_por_variacao.get(chave_variacao, 0) + qtd
-                if quantidade_total_variacao > estoque_variacao.estoque_atual:
-                    return RedirectResponse(url=f"/pdv?erro=estoque_variacao&produto={produto.nome}", status_code=302)
-                quantidades_por_variacao[chave_variacao] = quantidade_total_variacao
-            else:
-                estoque_tamanho = db.query(EstoqueTamanho).filter(
-                    EstoqueTamanho.produto_id == produto.id,
-                    EstoqueTamanho.tamanho_id == tamanho_id,
-                ).with_for_update().first()
-                chave_variacao = (produto.id, tamanho_id, None)
-                quantidade_total_variacao = quantidades_por_variacao.get(chave_variacao, 0) + qtd
-                if not estoque_tamanho or quantidade_total_variacao > estoque_tamanho.estoque_atual:
-                    return RedirectResponse(url=f"/pdv?erro=estoque_variacao&produto={produto.nome}", status_code=302)
-                quantidades_por_variacao[chave_variacao] = quantidade_total_variacao
-
-        preco_unitario = produto.preco
-        subtotal    = preco_unitario * qtd
-        total_bruto += subtotal
-
-        itens_validados.append({
-            "produto":       produto,
-            "quantidade":    qtd,
-            "preco":         preco_unitario,
-            "produto_nome":  produto.nome,
-            "tamanho":       estoque_variacao.tamanho.nome if estoque_variacao else (estoque_tamanho.tamanho.nome if estoque_tamanho else None),
-            "cor":           estoque_variacao.cor if estoque_variacao else ("Padrão" if estoque_tamanho else None),
-            "estoque_tamanho": estoque_tamanho,
-            "estoque_variacao": estoque_variacao,
-            "saldo_filial": saldo_filial,
-        })
-
-    # ── Calcula desconto e total final
-    desconto_valor = total_bruto * (desconto_percentual / 100)
-    total_liquido  = total_bruto - desconto_valor
-
-    # ── Persiste tudo em uma única transação
-    venda = Venda(
-        usuario_id          = usuario.get("id"),
-        desconto_percentual = desconto_percentual,
-        total_bruto         = round(total_bruto, 2),
-        total_liquido       = round(total_liquido, 2),
-        observacao          = observacao or None,
-        forma_pagamento     = forma_pagamento,
-    )
-    db.add(venda)
-    db.flush()  # gera o venda.id sem commitar ainda
-
-    for item in itens_validados:
-        db.add(ItemVenda(
-            venda_id       = venda.id,
-            produto_id     = item["produto"].id,
-            produto_nome   = item["produto_nome"],
-            tamanho        = item["tamanho"],
-            cor            = item["cor"],
-            quantidade     = item["quantidade"],
-            preco_unitario = item["preco"],
-        ))
-        # Baixa o estoque do produto
-        if item["saldo_filial"]:
-            item["produto"].estoque_atual -= item["quantidade"]
-            item["saldo_filial"].quantidade -= item["quantidade"]
-            if item["estoque_tamanho"]:
-                item["estoque_tamanho"].estoque_atual -= item["quantidade"]
-            if item["estoque_variacao"]:
-                item["estoque_variacao"].estoque_atual -= item["quantidade"]
-
-    db.commit()
-
-    return RedirectResponse(
-        url=f"/pdv/venda/{venda.id}?sucesso=ok",
-        status_code=302
-    )
+@router.get("/pedido/{token}")
+def consultar_pedido(token: str, db: Session = Depends(get_db), usuario=Depends(get_usuario_logado)):
+    token = validar_token(token)
+    venda = db.query(Venda).filter_by(pedido_token=token, usuario_id=usuario["id"]).first()
+    return JSONResponse({"venda_id": venda.id if venda else None}, headers={"Cache-Control": "no-store"})
 
 
 @router.get("/venda/{venda_id}")

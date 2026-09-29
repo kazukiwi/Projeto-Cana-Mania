@@ -1,3 +1,5 @@
+from app.money import dinheiro, ZERO
+from app.controllers import comercial_controller
 import asyncio
 import logging
 from pathlib import Path
@@ -98,7 +100,7 @@ def suporte(request: Request):
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    if request.url.path.rstrip("/") == "/pdv/pix":
+    if request.url.path.rstrip("/") == "/pdv/pix" or "application/json" in request.headers.get("accept", ""):
         return JSONResponse(
             {"detail": exc.detail}, status_code=exc.status_code,
             headers={**(exc.headers or {}), "Cache-Control": "no-store"},
@@ -146,7 +148,7 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Evita expor uma resposta técnica quando um filtro ou formulário é inválido."""
-    if request.url.path.rstrip("/") == "/pdv/pix":
+    if request.url.path.rstrip("/") == "/pdv/pix" or "application/json" in request.headers.get("accept", ""):
         return JSONResponse(
             {"detail": "Confira os itens e a loja selecionada e tente novamente."},
             status_code=422, headers={"Cache-Control": "no-store"},
@@ -170,9 +172,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def unexpected_exception_handler(request: Request, exc: Exception):
     """Mostra uma tela clara ao usuário e preserva o detalhe técnico no log."""
     logger.exception("Erro não tratado em %s", request.url.path, exc_info=exc)
-    if request.url.path.rstrip("/") == "/pdv/pix":
+    if request.url.path.rstrip("/") == "/pdv/pix" or "application/json" in request.headers.get("accept", ""):
         return JSONResponse(
-            {"detail": "Não foi possível gerar o Pix. Tente novamente; se persistir, consulte o suporte."},
+            {"detail": "Não foi possível concluir a solicitação. Tente novamente; se persistir, consulte o suporte."},
             status_code=500, headers={"Cache-Control": "no-store"},
         )
     return templates.TemplateResponse(
@@ -190,6 +192,7 @@ async def unexpected_exception_handler(request: Request, exc: Exception):
     )
 
 # 3º: INCLUIR OS ROUTERS dos controllers
+app.include_router(comercial_controller.router)
 app.include_router(auth_controller.router)
 app.include_router(admin_controller.router)
 app.include_router(categorias_controller.router)
@@ -311,11 +314,11 @@ def home(
             "nome": item.produto_nome or (produto.nome if produto else "Produto removido"),
             "imagem_url": produto.imagem_url if produto else "/static/img/produto_padrao.png",
             "vendas": 0,
-            "receita": 0.0,
+            "receita": ZERO,
         })
         quantidade = int(item.quantidade or 0)
         dados["vendas"] += quantidade
-        dados["receita"] += quantidade * float(item.preco_unitario or 0)
+        dados["receita"] += quantidade * dinheiro(item.preco_unitario or 0)
 
     total_unidades_vendidas = sum(produto["vendas"] for produto in ranking_dashboard.values())
     mais_vendidos_dashboard = sorted(
@@ -371,7 +374,7 @@ def mais_vendidos(
         
         vendas_reais = db.query(Venda).all()
         total_unidades = len(vendas_reais)
-        receita_total = sum(float(v.total_liquido or 0) for v in vendas_reais)
+        receita_total = sum((dinheiro(v.total_liquido or 0) for v in vendas_reais), ZERO)
 
         for venda in vendas_reais:
             if venda.itens:
@@ -390,14 +393,14 @@ def mais_vendidos(
                         cod_p = item.produto.codigo
 
                     qtd = int(item.quantidade or 0)
-                    subtotal = qtd * float(item.preco_unitario or 0)
+                    subtotal = qtd * dinheiro(item.preco_unitario or 0)
 
                     if nome_p not in controle_produtos:
                         controle_produtos[nome_p] = {
                             "codigo": cod_p,
                             "categoria": cat_p,
                             "vendas": 0,
-                            "receita": 0.0
+                            "receita": ZERO
                         }
                     
                     controle_produtos[nome_p]["vendas"] += qtd
@@ -421,7 +424,7 @@ def mais_vendidos(
 
     if not ranking_produtos:
         total_unidades = 0
-        receita_total = 0.0
+        receita_total = ZERO
     else:
         ranking_produtos = sorted(ranking_produtos, key=lambda x: x["vendas"], reverse=True)
         total_vendas_geral = sum(p["vendas"] for p in ranking_produtos) or 1
@@ -437,6 +440,7 @@ def mais_vendidos(
             "request": request,
             "usuario": usuario,
             "ranking": ranking_produtos,
+            "ranking_json": [{**item, "receita": str(item["receita"])} for item in ranking_produtos],
             "categories": categorias_dados,
             "total_unidades": total_unidades,
             "receita_total": receita_total,

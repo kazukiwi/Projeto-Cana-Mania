@@ -13,6 +13,9 @@
             <li><a href="/" class="{{ 'active' if caminho == '/' else '' }}">Dashboard</a></li>
             <li><a href="/produtos" class="{{ 'active' if caminho.startswith('/produtos') else '' }}">Consumos</a></li>
             <li><a href="/pdv/" class="{{ 'active' if caminho.startswith('/pdv') else '' }}">PDV</a></li>
+            <li><a href="/relatorios" class="{{ 'active' if caminho.startswith('/relatorios') or caminho.startswith('/auditoria') else '' }}" {% if caminho.startswith('/relatorios') or caminho.startswith('/auditoria') %}aria-current="page"{% endif %}>Relat&oacute;rios</a></li>
+            <li><a href="/caixa" class="{{ 'active' if caminho.startswith('/caixa') else '' }}" {% if caminho.startswith('/caixa') %}aria-current="page"{% endif %}>Caixa</a></li>
+            <li><a href="/cardapio" class="{{ 'active' if caminho.startswith('/cardapio') else '' }}" {% if caminho.startswith('/cardapio') %}aria-current="page"{% endif %} target="_blank" rel="noopener">Card&aacute;pio</a></li>
             <li><a href="/estoque/" class="{{ 'active' if caminho.startswith('/estoque') else '' }}">Estoque</a></li>
             {% if usuario.role == 'admin' %}
             <li><a href="/maquinas" class="{{ 'active' if caminho.startswith('/maquinas') else '' }}">Máquinas</a></li>
@@ -24,6 +27,6 @@
         </ul>
     </nav>
 </header>
-<script src="/static/javascript/feedback.js?v=2"></script>
+<script src="/static/javascript/feedback.js?v=3"></script>
 <script src="/static/javascript/theme.js"></script>
 <script src="/static/javascript/navigation.js" defer></script>
