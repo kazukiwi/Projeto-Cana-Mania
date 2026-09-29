@@ -117,3 +117,77 @@ html[data-theme="dark"] .form-group label { color: #d7fbb3 !important; }
 html[data-theme="dark"] .form-container :is(.current-image-container, .variacoes-card, .opcao-variacao) { background-color: #1c2b1f !important; border-color: #365840 !important; }
 html[data-theme="dark"] .form-container .btn-cancel { color: #e4ebe5; background-color: #1c2b1f; border-color: #365840; }
 
+/* Catálogo de produtos do PDV, inclusive no tema escuro. */
+.catalogo-pdv-modal { position:fixed; inset:0; z-index:1000; padding:24px; overflow:auto; background:rgba(15,23,42,.6); }
+.catalogo-pdv-card { width:min(860px,100%); margin:30px auto; padding:24px; border:1px solid #e2e8f0; border-radius:18px; background:#fff; box-shadow:0 24px 60px rgba(0,0,0,.28); }
+.catalogo-pdv-header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding-bottom:16px; border-bottom:1px solid #e2e8f0; }
+.catalogo-pdv-header p { margin:0 0 4px; color:#c9085a; font-size:.75rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+.catalogo-pdv-header h2 { margin:0; color:#083d2c; font-size:1.35rem; }
+.catalogo-pdv-fechar { display:grid; width:40px; height:40px; place-items:center; padding:0; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; color:#475569; font-size:28px; line-height:1; cursor:pointer; }
+.catalogo-pdv-busca { width:100%; box-sizing:border-box; margin:18px 0; padding:12px 14px; border:1px solid #cbd5e1; border-radius:10px; background:#fff; color:#0f172a; }
+.catalogo-pdv-grade { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px; }
+.catalogo-pdv-produto { display:grid; gap:9px; overflow:hidden; padding:10px; border:1px solid #e2e8f0; border-radius:12px; background:#fff; color:#0f172a; text-align:left; cursor:pointer; }
+.catalogo-pdv-produto:hover { border-color:#ff78b0; box-shadow:0 10px 22px rgba(255,24,119,.13); }
+.catalogo-pdv-imagem { width:100%; height:105px; object-fit:cover; border-radius:8px; background:#f1f5f9; }
+.catalogo-pdv-nome { overflow:hidden; color:#0f172a; font-size:.9rem; line-height:1.3; text-overflow:ellipsis; white-space:nowrap; }
+.catalogo-pdv-detalhe { color:#64748b; font-size:.78rem; }
+html[data-theme="dark"] .catalogo-pdv-card { border-color:#365840; background:#141d17; }
+html[data-theme="dark"] .catalogo-pdv-header { border-color:#365840; }
+html[data-theme="dark"] .catalogo-pdv-header h2, html[data-theme="dark"] .catalogo-pdv-nome { color:#f1f8ef !important; }
+html[data-theme="dark"] .catalogo-pdv-fechar { border-color:#365840; background:#1c2b1f; color:#e4ebe5; }
+html[data-theme="dark"] .catalogo-pdv-busca { border-color:#3a5541; background:#0e1510; color:#f5f7f4; }
+html[data-theme="dark"] .catalogo-pdv-produto { border-color:#365840; background:#1c2b1f; color:#f5f7f4; }
+html[data-theme="dark"] .catalogo-pdv-produto:hover { border-color:#ff70ad; background:#213023; }
+html[data-theme="dark"] .catalogo-pdv-detalhe { color:#b8cbb9; }
+html[data-theme="dark"] .tabela-produtos td a { color:#ff9bc5 !important; }
+html[data-theme="dark"] .tabela-produtos td a:hover { color:#d7fbb3 !important; }
+@media(max-width:600px) { .catalogo-pdv-modal { padding:14px; } .catalogo-pdv-card { margin:10px auto; padding:18px; } .catalogo-pdv-grade { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+
+/* Diálogos de confirmação e pop-ups compartilhados. */
+html[data-theme="dark"] :is(.confirmacao-acao-card, .modal-finalizar-dia-card, .modal-content-pdv, .modal-content, .feedback-processando-card, .feedback-modal-card, .feedback-bem-vindo-card) {
+    background:#141d17 !important;
+    color:#f5f7f4 !important;
+    border:1px solid #365840;
+    box-shadow:0 24px 60px rgba(0,0,0,.42);
+}
+html[data-theme="dark"] :is(.confirmacao-acao-card, .modal-finalizar-dia-card, .modal-content-pdv, .modal-content, .feedback-processando-card, .feedback-modal-card, .feedback-bem-vindo-card) :is(h1, h2, h3, h4, strong, label) { color:#f1f8ef !important; }
+html[data-theme="dark"] :is(.confirmacao-acao-card, .modal-finalizar-dia-card, .modal-content-pdv, .modal-content, .feedback-processando-card, .feedback-modal-card, .feedback-bem-vindo-card) :is(p, small, .modal-info, .input-readonly) { color:#c2d0c4 !important; }
+html[data-theme="dark"] :is(.modal-header, .catalogo-pdv-header) { border-color:#365840; }
+html[data-theme="dark"] :is(.confirmacao-acao-cancelar, .btn-cancelar-finalizacao, .feedback-modal-cancelar, .btn-fechar-modal) { background:#1c2b1f !important; color:#e4ebe5 !important; border:1px solid #365840 !important; }
+html[data-theme="dark"] :is(.modal-content-pdv, .modal-content) :is(input, select, textarea, .input-readonly) { background:#0e1510 !important; color:#f5f7f4 !important; border-color:#3a5541 !important; }
+html[data-theme="dark"] :is(.modal-content-pdv, .modal-content) .input-readonly { background:#1c2b1f !important; }
+html[data-theme="dark"] .confirmacao-acao-icon { background:#3a1c25; color:#ffb8cf; }
+html[data-theme="dark"] .modal-finalizar-dia-icon { background:#163425; color:#9ee9b3; }
+
+/* Cadastro e edição de funcionários. */
+html[data-theme="dark"] .glass-card { background:#141d17 !important; border-color:#365840 !important; box-shadow:0 18px 35px rgba(0,0,0,.28); }
+html[data-theme="dark"] .glass-card .header, html[data-theme="dark"] .actions-group { border-color:#365840; }
+html[data-theme="dark"] .glass-card .header h1, html[data-theme="dark"] .input-group label { color:#f1f8ef !important; }
+html[data-theme="dark"] :is(.glass-card .subtitle, .glass-card .input-icon) { color:#b8cbb9 !important; }
+html[data-theme="dark"] .glass-card .input-wrapper :is(input, select) { background:#0e1510 !important; color:#f5f7f4 !important; border-color:#3a5541 !important; }
+html[data-theme="dark"] .glass-card .input-wrapper :is(input, select):focus { border-color:#ff70ad !important; box-shadow:0 0 0 3px rgba(255,112,173,.16); }
+html[data-theme="dark"] .glass-card .btn-secondary { background:#1c2b1f !important; color:#e4ebe5 !important; border-color:#365840 !important; }
+
+/* Janela exibida ao sair da conta. */
+html[data-theme="dark"] .feedback-modal { background:rgba(0,0,0,.68); }
+html[data-theme="dark"] .feedback-modal-card { background:#141d17 !important; color:#f5f7f4 !important; border:1px solid #365840; }
+html[data-theme="dark"] .feedback-modal-card h2 { color:#f1f8ef !important; }
+html[data-theme="dark"] .feedback-modal-card p { color:#c2d0c4 !important; }
+html[data-theme="dark"] .feedback-modal-icone { background:#35202b; color:#ff9bc5; }
+html[data-theme="dark"] .feedback-modal-cancelar { background:#1c2b1f !important; color:#e4ebe5 !important; border:1px solid #365840 !important; }
+html[data-theme="dark"] .feedback-modal-confirmar { background:#ff1877 !important; color:#fff !important; }
+html[data-theme="dark"] .feedback-modal-confirmar:hover { background:#baf57a !important; color:#061e15 !important; }
+
+/* Fluxo público de recuperação de senha. */
+html[data-theme="dark"] .background { background:radial-gradient(circle at 8% 5%,#3a142a 0,transparent 29rem),radial-gradient(circle at 96% 14%,#17321d 0,transparent 28rem),#0b100d; }
+html[data-theme="dark"] .background .navbar { background:rgba(14,23,17,.88); border-color:#294433; }
+html[data-theme="dark"] .recovery-wordmark { color:#d7fbb3; }.recovery-wordmark small { color:#b8cbb9; }
+html[data-theme="dark"] .recovery-copy h1 { color:#d7fbb3; } html[data-theme="dark"] .recovery-copy p { color:#c2d0c4; }
+html[data-theme="dark"] .recovery-card { background:#141d17; border-color:#365840; border-top-color:#ff70ad; }
+html[data-theme="dark"] .recovery-card h1, html[data-theme="dark"] .recovery-card label { color:#f1f8ef; }
+html[data-theme="dark"] .recovery-card .intro { color:#c2d0c4; }
+html[data-theme="dark"] .recovery-card .input-box { background:#0e1510; border-color:#3a5541; color:#b8cbb9; }
+html[data-theme="dark"] .recovery-card .input-box input { color:#f5f7f4; }
+html[data-theme="dark"] .recovery-card .secondary-link { color:#ff9bc5; }
+html[data-theme="dark"] .recovery-card .feedback--error { background:#351a25; color:#ffc1d8; }
+

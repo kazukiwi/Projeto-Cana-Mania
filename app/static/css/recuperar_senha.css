@@ -55,3 +55,19 @@ button:hover { transform: scale(1.02); }
     .recovery-card h1 { font-size: 31px; }
     .recovery-copy p { font-size: 18px; }
 }
+
+/* Identidade Canamania para todo o fluxo de recuperação. */
+body { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #111315; background: #fffafd; }
+.background { min-height: calc(100vh - 64px); background: radial-gradient(circle at 8% 5%, #ffe0ee 0, transparent 29rem), radial-gradient(circle at 96% 14%, #e1ffc2 0, transparent 28rem), #fffafd; }
+.navbar { height: 76px; padding: 0 48px; background: rgba(255,255,255,.78); border-bottom: 1px solid rgba(8,61,44,.12); }
+.recovery-wordmark { color: #083d2c; font-size: 1.55rem; font-weight: 950; letter-spacing: -.08em; text-decoration: none; }.recovery-wordmark span { color: #ff1877; }.recovery-wordmark small { display:block; color:#4b5e51; font-size:.52rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+.rotating-circle { opacity: .12; filter: none; }
+.recovery-container { min-height: calc(100vh - 76px); gap: clamp(40px,8vw,125px); padding: 52px 24px; }
+.recovery-copy { max-width: 470px; }.recovery-eyebrow { margin-bottom:10px; color:#c9085a !important; font-size:.78rem !important; font-weight:850 !important; letter-spacing:.1em; text-shadow:none !important; text-transform:uppercase; }
+.recovery-copy h1 { margin:0 0 16px; color:#083d2c; font-size:clamp(2.5rem,5vw,4.6rem); letter-spacing:-.065em; line-height:.98; }.recovery-copy p { color:#526257; font-size:1.08rem; font-weight:500; line-height:1.6; text-shadow:none; }
+.recovery-card { padding:34px; border:1px solid rgba(8,61,44,.15); border-top:4px solid #ff1877; border-radius:20px; background:rgba(255,255,255,.88); color:#111315; box-shadow:0 22px 48px rgba(8,61,44,.14); }.recovery-card h1 { color:#083d2c; font-size:1.75rem; }.intro { color:#627167; }
+.status-icon { color:#c9085a; background:#fff0f6; }.status-icon--success { color:#17653a; background:#effce9; }.status-icon--error { color:#a31245; background:#fff1f3; }
+label { color:#274234; }.input-box { height:52px; border:1px solid #cbd9d0; border-radius:10px; background:#fff; color:#567064; }.input-box:focus-within { border-color:#ff1877; box-shadow:0 0 0 3px rgba(255,24,119,.13); }.input-box input { color:#111315; }.input-box input::placeholder { color:#87958c; }
+button { height:52px; border-radius:11px; background:linear-gradient(135deg,#ff1877,#c9085a); color:#fff; font-size:1rem; }.secondary-link { color:#a31245; font-weight:700; }.secondary-link:hover { border-color:#a31245; }.feedback--error { background:#fff1f3; color:#a31245; }.main-footer { min-height:64px; background:#083d2c; }
+@media (max-width:850px) { .recovery-copy h1 { font-size:3rem; } }
+@media (max-width:480px) { .navbar { justify-content:flex-start; padding:0 22px; } .recovery-container { padding:34px 18px; } .recovery-card { padding:26px 22px; } }

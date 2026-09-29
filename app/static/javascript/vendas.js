@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
         [...produto.options].filter(opcao => opcao.value && !opcao.hidden && opcao.textContent.toLocaleLowerCase('pt-BR').includes(filtro)).forEach(opcao => {
             const card = document.createElement('button');
             card.type = 'button'; card.dataset.produtoId = opcao.value;
-            card.style.cssText = 'border:1px solid #ddd;border-radius:10px;background:#fff;padding:10px;text-align:left;cursor:pointer;display:grid;gap:8px;';
+            card.className = 'catalogo-pdv-produto';
             const imagem = document.createElement('img');
-            imagem.src = opcao.dataset.imagem || '/static/img/produto_padrao.png'; imagem.alt = ''; imagem.style.cssText = 'width:100%;height:105px;object-fit:cover;border-radius:7px;';
-            const nome = document.createElement('strong'); nome.textContent = opcao.dataset.nome;
-            const detalhe = document.createElement('small'); detalhe.textContent = opcao.dataset.semEstoque === 'true' ? 'Venda sem limite' : `${saldoDaFilial(opcao.value)} un. nesta loja`;
+            imagem.src = opcao.dataset.imagem || '/static/img/produto_padrao.png'; imagem.alt = ''; imagem.className = 'catalogo-pdv-imagem';
+            const nome = document.createElement('strong'); nome.className = 'catalogo-pdv-nome'; nome.textContent = opcao.dataset.nome;
+            const detalhe = document.createElement('small'); detalhe.className = 'catalogo-pdv-detalhe'; detalhe.textContent = opcao.dataset.semEstoque === 'true' ? 'Venda sem limite' : `${saldoDaFilial(opcao.value)} un. nesta loja`;
             card.append(imagem, nome, detalhe); gradeCatalogo.appendChild(card);
         });
         if (!gradeCatalogo.children.length) gradeCatalogo.textContent = 'Nenhum produto disponível nesta loja.';
