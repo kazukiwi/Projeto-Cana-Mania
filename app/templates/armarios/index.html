@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>Máquinas | Canamania</title>
-    <link rel="stylesheet" href="/static/css/armarios.css?v=3">
+    <link rel="stylesheet" href="/static/css/armarios.css?v=filiais-5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 
@@ -134,6 +134,10 @@
             <button type="button" class="btn-filtro" data-filtro="disponivel">Disponiveis</button>
             <button type="button" class="btn-filtro" data-filtro="ocupado">Ocupados</button>
             <button type="button" class="btn-filtro" data-filtro="manutencao">Manutencao</button>
+            <button type="button" class="btn-filtro" data-filtro="desativado">Desativadas</button>
+            <label class="filtro-maquinas-filial" for="filtro-filial-maquinas">Filial
+                <select id="filtro-filial-maquinas"><option value="">Todas as filiais</option>{% for filial in filiais %}<option value="{{ filial }}">{{ filial }}</option>{% endfor %}<option value="sem-filial">Sem filial vinculada</option></select>
+            </label>
         </section>
 
         {% if request.query_params.get("erro") == "filial" %}
@@ -150,7 +154,15 @@
             <span class="legenda-item"><i class="dot dot-desativado"></i> Desativado</span>
         </section>
 
+        <section class="legenda-bar legenda-filiais" aria-label="Cores das filiais">
+            <span>Cores por filial:</span>
+            <span class="legenda-item"><i class="dot dot-pinheiros" aria-hidden="true"></i> Pinheiros</span>
+            <span class="legenda-item"><i class="dot dot-liberdade" aria-hidden="true"></i> Liberdade</span>
+            <span class="legenda-item"><i class="dot dot-fabrica" aria-hidden="true"></i> Carrão (Fábrica)</span>
+        </section>
         <section class="grid-shell">
+            <p id="maquinas-contagem" class="maquinas-contagem" role="status" aria-live="polite"></p>
+            <p id="maquinas-vazio" class="maquinas-vazio" hidden>Nenhuma máquina encontrada. Experimente outra filial ou outro status.</p>
             <div class="grid-armarios" id="grid-armarios">
                 {% for armario in armarios %}
                 <button
@@ -176,6 +188,8 @@
                     <i class="fa-solid fa-lock-open"></i>
                     {% endif %}
                     <span>{{ armario.numero|int }}</span>
+                    <small class="maquina-filial">{{ armario.associado_nome if armario.associado_nome in filiais else 'Sem filial' }}</small>
+                    <small class="maquina-status">{{ {'disponivel': 'Disponível', 'ocupado': 'Reservada', 'manutencao': 'Manutenção', 'desativado': 'Desativada'}.get(armario.status, armario.status) }}</small>
                 </button>
                 {% endfor %}
             </div>
@@ -247,7 +261,7 @@
 
     <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 
-    <script src="/static/javascript/armarios.js?v=filiais-4"></script>
+    <script src="/static/javascript/armarios.js?v=filiais-5"></script>
 </body>
 
 </html>

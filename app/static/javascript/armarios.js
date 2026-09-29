@@ -39,12 +39,26 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function aplicarFiltro(status) {
+    let statusSelecionado = "";
+    const filtroFilialMaquinas = document.getElementById("filtro-filial-maquinas");
+    function aplicarFiltro(status = statusSelecionado) {
+        statusSelecionado = status;
+        const filial = filtroFilialMaquinas?.value || "";
+        let visiveis = 0;
         cards.forEach(function (card) {
-            const statusCard = card.getAttribute("data-status");
-            card.style.display = !status || statusCard === status ? "" : "none";
+            const filialCard = card.dataset.filial || "";
+            const correspondeFilial = !filial || (filial === "sem-filial" ? !filialCard : filialCard === filial);
+            card.hidden = !((!status || card.dataset.status === status) && correspondeFilial);
+            if (!card.hidden) visiveis++;
         });
+        const contagem = document.getElementById("maquinas-contagem");
+        if (contagem) contagem.textContent = visiveis + " de " + cards.length + " máquina(s) nos filtros selecionados.";
+        const vazio = document.getElementById("maquinas-vazio");
+        if (vazio) vazio.hidden = visiveis > 0;
+        botoesFiltro.forEach(botao => botao.setAttribute("aria-pressed", String(botao.dataset.filtro === status)));
     }
+    filtroFilialMaquinas?.addEventListener("change", () => aplicarFiltro());
+    aplicarFiltro();
 
     function atualizarCamposModal() {
         const status = selectStatus ? selectStatus.value : "";

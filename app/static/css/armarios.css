@@ -442,3 +442,37 @@ html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .pa
         min-height: 58px;
     }
 }
+
+/* Cores de filial e filtros combinados de maquinas. */
+.filtro-maquinas-filial { display: flex; align-items: center; gap: 8px; margin-left: auto; font-size: 14px; font-weight: 700; }
+.filtro-maquinas-filial select { max-width: 100%; padding: 9px 12px; border: 1px solid #b8c8bc; border-radius: 8px; background: #fff; color: #183b28; font: inherit; }
+.maquinas-contagem { margin: 0 0 16px; font-size: 13px; color: #526c68; }
+.maquinas-vazio { padding: 28px 12px; text-align: center; line-height: 1.6; }
+.legenda-filiais .dot-pinheiros { background: #2563eb; }
+.legenda-filiais .dot-liberdade { background: #db2777; }
+.legenda-filiais .dot-fabrica { background: #7c3aed; }
+html .armarios-page #grid-armarios { grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); }
+html .armarios-page #grid-armarios .item-armario {
+    --maquina-cor: #64748b; --maquina-fundo: #f1f5f9; --maquina-texto: #334155;
+    aspect-ratio: auto; min-height: 128px; padding: 14px 8px; gap: 7px;
+    background: var(--maquina-fundo) !important; color: var(--maquina-texto) !important;
+    border: 1px solid var(--maquina-cor) !important; border-top: 5px solid var(--maquina-cor) !important;
+    box-shadow: 0 3px 12px #0000000a !important;
+}
+html .armarios-page #grid-armarios .item-armario.status-disponivel { --maquina-cor: #16a34a; --maquina-fundo: #f0fdf4; --maquina-texto: #166534; }
+html .armarios-page #grid-armarios .item-armario.status-manutencao { --maquina-cor: #ea580c; --maquina-fundo: #fff7ed; --maquina-texto: #9a3412; }
+html .armarios-page #grid-armarios .item-armario[data-filial="Pinheiros"] { --maquina-cor: #2563eb; --maquina-fundo: #eff6ff; --maquina-texto: #1e40af; }
+html .armarios-page #grid-armarios .item-armario[data-filial="Liberdade"] { --maquina-cor: #db2777; --maquina-fundo: #fdf2f8; --maquina-texto: #9d174d; }
+html .armarios-page #grid-armarios .item-armario[data-filial="Carrão (Fábrica)"] { --maquina-cor: #7c3aed; --maquina-fundo: #f5f3ff; --maquina-texto: #5b21b6; }
+html .armarios-page #grid-armarios .item-armario :is(span, small, i) { color: inherit !important; }
+html .armarios-page #grid-armarios .maquina-filial { font-size: 12px; line-height: 1.4; }
+html .armarios-page #grid-armarios .maquina-status { font-size: 11px; font-weight: 400; }
+html .armarios-page #grid-armarios .item-armario[hidden], .maquinas-vazio[hidden] { display: none !important; }
+html .armarios-page #grid-armarios .item-armario:focus-visible { outline: 3px solid var(--maquina-cor); outline-offset: 3px; }
+html[data-theme="dark"] .armarios-page #grid-armarios .item-armario { --maquina-fundo: #1e293b; --maquina-texto: #e2e8f0; }
+html[data-theme="dark"] .armarios-page #grid-armarios .item-armario.status-disponivel { --maquina-fundo: #123323; --maquina-texto: #bbf7d0; }
+html[data-theme="dark"] .armarios-page #grid-armarios .item-armario.status-manutencao { --maquina-fundo: #3b2417; --maquina-texto: #fed7aa; }
+html[data-theme="dark"] .armarios-page #grid-armarios .item-armario[data-filial="Pinheiros"] { --maquina-fundo: #172c50; --maquina-texto: #bfdbfe; }
+html[data-theme="dark"] .armarios-page #grid-armarios .item-armario[data-filial="Liberdade"] { --maquina-fundo: #3c1e32; --maquina-texto: #fbcfe8; }
+html[data-theme="dark"] .armarios-page #grid-armarios .item-armario[data-filial="Carrão (Fábrica)"] { --maquina-fundo: #2d2147; --maquina-texto: #ddd6fe; }
+@media(max-width:600px) { .filtro-maquinas-filial { margin-left: 0; width: 100%; flex-wrap: wrap; } .filtro-maquinas-filial select { flex: 1; } }
