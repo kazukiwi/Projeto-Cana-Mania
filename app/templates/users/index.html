@@ -8,6 +8,7 @@
     <title>Gerenciamento de Usuários</title>
     <link rel="stylesheet" href="/static/css/usuarios.css">
     <link rel="stylesheet" href="/static/css/listagem.css">
+    <link rel="stylesheet" href="/static/css/confirmacao.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -189,7 +190,11 @@
                         </td>
                         <td>
                             <div class="user-actions-wrapper">
-                                <form action="/usuarios/{{ u.id }}/toggle-ativo" method="post" style="display:inline" data-confirm="Alterar o status deste usuário?">
+                                <form action="/usuarios/{{ u.id }}/toggle-ativo" method="post" style="display:inline"
+                                    data-confirmacao
+                                    data-titulo="{{ 'Desativar usuário?' if u.ativo else 'Ativar usuário?' }}"
+                                    data-mensagem="{{ 'O acesso de ' ~ u.nome ~ ' será desativado.' if u.ativo else 'O acesso de ' ~ u.nome ~ ' será ativado novamente.' }}"
+                                    data-confirmar="{{ 'Desativar usuário' if u.ativo else 'Ativar usuário' }}">
                                     {% if u.ativo %}
                                     <button type="submit" class="btn-acao excluir" title="Desativar Usuário"
                                         style="font-size: 15px;">
@@ -215,9 +220,22 @@
         </div>
     </main>
 
+    <div class="modal-confirmacao-acao" id="modal-confirmacao-acao" aria-hidden="true">
+        <div class="confirmacao-acao-card" role="dialog" aria-modal="true" aria-labelledby="confirmacao-acao-titulo">
+            <div class="confirmacao-acao-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></div>
+            <h2 id="confirmacao-acao-titulo">Confirmar ação</h2>
+            <p id="confirmacao-acao-texto"></p>
+            <form method="post" id="form-confirmacao-acao" class="confirmacao-acao-botoes">
+                <button type="button" class="confirmacao-acao-cancelar" id="confirmacao-acao-cancelar">Voltar</button>
+                <button type="button" class="confirmacao-acao-confirmar" id="confirmacao-acao-confirmar">Confirmar</button>
+            </form>
+        </div>
+    </div>
+
     <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 
     <script src="/static/javascript/listagem.js?v=4"></script>
+    <script src="/static/javascript/confirmacao.js?v=2"></script>
     <script>
         // Renderiza os ícones do Lucide do seu projeto
         lucide.createIcons();

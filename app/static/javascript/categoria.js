@@ -12,32 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
         console.warn("A biblioteca Lucide não foi carregada corretamente.");
     }
 
-    // 2. Confirmação de segurança antes de alterar o status de um usuário
-    const formToggles = document.querySelectorAll('form[action*="/toggle-ativo"]');
-    
-    formToggles.forEach(form => {
-        form.addEventListener("submit", function (event) {
-            const button = form.querySelector(".btn-toggle");
-            if (!button) return; // Proteção caso o botão não exista na árvore
-
-            const isDeactivate = button.classList.contains("deactivate");
-            
-            // Encontra o nome do usuário na mesma linha da tabela para personalizar a mensagem
-            const row = form.closest("tr");
-            const userName = row ? row.querySelector("td").textContent.trim() : "este usuário";
-
-            const mensagem = isDeactivate
-                ? `Tem certeza que deseja DESATIVAR o acesso do usuário "${userName}"?`
-                : `Deseja ATIVAR novamente o acesso do usuário "${userName}"?`;
-
-            // Se o usuário clicar em "Cancelar", cancela o envio do formulário POST
-            if (!confirm(mensagem)) {
-                event.preventDefault();
-            }
-        });
-    });
-
-    // 3. Desaparecer com as caixas de alerta após 5 segundos de forma suave
+    // 2. Desaparecer com as caixas de alerta após 5 segundos de forma suave
     const alertBoxes = document.querySelectorAll(".alert-box");
     
     alertBoxes.forEach(alert => {

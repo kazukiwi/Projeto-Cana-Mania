@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (buscaReserva) buscaReserva.addEventListener("input", filtrarReservas);
     if (filtroSemestre) filtroSemestre.addEventListener("change", filtrarReservas);
 
-    document.querySelectorAll("[data-confirm]").forEach(function (formulario) {
+    document.querySelectorAll("[data-confirmacao]").forEach(function (formulario) {
         formulario.addEventListener("submit", function (event) {
             event.preventDefault();
             const linha = formulario.closest("tr");

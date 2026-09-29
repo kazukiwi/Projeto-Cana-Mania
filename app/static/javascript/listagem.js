@@ -75,10 +75,6 @@ function iniciarListagens() {
     document.querySelector('input[name="apenas_associados"]')?.addEventListener("change", () => { pagina = 1; renderizar(); });
     renderizar();
   });
-
-  document.querySelectorAll("form[data-confirm]").forEach(form => form.addEventListener("submit", event => {
-    if (!confirm(form.dataset.confirm)) event.preventDefault();
-  }));
 }
 
 // Funciona tanto quando o arquivo é carregado durante o parsing quanto depois
