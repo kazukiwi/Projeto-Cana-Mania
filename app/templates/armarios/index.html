@@ -103,21 +103,21 @@
                     <span>Total de máquinas</span>
                     <strong>{{ total_armarios }}</strong>
                 </div>
-                <i class="fa-solid fa-lock"></i>
+                <i class="fa-solid fa-gears" aria-hidden="true"></i>
             </div>
             <div class="card-resumo card-disponivel">
                 <div>
                     <span>Disponiveis</span>
                     <strong>{{ armarios_disponiveis }}</strong>
                 </div>
-                <i class="fa-solid fa-lock-open"></i>
+                <i class="fa-solid fa-gears" aria-hidden="true"></i>
             </div>
             <div class="card-resumo card-ocupado">
                 <div>
                     <span>Ocupados</span>
                     <strong>{{ armarios_ocupados }}</strong>
                 </div>
-                <i class="fa-regular fa-user"></i>
+                <i class="fa-solid fa-gears" aria-hidden="true"></i>
             </div>
             <div class="card-resumo card-manutencao">
                 <div>
@@ -178,15 +178,7 @@
                     data-matricula="{{ armario.associado_matricula|e }}"
                     title="Máquina {{ armario.numero }}"
                 >
-                    {% if armario.status == "manutencao" %}
-                    <i class="fa-solid fa-wrench"></i>
-                    {% elif armario.status == "ocupado" %}
-                    <i class="fa-regular fa-user"></i>
-                    {% elif armario.status == "desativado" %}
-                    <i class="fa-solid fa-lock"></i>
-                    {% else %}
-                    <i class="fa-solid fa-lock-open"></i>
-                    {% endif %}
+                    <i class="fa-solid fa-gears" aria-hidden="true"></i>
                     <span>{{ armario.numero|int }}</span>
                     <small class="maquina-filial">{{ armario.associado_nome if armario.associado_nome in filiais else 'Sem filial' }}</small>
                     <small class="maquina-status">{{ {'disponivel': 'Disponível', 'ocupado': 'Reservada', 'manutencao': 'Manutenção', 'desativado': 'Desativada'}.get(armario.status, armario.status) }}</small>
