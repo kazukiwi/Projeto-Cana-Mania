@@ -2,6 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const painel = document.getElementById('pix-painel');
     if (!painel) return;
     const pagamento = document.getElementById('forma_pagamento');
+    const pagamento2 = document.getElementById('forma_pagamento_2');
+    const valorPagamento1 = document.getElementById('valor_pagamento_1');
+    const valorPagamento2 = document.getElementById('valor_pagamento_2');
+    const dividirPagamento = document.getElementById('dividir-pagamento');
     const gerar = document.getElementById('pix-gerar');
     const resultado = document.getElementById('pix-resultado');
     const mensagem = document.getElementById('pix-mensagem');
@@ -13,19 +17,36 @@ document.addEventListener('DOMContentLoaded', () => {
     function invalidar() {
         versao++;
         requisicao?.abort();
-        painel.hidden = pagamento.value !== 'pix';
+        const pixNaPrimeira = pagamento.value === 'pix';
+        const pixNaSegunda = dividirPagamento?.checked && pagamento2.value === 'pix';
+        painel.hidden = !pixNaPrimeira && !pixNaSegunda;
         resultado.hidden = true;
         codigo.value = '';
         imagem.removeAttribute('src');
-        gerar.disabled = !carrinho.length;
-        mensagem.textContent = carrinho.length ? '' : 'Adicione itens ao carrinho para gerar o Pix.';
+        const valor1 = Number(valorPagamento1?.value || 0);
+        const valor2 = Number(valorPagamento2?.value || 0);
+        const totalCentavos = Math.round(carrinho.reduce((soma, item) => soma + Number(item.preco) * Number(item.quantidade), 0) * 100);
+        const somaCentavos = Math.round((valor1 + valor2) * 100);
+        const divisaoValida = !dividirPagamento?.checked || (
+            pagamento2.value && pagamento2.value !== pagamento.value
+            && Number.isFinite(valor1) && Number.isFinite(valor2)
+            && valor1 > 0 && valor2 > 0 && somaCentavos === totalCentavos
+        );
+        gerar.disabled = !carrinho.length || !divisaoValida;
+        mensagem.textContent = !carrinho.length
+            ? 'Adicione itens ao carrinho para gerar o Pix.'
+            : !divisaoValida ? 'Informe valores válidos para as duas formas de pagamento.' : '';
     }
     pagamento.addEventListener('change', invalidar);
+    pagamento2?.addEventListener('change', invalidar);
+    valorPagamento1?.addEventListener('input', invalidar);
+    valorPagamento2?.addEventListener('input', invalidar);
+    dividirPagamento?.addEventListener('change', invalidar);
     document.addEventListener('pdv:carrinho-alterado', invalidar);
     document.getElementById('filial-pdv').addEventListener('change', invalidar);
     gerar.addEventListener('click', async () => {
         invalidar();
-        if (!carrinho.length) return;
+        if (!carrinho.length || gerar.disabled) return;
         const atual = versao;
         requisicao = new AbortController();
         gerar.disabled = true;
@@ -33,6 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const dados = new FormData();
         dados.set('carrinho_json', JSON.stringify(carrinho));
         dados.set('filial', document.getElementById('filial-pdv').value);
+        if (dividirPagamento?.checked) {
+            const valorPix = pagamento.value === 'pix' ? valorPagamento1.value : valorPagamento2.value;
+            dados.set('valor_pix', valorPix);
+        }
         try {
             const resposta = await fetch('/pdv/pix', {
                 method: 'POST', body: dados, signal: requisicao.signal,

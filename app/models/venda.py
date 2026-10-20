@@ -44,6 +44,7 @@ class Venda(Base):
     # Observação opcional do operador
     observacao = Column(String(255), nullable=True)
     forma_pagamento = Column(String(30), nullable=True)
+    valor_pagamento_1 = Column(Float, nullable=True)
     forma_pagamento_2 = Column(String(30), nullable=True)
     valor_pagamento_2 = Column(Float, nullable=True)
 

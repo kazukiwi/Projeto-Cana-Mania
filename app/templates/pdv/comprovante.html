@@ -86,7 +86,7 @@
                 <strong>DATA/HORA:</strong> {{ venda.criado_em.strftime('%d/%m/%Y %H:%M:%S') }}<br>
                 <strong>CLIENTE:</strong> {{ venda.cliente.nome if venda.cliente else "Consumidor Geral" }}<br>
                 <strong>OPERADOR ID:</strong> {{ venda.usuario_id }}
-                {% if venda.forma_pagamento %}<br><strong>PAGAMENTO:</strong> {{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite'}.get(venda.forma_pagamento, venda.forma_pagamento) }}{% if venda.forma_pagamento_2 %} (R$ {{ '%.2f'|format(venda.total_liquido - (venda.valor_pagamento_2 or 0)).replace('.', ',') }}) + {{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite'}.get(venda.forma_pagamento_2, venda.forma_pagamento_2) }} (R$ {{ '%.2f'|format(venda.valor_pagamento_2 or 0).replace('.', ',') }}){% endif %}{% endif %}
+                {% if venda.forma_pagamento %}<br><strong>PAGAMENTO:</strong> {{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite'}.get(venda.forma_pagamento, venda.forma_pagamento) }}{% if venda.forma_pagamento_2 %} (R$ {{ '%.2f'|format(venda.valor_pagamento_1 or 0).replace('.', ',') }}) + {{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite'}.get(venda.forma_pagamento_2, venda.forma_pagamento_2) }} (R$ {{ '%.2f'|format(venda.valor_pagamento_2 or 0).replace('.', ',') }}){% endif %}{% endif %}
             </div>
 
             <div style="border-bottom: 1px dashed #ccc; margin: 15px 0;"></div>

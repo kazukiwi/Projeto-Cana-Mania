@@ -1,35 +1,47 @@
 let carrinho = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    const dividirPagamento = document.getElementById('dividir-pagamento');
-    const segundoPagamento = document.getElementById('segundo-pagamento');
     const formaPagamento = document.getElementById('forma_pagamento');
+    const dividirPagamento = document.getElementById('dividir-pagamento');
+    const blocoSegundoPagamento = document.getElementById('segundo-pagamento');
     const formaPagamento2 = document.getElementById('forma_pagamento_2');
+    const valorPagamento1 = document.getElementById('valor_pagamento_1');
     const valorPagamento2 = document.getElementById('valor_pagamento_2');
-    const valorPrimeiroPagamento = document.getElementById('valor-primeiro-pagamento');
-    const atualizarDivisaoPagamento = () => {
-        if (!dividirPagamento || !segundoPagamento) return;
-        segundoPagamento.hidden = !dividirPagamento.checked;
-        formaPagamento2.required = dividirPagamento.checked;
-        valorPagamento2.required = dividirPagamento.checked;
-        if (!dividirPagamento.checked) {
+    const resumoPagamento = document.getElementById('pagamento-dividido-resumo');
+    const valorizaDivisao = () => {
+        if (!dividirPagamento) return false;
+        const ativado = dividirPagamento.checked;
+        blocoSegundoPagamento.hidden = !ativado;
+        formaPagamento2.required = ativado;
+        valorPagamento1.required = ativado;
+        valorPagamento2.required = ativado;
+        if (!ativado) {
             formaPagamento2.value = '';
+            valorPagamento1.value = '';
             valorPagamento2.value = '';
-            valorPrimeiroPagamento.textContent = '';
-        } else {
-            atualizarTabelaCarrinho();
+            resumoPagamento.textContent = '';
+            return true;
         }
+        const totalCentavos = Math.round(carrinho.reduce((soma, item) => soma + Number(item.preco) * Number(item.quantidade), 0) * 100);
+        const valor1 = Number(valorPagamento1.value);
+        const valor2 = Number(valorPagamento2.value);
+        const somaCentavos = Math.round((valor1 + valor2) * 100);
+        const valido = formaPagamento2.value && formaPagamento2.value !== formaPagamento.value
+            && valorPagamento1.value && valorPagamento2.value
+            && Number.isFinite(valor1) && Number.isFinite(valor2)
+            && valor1 > 0 && valor2 > 0 && somaCentavos === totalCentavos;
+        resumoPagamento.textContent = valido
+            ? 'Os valores somam o total da venda.'
+            : 'Informe duas formas diferentes e valores cuja soma seja igual ao total da venda.';
+        resumoPagamento.style.color = valido ? '#15803d' : '#b91c1c';
+        return Boolean(valido);
     };
-    dividirPagamento?.addEventListener('change', atualizarDivisaoPagamento);
-    formaPagamento2?.addEventListener('change', () => {
-        if (formaPagamento2.value && formaPagamento2.value === formaPagamento.value) {
-            formaPagamento2.setCustomValidity('Escolha uma forma diferente da primeira.');
-        } else {
-            formaPagamento2.setCustomValidity('');
-        }
-    });
-    formaPagamento?.addEventListener('change', () => formaPagamento2?.dispatchEvent(new Event('change')));
-    valorPagamento2?.addEventListener('input', atualizarTabelaCarrinho);
+    dividirPagamento?.addEventListener('change', valorizaDivisao);
+    formaPagamento?.addEventListener('change', () => { if (dividirPagamento?.checked) valorizaDivisao(); });
+    formaPagamento2?.addEventListener('change', valorizaDivisao);
+    valorPagamento1?.addEventListener('input', valorizaDivisao);
+    valorPagamento2?.addEventListener('input', valorizaDivisao);
+    document.addEventListener('pdv:carrinho-alterado', () => { if (dividirPagamento?.checked) valorizaDivisao(); });
     const produto = document.getElementById('select-prod');
     const tamanho = document.getElementById('pdv-tamanho');
     const cor = document.getElementById('pdv-cor');
@@ -174,6 +186,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('form-add-item-pdv')?.addEventListener('submit', adicionarAoCarrinho);
 
     document.getElementById('form-finalizar-real')?.addEventListener('submit', evento => {
+        if (dividirPagamento?.checked && !valorizaDivisao()) {
+            evento.preventDefault();
+            return;
+        }
         if (!carrinho.length) {
             evento.preventDefault();
             return;
@@ -240,16 +256,9 @@ function atualizarTabelaCarrinho() {
     }).join('');
     document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('pdv-total-geral').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-    const valor2 = Number(document.getElementById('valor_pagamento_2')?.value || 0);
-    const resumoPrimeiroPagamento = document.getElementById('valor-primeiro-pagamento');
-    if (resumoPrimeiroPagamento && document.getElementById('dividir-pagamento')?.checked) {
-        const restante = total - valor2;
-        resumoPrimeiroPagamento.textContent = restante > 0
-            ? `Primeira forma (${document.getElementById('forma_pagamento').selectedOptions[0]?.text || 'pagamento'}): R$ ${restante.toFixed(2).replace('.', ',')}`
-            : 'O segundo valor deve ser menor que o total da venda.';
-    }
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
     document.getElementById('btn-salvar-venda-banco').disabled = !carrinho.length;
+    document.dispatchEvent(new Event('pdv:carrinho-alterado'));
 }
 
 window.removerDoCarrinho = indice => { carrinho.splice(indice, 1); atualizarTabelaCarrinho(); };
