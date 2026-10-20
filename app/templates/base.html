@@ -16,7 +16,9 @@
     {% include "partials/navbar.html" %}
     {% endif %}
 
-    {% block content %}{% endblock %}
+    <div class="page-transition">
+        {% block content %}{% endblock %}
+    </div>
 
     {% block footer %}
     <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
