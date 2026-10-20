@@ -9,6 +9,7 @@
 # ============================================================
 
 import json
+import math
 from datetime import date, datetime, time, timedelta, timezone
 from fastapi import APIRouter, Depends, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -170,6 +171,8 @@ def finalizar_venda(
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     observacao: str    = Form(""),
     forma_pagamento: str = Form(""),
+    forma_pagamento_2: str = Form(""),
+    valor_pagamento_2: str = Form(""),
     filial: str        = Form("Pinheiros"),
     db: Session        = Depends(get_db),
     usuario            = Depends(get_usuario_logado)
@@ -187,6 +190,19 @@ def finalizar_venda(
         return RedirectResponse(url="/pdv?erro=filial", status_code=302)
     if forma_pagamento not in FORMAS_PAGAMENTO:
         return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
+    forma_pagamento_2 = forma_pagamento_2.strip()
+    valor_pagamento_2 = valor_pagamento_2.strip().replace(",", ".")
+    if forma_pagamento_2:
+        if forma_pagamento_2 not in FORMAS_PAGAMENTO or forma_pagamento_2 == forma_pagamento:
+            return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
+        try:
+            valor_pagamento_2 = round(float(valor_pagamento_2), 2)
+        except (TypeError, ValueError):
+            return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
+        if not math.isfinite(valor_pagamento_2) or valor_pagamento_2 <= 0:
+            return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
+    else:
+        valor_pagamento_2 = None
 
     try:
         itens = json.loads(carrinho_json)
@@ -302,15 +318,20 @@ def finalizar_venda(
     # ── Calcula desconto e total final
     desconto_valor = total_bruto * (desconto_percentual / 100)
     total_liquido  = total_bruto - desconto_valor
+    total_liquido = round(total_liquido, 2)
+    if valor_pagamento_2 is not None and valor_pagamento_2 >= total_liquido:
+        return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
 
     # ── Persiste tudo em uma única transação
     venda = Venda(
         usuario_id          = usuario.get("id"),
         desconto_percentual = desconto_percentual,
         total_bruto         = round(total_bruto, 2),
-        total_liquido       = round(total_liquido, 2),
+        total_liquido       = total_liquido,
         observacao          = observacao or None,
         forma_pagamento     = forma_pagamento,
+        forma_pagamento_2   = forma_pagamento_2 or None,
+        valor_pagamento_2   = valor_pagamento_2,
     )
     db.add(venda)
     db.flush()  # gera o venda.id sem commitar ainda
