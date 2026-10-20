@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Canamania | Gestão de consumos</title>
-    <link rel="stylesheet" href="/static/css/index.css?v=canamania-3">
+    <link rel="stylesheet" href="/static/css/index.css?v=canamania-7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/static/css/theme-accents.css?v=global-theme-3">
 </head>
 
 <body class="canamania-login">
     <main class="login-shell">
-        <section class="brand-panel"><a class="brand" href="/"><span>Cana</span>mania</a>
+        <section class="brand-panel"><div class="login-orb" aria-hidden="true"><span class="login-orb-core"></span></div><a class="brand" href="/"><span>Cana</span>mania</a>
             <p class="brand-tag">gestão de consumos</p>
             <div class="brand-copy"><span>Gestão saborosa</span>
                 <h1>Seus consumos começam aqui.</h1>
@@ -35,8 +35,15 @@
             </form>
         </section>
     </main>
+    <div class="login-welcome" hidden role="status" aria-live="polite" tabindex="-1">
+        <div class="login-welcome-logo" aria-label="Canamania"><span>Cana</span>mania</div>
+        <h2>Bem-vindo ao CanaMania</h2>
+        <p>Acesso confirmado. Preparando seu dashboard.</p>
+        <div class="login-welcome-progress" aria-hidden="true"></div>
+    </div>
 <script src="/static/javascript/theme.js?v=global-theme-1"></script>
 <script src="/static/javascript/password_visibility.js?v=1"></script>
+<script src="/static/javascript/login_animation.js?v=4"></script>
 </body>
 
 </html>
