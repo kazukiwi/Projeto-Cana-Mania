@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    document.querySelectorAll('.btn-sair').forEach((link) => {
+    document.querySelectorAll('.btn-sair:not([data-logout-confirm])').forEach((link) => {
         link.addEventListener('click', (evento) => {
             evento.preventDefault();
             if (document.getElementById('feedback-confirmar-saida')) return;
