@@ -71,8 +71,8 @@
         } else {
             cover.style.transform = expanded;
         }
-        // Reveal the welcome while the original circle is still growing.
-        await new Promise(resolve => setTimeout(resolve, reducedMotion.matches ? 120 : 420));
+        // Show the complete wordmark after the pink background fills the screen.
+        if (expansion) await expansion.finished.catch(() => {});
         if (welcome) {
             welcome.hidden = false;
             welcome.focus({ preventScroll: true });
@@ -86,8 +86,7 @@
                 welcome.style.opacity = '1';
             }
         }
-        if (expansion) await expansion.finished.catch(() => {});
-        await new Promise(resolve => setTimeout(resolve, 1100));
+        await new Promise(resolve => setTimeout(resolve, reducedMotion.matches ? 400 : 2000));
         // The welcome has already confirmed access; avoid repeating the dashboard notice.
         const nextPage = new URL(destination);
         nextPage.searchParams.delete('login');
