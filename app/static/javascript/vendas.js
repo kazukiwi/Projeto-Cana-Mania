@@ -3,7 +3,7 @@ let carrinho = [];
 document.addEventListener('DOMContentLoaded', () => {
     configurarPagamentoDividido();
     const produto = document.getElementById('select-prod');
-    const compraFuncionario = document.getElementById('compra-funcionario');
+    const funcionarioComprador = document.getElementById('funcionario-comprador');
     const tamanho = document.getElementById('pdv-tamanho');
     const cor = document.getElementById('pdv-cor');
     const grupoTamanho = document.getElementById('grupo-tamanho');
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.setTimeout(() => formulario.submit(), 150);
     });
     document.getElementById('select-cliente')?.addEventListener('change', atualizarTabelaCarrinho);
-    compraFuncionario?.addEventListener('change', atualizarTabelaCarrinho);
+    funcionarioComprador?.addEventListener('change', atualizarTabelaCarrinho);
     filial?.addEventListener('change', aplicarFilial);
     buscaFrozen?.addEventListener('input', () => {
         const termo = buscaFrozen.value.trim().toLocaleLowerCase('pt-BR');
@@ -215,7 +215,7 @@ function atualizarTabelaCarrinho() {
         const variacao = item.tamanho ? ` (Tam: ${item.tamanho} | Cor: ${item.cor})` : '';
         return `<tr><td><strong>${item.nome}${variacao}</strong></td><td>${item.quantidade}x</td><td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td><td><button type="button" onclick="removerDoCarrinho(${indice})">Remover</button></td></tr>`;
     }).join('');
-    const compraFuncionario = document.getElementById('compra-funcionario')?.checked === true;
+    const compraFuncionario = Boolean(document.getElementById('funcionario-comprador')?.value);
     const descontoValor = Math.round(total * (compraFuncionario ? 0.1 : 0) * 100) / 100;
     const totalFinal = Math.round((total - descontoValor) * 100) / 100;
     document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
@@ -225,6 +225,7 @@ function atualizarTabelaCarrinho() {
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
     atualizarPagamentoDividido('valor_pagamento_1');
     document.getElementById('btn-salvar-venda-banco').disabled = !carrinho.length;
+    document.dispatchEvent(new Event('pdv:carrinho-atualizado'));
 }
 
 window.removerDoCarrinho = indice => { carrinho.splice(indice, 1); atualizarTabelaCarrinho(); };
@@ -268,7 +269,7 @@ function atualizarPagamentoDividido(editado) {
     });
     if (segunda.value && segunda.value === primeira.value) segunda.value = '';
     const bruto = carrinho.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
-    const descontoAtivo = document.getElementById('compra-funcionario')?.checked === true;
+    const descontoAtivo = Boolean(document.getElementById('funcionario-comprador')?.value);
     const total = Math.round((bruto - Math.round(bruto * (descontoAtivo ? 0.1 : 0) * 100) / 100) * 100);
     const emCentavos = campo => Math.round(Number(campo.value) * 100);
     if (editado) {
