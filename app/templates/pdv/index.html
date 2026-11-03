@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>PDV - Nova Venda</title>
-    <link rel="stylesheet" href="/static/css/vendas.css">
+    <link rel="stylesheet" href="/static/css/vendas.css?v=pix-visual-1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="/static/javascript/confirmar_saida.js" defer></script>
 </head>
@@ -189,18 +189,25 @@
                         <p id="pagamento-dividido-resumo" aria-live="polite" style="margin-top:-8px;"></p>
                     </div>
 
-                    <section id="pix-painel" hidden style="margin-bottom:15px; padding:15px; border:1px solid #d1d5db; border-radius:6px;" aria-labelledby="pix-titulo">
-                        <h3 id="pix-titulo">Pagamento via Pix</h3>
-                        <button type="button" id="pix-gerar" style="padding:10px; cursor:pointer;">Gerar QR Code Pix</button>
-                        <p id="pix-mensagem" role="status" aria-live="polite"></p>
-                        <div id="pix-resultado" hidden>
-                            <p>Valor: <strong id="pix-valor"></strong></p>
-                            <img id="pix-imagem" alt="QR Code para pagamento via Pix" width="280" height="280" style="max-width:100%; height:auto; background:white;">
-                            <label for="pix-codigo" style="display:block;">Pix copia e cola</label>
-                            <textarea id="pix-codigo" readonly rows="3" style="width:100%; box-sizing:border-box;"></textarea>
-                            <button type="button" id="pix-copiar" style="padding:10px; cursor:pointer;">Copiar código Pix</button>
+                    <section id="pix-painel" class="pix-card" hidden aria-labelledby="pix-titulo">
+                        <div class="pix-card-header">
+                            <span class="pix-card-icon" aria-hidden="true"><i class="fa-solid fa-qrcode"></i></span>
+                            <div><span class="pix-eyebrow">PAGAMENTO DIGITAL</span><h3 id="pix-titulo">Receba com Pix</h3></div>
+                            <span class="pix-badge">Pix</span>
                         </div>
-                        <p>Confira o recebimento no banco antes de finalizar a venda. O sistema não confirma o pagamento automaticamente.</p>
+                        <p class="pix-intro">Gere o código e peça ao cliente para escanear pelo aplicativo do banco.</p>
+                        <button type="button" id="pix-gerar" class="pix-button pix-button-primary"><i class="fa-solid fa-qrcode" aria-hidden="true"></i> Gerar QR Code Pix</button>
+                        <p id="pix-mensagem" class="pix-status" role="status" aria-live="polite"></p>
+                        <div id="pix-resultado" class="pix-result" hidden>
+                            <div class="pix-amount"><span>Valor a receber via Pix</span><strong id="pix-valor"></strong></div>
+                            <div class="pix-qr-frame"><img id="pix-imagem" alt="QR Code para pagamento via Pix" width="280" height="280"></div>
+                            <p class="pix-scan-hint"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i> Abra o app do banco e escolha pagar com Pix</p>
+                            <div class="pix-divider"><span>ou use o código</span></div>
+                            <label for="pix-codigo" class="pix-code-label">Pix copia e cola</label>
+                            <textarea id="pix-codigo" readonly rows="3" spellcheck="false"></textarea>
+                            <button type="button" id="pix-copiar" class="pix-button pix-button-secondary"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar código Pix</button>
+                        </div>
+                        <p class="pix-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Confira o recebimento no banco antes de finalizar a venda. A confirmação não é automática.</span></p>
                     </section>
 
                     <div class="form-group" style="margin-bottom:15px;">
@@ -242,8 +249,8 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=pagamentos-duplos-2"></script>
-    <script src="/static/javascript/pix.js?v=pagamentos-duplos-1"></script>
+    <script src="/static/javascript/vendas.js?v=pagamentos-duplos-3"></script>
+    <script src="/static/javascript/pix.js?v=qr-code-3"></script>
     <script type="application/x-disabled">
         let carrinho = [];
 

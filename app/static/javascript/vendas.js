@@ -218,6 +218,7 @@ function atualizarTabelaCarrinho() {
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
     atualizarPagamentoDividido('valor_pagamento_1');
     document.getElementById('btn-salvar-venda-banco').disabled = !carrinho.length;
+    document.dispatchEvent(new Event('pdv:carrinho-atualizado'));
 }
 
 window.removerDoCarrinho = indice => { carrinho.splice(indice, 1); atualizarTabelaCarrinho(); };

@@ -661,3 +661,60 @@ body {
     background-color: #4f46e5;
     color: white;
 }
+
+
+/* Pagamento Pix */
+.pix-card {
+    margin-bottom: 20px;
+    padding: clamp(16px, 3vw, 24px);
+    border: 1px solid #bce7dc;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #f0fdf8, #ffffff 65%);
+    color: #183c35;
+    box-shadow: 0 6px 24px rgba(15, 118, 95, .06);
+    min-width: 0;
+}
+.pix-card [hidden], .pix-card[hidden] { display: none !important; }
+.pix-card-header { display: flex; align-items: center; gap: 12px; }
+.pix-card-icon {
+    display: grid; place-items: center; flex: 0 0 46px; height: 46px;
+    border-radius: 14px; background: #d8f5e9; color: #087f64; font-size: 23px;
+}
+.pix-eyebrow { display: block; font-size: 10px; letter-spacing: .12em; font-weight: 700; color: #52766c; margin-bottom: 3px; }
+.pix-card-header h3 { margin: 0; font-size: 20px; letter-spacing: -.4px; color: #123d32; }
+.pix-badge { margin-left: auto; border: 1px solid #bce7dc; background: #fff; color: #08745b; padding: 5px 11px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+.pix-intro { margin: 16px 0; color: #536e65; font-size: 13px; line-height: 1.6; }
+.pix-button {
+    width: 100%; min-height: 46px; padding: 12px 16px; border: 1px solid transparent;
+    border-radius: 10px; font: inherit; font-size: 14px; font-weight: 650;
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    cursor: pointer; transition: background .18s, box-shadow .18s;
+}
+.pix-button-primary { background: #087f64; color: #fff; box-shadow: 0 3px 8px #087f641a; }
+.pix-button-primary:hover { background: #06664f; }
+.pix-button-secondary { background: #edf8f3; color: #08664f; border-color: #bce7dc; }
+.pix-button-secondary:hover { background: #dcf2e8; }
+.pix-button:focus-visible, #pix-codigo:focus-visible { outline: 3px solid #239e84; outline-offset: 3px; }
+.pix-button:disabled { cursor: wait; opacity: .65; }
+.pix-status { color: #47665b; font-size: 13px; line-height: 1.5; margin: 12px 0; overflow-wrap: anywhere; }
+.pix-status:empty { display: none; }
+.pix-result { margin-top: 18px; padding: 20px 16px; border: 1px solid #d7e9e0; border-radius: 14px; background: white; }
+.pix-amount { display: grid; gap: 5px; text-align: center; margin-bottom: 18px; }
+.pix-amount span { color: #667b73; font-size: 12px; }
+.pix-amount strong { color: #123d32; font-size: clamp(26px, 4vw, 34px); letter-spacing: -1px; font-variant-numeric: tabular-nums; }
+.pix-qr-frame { width: fit-content; max-width: 100%; margin: 0 auto; padding: 8px; border: 1px solid #e2ece6; border-radius: 12px; background: #fff; }
+.pix-qr-frame img { display: block; width: 100%; max-width: 260px; height: auto; }
+.pix-scan-hint { margin: 14px 0 20px; color: #60776b; text-align: center; font-size: 12px; line-height: 1.6; }
+.pix-scan-hint i { margin-right: 4px; }
+.pix-divider { display: flex; align-items: center; gap: 12px; color: #78897f; font-size: 11px; margin: 18px 0; }
+.pix-divider::before, .pix-divider::after { content: ''; height: 1px; flex: 1; background: #e4ece7; }
+.pix-code-label { display: block; font-size: 12px; font-weight: 650; margin-bottom: 8px; color: #3b584b; }
+#pix-codigo { display: block; width: 100%; resize: vertical; min-height: 72px; padding: 10px 12px; margin-bottom: 12px; border: 1px solid #dae5df; border-radius: 8px; background: #f7faf8; color: #4b6356; font: 11px/1.6 monospace; overflow-wrap: anywhere; }
+.pix-notice { display: flex; align-items: flex-start; gap: 8px; margin: 16px 0 0; font-size: 12px; line-height: 1.6; color: #596d62; }
+.pix-notice i { margin-top: 3px; color: #087f64; }
+@media (max-width: 420px) {
+    .pix-card-header { gap: 9px; }
+    .pix-card-header h3 { font-size: 18px; }
+    .pix-badge { display: none; }
+    .pix-result { padding: 16px 10px; }
+}
