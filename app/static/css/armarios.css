@@ -13,7 +13,7 @@ body {
     color: #020617;
 }
 
-html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .page-title h1{color:#d7fbb3}html[data-theme="dark"] .page-title p{color:#bed0c0}html[data-theme="dark"] :is(.armarios-panel,.card-resumo,.filtro-bar,.legenda-bar,.grid-shell,.modal-card,.confirmacao-card){background:#142019!important;border-color:#385b41!important;color:#edf7eb!important}html[data-theme="dark"] :is(.armarios-page input,.armarios-page select){background:#0d1510!important;color:#edf7eb!important;border-color:#416847!important}html[data-theme="dark"] :is(.armarios-page th,.armarios-page td,.armarios-page label,.armarios-page span,.armarios-page p,.armarios-page small){color:#d5e4d5!important}html[data-theme="dark"] .item-armario{background:#101913!important;border-color:#416847!important;color:#baf57a!important}html[data-theme="dark"] .armarios-tab{background:#1a2920!important;color:#d5e4d5!important;border-color:#385b41!important}html[data-theme="dark"] .armarios-tab.active{background:#ff1877!important;color:#fff!important;border-color:#ff70ad!important}
+html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .page-title h1{color:#d7fbb3}html[data-theme="dark"] .page-title p{color:#bed0c0}html[data-theme="dark"] :is(.armarios-panel,.card-resumo,.filtro-bar,.legenda-bar,.grid-shell,.modal-card,.confirmacao-card){background:#142019!important;border-color:#385b41!important;color:#edf7eb!important}html[data-theme="dark"] :is(.armarios-page input,.armarios-page select){background:#0d1510!important;color:#edf7eb!important;border-color:#416847!important}html[data-theme="dark"] :is(.armarios-page th,.armarios-page td,.armarios-page label,.armarios-page span,.armarios-page p,.armarios-page small){color:#d5e4d5!important}html[data-theme="dark"] .armarios-tab{background:#1a2920!important;color:#d5e4d5!important;border-color:#385b41!important}html[data-theme="dark"] .armarios-tab.active{background:#ff1877!important;color:#fff!important;border-color:#ff70ad!important}
 
 .navbar {
     width: 100%;
@@ -267,10 +267,15 @@ html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .pa
 .reserva-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end; }.reserva-form label, .cadastro-armario-form label { display: grid; gap: 6px; color: #334155; font-size: 13px; font-weight: 700; }.reserva-form input, .reserva-form select, .cadastro-armario-form input, .historico-filtros input, .historico-filtros select { width: 100%; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; font-size: 14px; background: #fff; }.cadastro-armario-form { display: flex; align-items: end; gap: 14px; }.cadastro-armario-form label { width: min(280px,100%); }
 .historico-filtros { display: flex; gap: 12px; margin-bottom: 16px; }.historico-filtros label { position: relative; flex: 1; }.historico-filtros label i { position: absolute; left: 12px; top: 12px; color: #64748b; }.historico-filtros input { padding-left: 34px; }.historico-filtros select { width: 180px; }.tabela-reservas-wrap { overflow-x: auto; }.tabela-reservas { width: 100%; border-collapse: collapse; text-align: left; }.tabela-reservas th, .tabela-reservas td { padding: 13px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }.tabela-reservas th { color: #64748b; background: #f8fafc; }.status-reserva { text-transform: capitalize; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }.status-reserva.ativa { background: #dcfce7; color: #166534; }.status-reserva.cancelada { background: #fee2e2; color: #991b1b; }.btn-cancelar-reserva { background: none; color: #b91c1c; border: 0; font-weight: 700; cursor: pointer; }.empty-reservas { text-align: center; color: #64748b; }
 
-.status-disponivel { background: #00c853; }
-.status-ocupado { background: #3b73f6; }
-.status-manutencao { background: #ff6d00; }
-.status-desativado { background: #64748b; }
+.item-armario.status-disponivel { background: #00c853 !important; }
+.item-armario.status-ocupado { background: #3b73f6 !important; }
+.item-armario.status-manutencao { background: #ff6d00 !important; }
+.item-armario.status-desativado { background: #64748b !important; }
+
+html[data-theme="dark"] .item-armario.status-disponivel { background: #00a84f !important; border-color: #00a84f !important; color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-ocupado { background: #2563eb !important; border-color: #2563eb !important; color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-manutencao { background: #ea580c !important; border-color: #ea580c !important; color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-desativado { background: #64748b !important; border-color: #64748b !important; color: #fff !important; }
 
 .btn-ativar-armario { margin-right: auto; border: 1px solid #86efac; border-radius: 6px; padding: 10px 14px; background: #f0fdf4; color: #166534; font-weight: 700; cursor: pointer; }
 .btn-ativar-armario:hover { background: #dcfce7; }

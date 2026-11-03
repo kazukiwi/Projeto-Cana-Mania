@@ -8,6 +8,7 @@
     <title>PDV - Nova Venda</title>
     <link rel="stylesheet" href="/static/css/vendas.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <script src="/static/javascript/confirmar_saida.js" defer></script>
 </head>
 
 <body>
@@ -166,7 +167,27 @@
                             <option value="convite">Convite</option>
                         </select>
                     </div>
-
+                    <div class="form-group" style="margin-bottom:15px;">
+                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="dividir-pagamento"> Dividir em duas formas de pagamento</label>
+                    </div>
+                    <div id="segundo-pagamento" hidden>
+                        <div class="form-group" style="margin-bottom:15px;">
+                            <label for="forma_pagamento_2" style="display:block; font-weight:bold; margin-bottom:5px;">Segunda forma de pagamento</label>
+                            <select name="forma_pagamento_2" id="forma_pagamento_2" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; background:white;">
+                                <option value="">Selecione...</option>
+                                <option value="credito">Cartão de crédito</option><option value="debito">Cartão de débito</option><option value="dinheiro">Dinheiro</option><option value="pix">Pix</option><option value="convite">Convite</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:15px;">
+                            <label for="valor_pagamento_1" style="display:block; font-weight:bold; margin-bottom:5px;">Valor na primeira forma</label>
+                            <input type="number" name="valor_pagamento_1" id="valor_pagamento_1" min="0.01" step="0.01" placeholder="Ex.: 10.00" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+                        </div>
+                        <div class="form-group" style="margin-bottom:15px;">
+                            <label for="valor_pagamento_2" style="display:block; font-weight:bold; margin-bottom:5px;">Valor na segunda forma</label>
+                            <input type="number" name="valor_pagamento_2" id="valor_pagamento_2" min="0.01" step="0.01" placeholder="Ex.: 10.00" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
+                        </div>
+                        <p id="pagamento-dividido-resumo" aria-live="polite" style="margin-top:-8px;"></p>
+                    </div>
 
                     <section id="pix-painel" hidden style="margin-bottom:15px; padding:15px; border:1px solid #d1d5db; border-radius:6px;" aria-labelledby="pix-titulo">
                         <h3 id="pix-titulo">Pagamento via Pix</h3>
@@ -209,11 +230,11 @@
         </div>
     </div>
 
-    <div id="catalogo-pdv-modal" class="catalogo-pdv-modal" hidden role="dialog" aria-modal="true" aria-labelledby="catalogo-pdv-titulo">
-        <section class="catalogo-pdv-card">
-            <div class="catalogo-pdv-header"><div><p>Seleção rápida</p><h2 id="catalogo-pdv-titulo">Catálogo de produtos</h2></div><button type="button" id="fechar-catalogo-pdv" class="catalogo-pdv-fechar" aria-label="Fechar catálogo">×</button></div>
-            <input id="busca-catalogo-pdv" class="catalogo-pdv-busca" type="search" placeholder="Pesquisar produto...">
-            <div id="grade-catalogo-pdv" class="catalogo-pdv-grade"></div>
+    <div id="catalogo-pdv-modal" hidden role="dialog" aria-modal="true" aria-labelledby="catalogo-pdv-titulo" style="position:fixed; inset:0; z-index:1000; background:rgba(15,23,42,.6); padding:24px; overflow:auto;">
+        <section style="max-width:860px; margin:30px auto; background:#fff; border-radius:14px; padding:22px; box-shadow:0 20px 50px rgba(0,0,0,.25);">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;"><h2 id="catalogo-pdv-titulo" style="margin:0; color:#1e1b4b;">Catálogo de produtos</h2><button type="button" id="fechar-catalogo-pdv" aria-label="Fechar catálogo" style="border:0; background:none; font-size:28px; cursor:pointer;">×</button></div>
+            <input id="busca-catalogo-pdv" type="search" placeholder="Pesquisar produto..." style="width:100%; box-sizing:border-box; margin:18px 0; padding:12px; border:1px solid #cbd5e1; border-radius:8px;">
+            <div id="grade-catalogo-pdv" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px;"></div>
         </section>
     </div>
 
@@ -221,8 +242,8 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=pix-1"></script>
-    <script src="/static/javascript/pix.js?v=2"></script>
+    <script src="/static/javascript/vendas.js?v=pagamentos-duplos-1"></script>
+    <script src="/static/javascript/pix.js?v=pagamentos-duplos-1"></script>
     <script type="application/x-disabled">
         let carrinho = [];
 

@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Canamania | Gestão de consumos</title>
-    <link rel="stylesheet" href="/static/css/index.css?v=canamania-3">
+    <link rel="stylesheet" href="/static/css/index.css?v=canamania-4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/static/css/theme-accents.css?v=global-theme-3">
 </head>
 
 <body class="canamania-login">
     <main class="login-shell">
-        <section class="brand-panel"><a class="brand" href="/"><span>Cana</span>mania</a>
+        <section class="brand-panel"><div class="login-orb" aria-hidden="true"></div><a class="brand" href="/"><span>Cana</span>mania</a>
             <p class="brand-tag">gestão de consumos</p>
             <div class="brand-copy"><span>Gestão saborosa</span>
                 <h1>Seus consumos começam aqui.</h1>
@@ -25,8 +25,8 @@
                 <p class="eyebrow">Área da equipe</p>
                 <h2>Bem-vindo de volta</h2>
                 <p class="login-lead">Entre para cuidar das lojas Canamania.</p><label>E-mail<input type="email"
-                        name="email" placeholder="voce@canamania.com" required></label><label>Senha<span class="password-field"><input
-                        type="password" name="senha" placeholder="Sua senha" required><button class="password-eye" type="button" aria-label="Mostrar senha" aria-pressed="false"><i class="fa-solid fa-eye" aria-hidden="true"></i></button></span></label>{% if erro %}<p
+                        name="email" placeholder="voce@canamania.com" required></label><label>Senha<input
+                        type="password" name="senha" placeholder="Sua senha" required></label>{% if erro %}<p
                     class="login-feedback login-feedback--error">{{ erro }}</p>{% endif %}{% if
                 request.query_params.get('senha_redefinida') %}<p class="login-feedback login-feedback--success">Senha
                     redefinida com sucesso.</p>{% endif %}<button type="submit">Entrar <i
@@ -35,8 +35,12 @@
             </form>
         </section>
     </main>
+    <section class="login-welcome" hidden tabindex="-1" role="status" aria-label="Acesso confirmado. Bem-vindo à Canamania.">
+        <div class="login-welcome__brand" aria-hidden="true"><span>Cana</span>mania</div>
+        <p>gestão de consumos</p>
+    </section>
+    <script src="/static/javascript/login_animation.js?v=2" defer></script>
 <script src="/static/javascript/theme.js?v=global-theme-1"></script>
-<script src="/static/javascript/password_visibility.js?v=1"></script>
 </body>
 
 </html>

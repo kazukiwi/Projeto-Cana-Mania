@@ -215,6 +215,12 @@ body.dashboard-navigating {
 .verde { border: 1px solid #9ae6b4; color: #16a34a; }
 .vermelho { border: 1px solid #fca5a5; color: #dc2626; }
 .roxo { border: 1px solid #d8b4fe; color: #9333ea; }
+.maquinas-ocupadas { border-color: #93c5fd !important; color: #2563eb !important; }
+.maquinas-disponiveis { border-color: #86efac !important; color: #00a84f !important; }
+.maquinas-manutencao { border-color: #fdba74 !important; color: #ea580c !important; }
+html[data-theme="dark"] .dashboard .maquinas-ocupadas { border-color: #3b73f6 !important; color: #7eacff !important; }
+html[data-theme="dark"] .dashboard .maquinas-disponiveis { border-color: #00a84f !important; color: #4ade80 !important; }
+html[data-theme="dark"] .dashboard .maquinas-manutencao { border-color: #ea580c !important; color: #fb923c !important; }
 
 .bottom {
     display: grid;
