@@ -1,6 +1,7 @@
 let carrinho = [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    configurarPagamentoDividido();
     const produto = document.getElementById('select-prod');
     const tamanho = document.getElementById('pdv-tamanho');
     const cor = document.getElementById('pdv-cor');
@@ -155,6 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const botao = document.getElementById('btn-salvar-venda-banco');
         if (formulario.dataset.enviando === 'true') return;
 
+        atualizarPagamentoDividido();
+        if (!formulario.reportValidity()) return;
+
         formulario.dataset.enviando = 'true';
         botao.disabled = true;
         botao.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Realizando venda...';
@@ -212,7 +216,62 @@ function atualizarTabelaCarrinho() {
     document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('pdv-total-geral').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
+    atualizarPagamentoDividido('valor_pagamento_1');
     document.getElementById('btn-salvar-venda-banco').disabled = !carrinho.length;
 }
 
 window.removerDoCarrinho = indice => { carrinho.splice(indice, 1); atualizarTabelaCarrinho(); };
+
+
+function configurarPagamentoDividido() {
+    const dividir = document.getElementById('dividir-pagamento');
+    if (!dividir) return;
+    dividir.addEventListener('change', () => atualizarPagamentoDividido('valor_pagamento_1'));
+    ['forma_pagamento', 'forma_pagamento_2'].forEach(id => {
+        document.getElementById(id)?.addEventListener('change', () => atualizarPagamentoDividido());
+    });
+    ['valor_pagamento_1', 'valor_pagamento_2'].forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => atualizarPagamentoDividido(id));
+    });
+    atualizarPagamentoDividido();
+}
+
+function atualizarPagamentoDividido(editado) {
+    const dividir = document.getElementById('dividir-pagamento');
+    if (!dividir) return;
+    const primeira = document.getElementById('forma_pagamento');
+    const segunda = document.getElementById('forma_pagamento_2');
+    const valor1 = document.getElementById('valor_pagamento_1');
+    const valor2 = document.getElementById('valor_pagamento_2');
+    const resumo = document.getElementById('pagamento-dividido-resumo');
+    const ativo = dividir.checked;
+    document.getElementById('segundo-pagamento').hidden = !ativo;
+    [segunda, valor1, valor2].forEach(campo => {
+        campo.disabled = !ativo;
+        campo.required = ativo;
+        campo.setCustomValidity('');
+    });
+    if (!ativo) {
+        segunda.value = ''; valor1.value = ''; valor2.value = '';
+        resumo.textContent = '';
+        return;
+    }
+    [...segunda.options].forEach(opcao => {
+        opcao.disabled = Boolean(opcao.value && opcao.value === primeira.value);
+    });
+    if (segunda.value && segunda.value === primeira.value) segunda.value = '';
+    const total = Math.round(carrinho.reduce((soma, item) => soma + item.preco * item.quantidade, 0) * 100);
+    const emCentavos = campo => Math.round(Number(campo.value) * 100);
+    if (editado) {
+        const origem = editado === 'valor_pagamento_2' ? valor2 : valor1;
+        const destino = origem === valor1 ? valor2 : valor1;
+        const restante = total - emCentavos(origem);
+        destino.value = origem.value && Number.isFinite(restante) && restante > 0 ? (restante / 100).toFixed(2) : '';
+    }
+    const soma = emCentavos(valor1) + emCentavos(valor2);
+    const valido = valor1.value && valor2.value && emCentavos(valor1) > 0 && emCentavos(valor2) > 0 && soma === total;
+    const mensagem = 'Informe dois valores positivos cuja soma seja igual ao total da venda.';
+    valor2.setCustomValidity(valido ? '' : mensagem);
+    const moeda = centavos => (centavos / 100).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+    resumo.textContent = valido ? `Pagamento dividido: ${moeda(emCentavos(valor1))} + ${moeda(emCentavos(valor2))} = ${moeda(total)}` : mensagem;
+}
