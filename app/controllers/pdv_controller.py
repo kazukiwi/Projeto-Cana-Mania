@@ -235,6 +235,7 @@ def finalizar_venda(
     request: Request,
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     observacao: str    = Form(""),
+    compra_funcionario: bool = Form(False),
     forma_pagamento: str = Form(""),
     forma_pagamento_2: str = Form(""),
     valor_pagamento_1: str = Form(""),
@@ -265,7 +266,7 @@ def finalizar_venda(
     if not isinstance(itens, list) or not itens:
         return RedirectResponse(url="/pdv?erro=vazio", status_code=302)
 
-    desconto_percentual = 0.0
+    desconto_percentual = 10.0 if compra_funcionario and usuario.get("role") == "funcionario" else 0.0
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0

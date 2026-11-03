@@ -67,6 +67,14 @@
                         {% endfor %}
                     </select>
                 </div>
+                {% if usuario.role == 'funcionario' %}
+                <div class="form-group" style="margin:-4px 0 16px;">
+                    <label for="compra-funcionario" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                        <input type="checkbox" id="compra-funcionario" name="compra_funcionario" value="true" form="form-finalizar-real">
+                        Esta compra é minha (funcionário) — desconto de 10%
+                    </label>
+                </div>
+                {% endif %}
 
                 <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
 
@@ -214,7 +222,7 @@
                             <strong id="pdv-total-bruto" style="font-size:20px; color:#1e1b4b;">R$ 0,00</strong>
                         </div>
                         <div class="linha-total" id="pdv-linha-desconto" style="display:none; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:16px; color:#16a34a;">
-                            <span>Desconto associado ({{ desconto_associado }}%):</span>
+                            <span>Desconto funcionário (10%):</span>
                             <strong id="pdv-desconto">- R$ 0,00</strong>
                         </div>
                         <div class="linha-total" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:18px;">
@@ -242,7 +250,7 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=pagamentos-duplos-2"></script>
+    <script src="/static/javascript/vendas.js?v=desconto-funcionario-1"></script>
     <script src="/static/javascript/pix.js?v=pagamentos-duplos-1"></script>
     <script type="application/x-disabled">
         let carrinho = [];
