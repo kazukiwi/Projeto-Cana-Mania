@@ -216,7 +216,7 @@ function atualizarTabelaCarrinho() {
         return `<tr><td><strong>${item.nome}${variacao}</strong></td><td>${item.quantidade}x</td><td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td><td><button type="button" onclick="removerDoCarrinho(${indice})">Remover</button></td></tr>`;
     }).join('');
     const compraFuncionario = Boolean(document.getElementById('funcionario-comprador')?.value);
-    const descontoValor = Math.round(total * (compraFuncionario ? 0.1 : 0) * 100) / 100;
+    const descontoValor = Math.round(total * (compraFuncionario ? 0.15 : 0) * 100) / 100;
     const totalFinal = Math.round((total - descontoValor) * 100) / 100;
     document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('pdv-desconto').textContent = `- R$ ${descontoValor.toFixed(2).replace('.', ',')}`;
@@ -270,7 +270,7 @@ function atualizarPagamentoDividido(editado) {
     if (segunda.value && segunda.value === primeira.value) segunda.value = '';
     const bruto = carrinho.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
     const descontoAtivo = Boolean(document.getElementById('funcionario-comprador')?.value);
-    const total = Math.round((bruto - Math.round(bruto * (descontoAtivo ? 0.1 : 0) * 100) / 100) * 100);
+    const total = Math.round((bruto - Math.round(bruto * (descontoAtivo ? 0.15 : 0) * 100) / 100) * 100);
     const emCentavos = campo => Math.round(Number(campo.value) * 100);
     if (editado) {
         const origem = editado === 'valor_pagamento_2' ? valor2 : valor1;

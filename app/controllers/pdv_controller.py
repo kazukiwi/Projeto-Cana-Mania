@@ -279,7 +279,7 @@ def finalizar_venda(
         ).first()
         if not funcionario_comprador:
             return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
-    desconto_percentual = 10.0 if funcionario_comprador else 0.0
+    desconto_percentual = 15.0 if funcionario_comprador else 0.0
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0
