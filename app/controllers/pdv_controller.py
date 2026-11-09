@@ -23,6 +23,7 @@ from app.models.produtos import Produto, EstoqueTamanho, EstoqueVariacao, Tamanh
 from app.models.categoria import Categoria
 from app.models.produtos import CATEGORIAS_PDV
 from app.models.filial import EstoqueFilial, FILIAIS
+from app.models.usuario import Usuario
 from app.controllers.estoque_controller import garantir_estoque_filiais
 from app.pix import gerar_pix
 from app.auth import get_usuario_logado
@@ -162,6 +163,7 @@ def tela_pdv(
                 )
             },
             "vendas_hoje": vendas_hoje,
+            "funcionarios": db.query(Usuario).filter(Usuario.role == "funcionario", Usuario.ativo == True).order_by(Usuario.nome).all(),
         }
     )
 
@@ -235,6 +237,7 @@ def finalizar_venda(
     request: Request,
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     observacao: str    = Form(""),
+    funcionario_comprador_id: str = Form(""),
     forma_pagamento: str = Form(""),
     forma_pagamento_2: str = Form(""),
     valor_pagamento_1: str = Form(""),
@@ -265,7 +268,18 @@ def finalizar_venda(
     if not isinstance(itens, list) or not itens:
         return RedirectResponse(url="/pdv?erro=vazio", status_code=302)
 
-    desconto_percentual = 0.0
+    funcionario_comprador = None
+    if funcionario_comprador_id.strip():
+        try:
+            funcionario_id = int(funcionario_comprador_id)
+        except (TypeError, ValueError):
+            return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
+        funcionario_comprador = db.query(Usuario).filter(
+            Usuario.id == funcionario_id, Usuario.role == "funcionario", Usuario.ativo == True
+        ).first()
+        if not funcionario_comprador:
+            return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
+    desconto_percentual = 10.0 if funcionario_comprador else 0.0
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0
@@ -395,6 +409,11 @@ def finalizar_venda(
     elif valor_pagamento_1.strip() or valor_pagamento_2.strip():
         return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
     # ── Persiste tudo em uma única transação
+    if funcionario_comprador:
+        identificacao_funcionario = f"Compra de funcion\u00e1rio: {funcionario_comprador.nome}"
+        observacao = f"{identificacao_funcionario} | {observacao.strip()}" if observacao.strip() else identificacao_funcionario
+        observacao = observacao[:255]
+
     venda = Venda(
         usuario_id          = usuario.get("id"),
         desconto_percentual = desconto_percentual,
