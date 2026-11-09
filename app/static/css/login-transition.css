@@ -1,0 +1,13 @@
+.login-welcome{z-index:10001;background:radial-gradient(circle at 50% 35%,#17583d 0,#083d2c 62%,#06291e 100%);transition:opacity .35s ease}
+.login-welcome.login-welcome--visible{opacity:1}
+.login-welcome__orb{display:grid;place-items:center;width:76px;height:76px;margin-bottom:24px;border:1px solid #baf57a66;border-radius:50%;background:#ffffff12;color:#baf57a;font-size:30px;box-shadow:0 0 0 12px #ffffff08,0 15px 50px #0003;animation:login-orb-pulse 1.8s ease-in-out infinite}
+.login-welcome__brand{animation:login-brand-in .55s cubic-bezier(.2,.8,.2,1) both}
+.login-welcome p{max-width:520px;color:#e0f0e4;animation:login-brand-in .65s .08s both}
+.login-welcome__progress{width:min(300px,75vw);height:5px;overflow:hidden;margin-top:30px;border-radius:99px;background:#ffffff2b}
+.login-welcome__progress span{display:block;width:36%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ff1877,#baf57a);animation:login-progress 1.2s ease-in-out infinite alternate}
+.canamania-login.is-entering{overflow:hidden}
+@keyframes login-orb-pulse{50%{transform:scale(1.06);box-shadow:0 0 0 18px #ffffff05,0 15px 55px #0004}}
+@keyframes login-brand-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes login-progress{from{transform:translateX(-10%)}to{transform:translateX(200%)}}
+html[data-theme="dark"] .login-welcome{background:radial-gradient(circle at 50% 35%,#153a2c 0,#071a12 68%,#030b07 100%)}
+@media(prefers-reduced-motion:reduce){.login-welcome,.login-welcome__orb,.login-welcome__brand,.login-welcome p,.login-welcome__progress span{animation:none!important;transition:none!important}}

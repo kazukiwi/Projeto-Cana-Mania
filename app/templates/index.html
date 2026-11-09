@@ -5,7 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Canamania | Gestão de consumos</title>
-    <link rel="stylesheet" href="/static/css/index.css?v=canamania-4">
+    <link rel="stylesheet" href="/static/css/index.css?v=canamania-5">
+    <link rel="stylesheet" href="/static/css/feedback.css?v=3">
+    <link rel="stylesheet" href="/static/css/feedback-progress.css?v=2">
+    <link rel="stylesheet" href="/static/css/login-transition.css?v=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/static/css/theme-accents.css?v=global-theme-3">
 </head>
@@ -21,7 +24,7 @@
             <div class="flavor-chips"><b>Abre-Alas</b><b>Enredo</b><b>Maníacos por drink</b></div>
         </section>
         <section class="access-panel">
-            <form class="login-card" action="/auth/login" method="post">
+            <form class="login-card" action="/auth/login" method="post" data-sem-processando>
                 <p class="eyebrow">Área da equipe</p>
                 <h2>Bem-vindo de volta</h2>
                 <p class="login-lead">Entre para cuidar das lojas Canamania.</p><label>E-mail<input type="email"
@@ -35,11 +38,13 @@
             </form>
         </section>
     </main>
-    <section class="login-welcome" hidden tabindex="-1" role="status" aria-label="Acesso confirmado. Bem-vindo à Canamania.">
+    <section class="login-welcome" hidden tabindex="-1" role="status" aria-live="assertive" aria-label="Validando seu acesso.">
+        <div class="login-welcome__orb" aria-hidden="true"><i class="fa-solid fa-spinner fa-spin"></i></div>
         <div class="login-welcome__brand" aria-hidden="true"><span>Cana</span>mania</div>
-        <p>gestão de consumos</p>
+        <p>Validando seu acesso e preparando sua área de trabalho...</p>
+        <div class="login-welcome__progress" aria-hidden="true"><span></span></div>
     </section>
-    <script src="/static/javascript/login_animation.js?v=2" defer></script>
+    <script src="/static/javascript/login_animation.js?v=3" defer></script>
 <script src="/static/javascript/theme.js?v=global-theme-1"></script>
 </body>
 
