@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dados.set('carrinho_json', JSON.stringify(carrinho));
         dados.set('filial', campo('filial-pdv').value);
         dados.set('funcionario_comprador_id', campo('funcionario-comprador').value);
-        dados.set('desconto_manual_percentual', campo('desconto-manual').value || '0');
+        dados.set('desconto_manual_percentual', campo('desconto-manual-aplicado')?.value || '0');
         if (campo('dividir-pagamento').checked) {
             const valor = campo(campo('forma_pagamento').value === 'pix' ? 'valor_pagamento_1' : 'valor_pagamento_2');
             if (![campo('forma_pagamento'), campo('forma_pagamento_2'), campo('valor_pagamento_1'), campo('valor_pagamento_2')].every(item => item.reportValidity())) return;
