@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>M&#225;quinas | Canamania</title>
-    <link rel="stylesheet" href="/static/css/armarios.css?v=6">
+    <link rel="stylesheet" href="/static/css/armarios.css?v=7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="/static/javascript/confirmar_saida.js" defer></script>
 </head>
@@ -86,8 +86,19 @@
             <div class="filiais-maquinas">
                 {% for filial in filiais %}
                 {% set maquinas_filial = armarios|selectattr('filial', 'equalto', filial)|list %}
+                {% set disponiveis_filial = maquinas_filial|selectattr('status', 'equalto', 'disponivel')|list %}
+                {% set ocupadas_filial = maquinas_filial|selectattr('status', 'equalto', 'ocupado')|list %}
+                {% set manutencao_filial = maquinas_filial|selectattr('status', 'equalto', 'manutencao')|list %}
                 <section class="grupo-filial" aria-labelledby="titulo-filial-{{ loop.index }}">
-                    <header class="grupo-filial-cabecalho"><div class="grupo-filial-icone"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></div><div><h2 id="titulo-filial-{{ loop.index }}">{{ filial }}</h2><p>{{ maquinas_filial|length }} m&#225;quinas nesta filial</p></div></header>
+                    <header class="grupo-filial-cabecalho">
+                        <div class="grupo-filial-identidade"><div class="grupo-filial-icone"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></div><div><h2 id="titulo-filial-{{ loop.index }}">{{ filial }}</h2><p>Local das m&#225;quinas Canamania</p></div></div>
+                        <div class="grupo-filial-resumo" aria-label="Resumo das m&#225;quinas desta filial">
+                            <span class="resumo-total"><strong>{{ maquinas_filial|length }}</strong> m&#225;quinas</span>
+                            <span class="resumo-disponiveis"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> {{ disponiveis_filial|length }} dispon&#237;veis</span>
+                            <span class="resumo-ocupadas"><i class="fa-solid fa-gears" aria-hidden="true"></i> {{ ocupadas_filial|length }} em uso</span>
+                            <span class="resumo-manutencao"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> {{ manutencao_filial|length }} em manuten&#231;&#227;o</span>
+                        </div>
+                    </header>
                     <div class="grid-shell"><div class="grid-armarios" id="grid-armarios-{{ loop.index }}">
                         {% for armario in maquinas_filial %}
                         {% set reserva_ativa = armario.reservas|selectattr('status', 'equalto', 'ativa')|first %}

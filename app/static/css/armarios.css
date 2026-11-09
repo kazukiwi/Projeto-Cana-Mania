@@ -458,10 +458,18 @@ html[data-theme="dark"] .item-armario.status-desativado { background: #64748b !i
 /* Painel de m?quinas organizado por filial. */
 .filiais-maquinas { display: grid; gap: 24px; }
 .grupo-filial { overflow: hidden; border: 1px solid #dce5dc; border-radius: 16px; background: linear-gradient(145deg, #ffffff, #f5faf5); box-shadow: 0 10px 30px rgba(22, 54, 32, .08); }
-.grupo-filial-cabecalho { display: flex; align-items: center; gap: 14px; padding: 20px 22px 4px; }
+.grupo-filial-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 22px 4px; }
+.grupo-filial-identidade { display: flex; min-width: 190px; align-items: center; gap: 14px; }
 .grupo-filial-icone { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 14px; color: #16844a; background: #e5f7eb; font-size: 18px; }
 .grupo-filial-cabecalho h2 { color: #173b27; font-size: 20px; }
 .grupo-filial-cabecalho p { margin-top: 4px; color: #668071; font-size: 13px; }
+.grupo-filial-resumo { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.grupo-filial-resumo span { display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; border: 1px solid #e2ebe3; border-radius: 999px; background: #fff; color: #496253; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.grupo-filial-resumo .resumo-total { color: #183b27; background: #eef8ee; border-color: #d4e9d5; }
+.grupo-filial-resumo .resumo-total strong { font-size: 15px; }
+.grupo-filial-resumo .resumo-disponiveis i { color: #16844a; }
+.grupo-filial-resumo .resumo-ocupadas i { color: #3478e5; }
+.grupo-filial-resumo .resumo-manutencao i { color: #e87924; }
 .grupo-filial .grid-shell { padding: 16px 20px 22px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .grid-armarios { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
 .item-armario { position: relative; aspect-ratio: auto; min-height: 138px; align-items: stretch; justify-content: space-between; gap: 12px; padding: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,.28); border-radius: 14px; text-align: left; box-shadow: 0 8px 18px rgba(15,23,42,.13); }
@@ -480,4 +488,7 @@ html[data-theme="dark"] .item-armario.status-desativado { background: #64748b !i
 html[data-theme="dark"] .grupo-filial { background: linear-gradient(145deg,#142019,#101912); border-color: #385b41; }
 html[data-theme="dark"] .grupo-filial-cabecalho h2 { color: #d7fbb3; }
 html[data-theme="dark"] .grupo-filial-cabecalho p { color: #bed0c0; }
+html[data-theme="dark"] .grupo-filial-resumo span { color: #d5e4d7; background: #17231a; border-color: #38513d; }
+html[data-theme="dark"] .grupo-filial-resumo .resumo-total { color: #d7fbb3; background: #203425; border-color: #426b4a; }
 @media (max-width: 460px) { .grid-armarios { grid-template-columns: repeat(2,minmax(0,1fr)); } .item-armario { min-height: 132px; } }
+@media (max-width: 720px) { .grupo-filial-cabecalho { align-items: flex-start; flex-direction: column; } .grupo-filial-resumo { justify-content: flex-start; } }
