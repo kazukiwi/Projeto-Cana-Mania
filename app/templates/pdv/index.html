@@ -53,6 +53,8 @@
             </a>
         </div>
 
+        {% if request.query_params.get("erro") == "desconto" %}<p class="pdv-desconto-erro" role="alert">Informe um desconto entre 0% e 100%, com no m&#225;ximo duas casas decimais.</p>{% endif %}
+
         <div class="pdv-layout-split" style="display: flex; gap: 20px; margin-top: 20px;">
             <div class="pdv-box-cadastro" style="flex: 1; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
 
@@ -162,6 +164,8 @@
 
                 <form id="form-finalizar-real" action="/pdv/finalizar" method="POST">
                     <input type="hidden" name="carrinho_json" id="carrinho_json_input">
+                    <input type="hidden" name="desconto_manual_percentual" id="desconto-manual-aplicado" value="">
+                    <input type="hidden" name="cortesia" id="cortesia-aplicada" value="false">
 
                     <div class="form-group" style="margin-bottom:15px;">
                         <label for="forma_pagamento" style="display:block; font-weight:bold; margin-bottom:5px;">Forma de pagamento</label>
@@ -172,6 +176,7 @@
                             <option value="dinheiro">Dinheiro</option>
                             <option value="pix">Pix</option>
                             <option value="convite">Convite</option>
+                            <option value="cortesia" hidden>Cortesia</option>
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom:15px;">
@@ -228,9 +233,18 @@
                             <strong id="pdv-total-bruto" style="font-size:20px; color:#1e1b4b;">R$ 0,00</strong>
                         </div>
                         <div class="linha-total" id="pdv-linha-desconto" style="display:none; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:16px; color:#16a34a;">
-                            <span>Desconto funcionário (15%):</span>
+                            <span id="pdv-desconto-label">Desconto:</span>
                             <strong id="pdv-desconto">- R$ 0,00</strong>
                         </div>
+                        <div class="pdv-acoes-desconto">
+                            <button type="button" id="btn-desconto-manual" class="pdv-btn-desconto"><i class="fa-solid fa-percent"></i> Desconto manual</button>
+                            <button type="button" id="btn-cortesia" class="pdv-btn-cortesia" aria-pressed="false"><i class="fa-solid fa-gift"></i> Cortesia</button>
+                        </div>
+                        <div id="painel-desconto-manual" class="pdv-desconto-manual" hidden>
+                            <label for="desconto-manual-percentual">Desconto manual (%)</label>
+                            <div><input type="number" id="desconto-manual-percentual" min="0" max="100" step="0.01" placeholder="Ex.: 10"><button type="button" id="aplicar-desconto-manual">Aplicar</button><button type="button" id="cancelar-desconto-manual">Cancelar</button></div>
+                        </div>
+                        <p id="pdv-desconto-status" class="pdv-desconto-status" aria-live="polite"></p>
                         <div class="linha-total" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:18px;">
                             <span>Total Final:</span>
                             <strong id="pdv-total-geral" style="font-size:24px; color:#1e1b4b;">R$ 0,00</strong>

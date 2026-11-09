@@ -718,3 +718,18 @@ body {
     .pix-badge { display: none; }
     .pix-result { padding: 16px 10px; }
 }
+
+
+.pdv-acoes-desconto { display:flex; gap:10px; margin:0 0 12px; }
+.pdv-btn-desconto,.pdv-btn-cortesia { flex:1; min-height:42px; border:1px solid #c7d2fe; border-radius:8px; background:#eef2ff; color:#312e81; font-weight:700; cursor:pointer; }
+.pdv-btn-cortesia { border-color:#f5d0fe; background:#fdf4ff; color:#86198f; }
+.pdv-btn-cortesia.ativo { background:#a21caf; border-color:#a21caf; color:#fff; }
+.pdv-desconto-manual { display:grid; gap:7px; margin:0 0 10px; padding:12px; border:1px solid #c7d2fe; border-radius:8px; background:#f8faff; }
+.pdv-desconto-manual label { font-size:13px; font-weight:700; color:#312e81; }
+.pdv-desconto-manual > div { display:flex; gap:7px; }
+.pdv-desconto-manual input { min-width:0; flex:1; padding:9px; border:1px solid #cbd5e1; border-radius:6px; }
+.pdv-desconto-manual button { padding:8px 10px; border:0; border-radius:6px; background:#312e81; color:#fff; font-weight:700; cursor:pointer; }
+.pdv-desconto-manual button:last-child { background:#e5e7eb; color:#334155; }
+.pdv-desconto-status { margin:0 0 10px; color:#6b21a8; font-size:13px; font-weight:700; }
+.pdv-desconto-erro { margin:12px 0; color:#b91c1c; font-weight:700; }
+@media (max-width:520px) { .pdv-acoes-desconto { flex-direction:column; } .pdv-desconto-manual > div { flex-wrap:wrap; } }

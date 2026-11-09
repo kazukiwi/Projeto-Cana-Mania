@@ -30,7 +30,7 @@ from app.auth import get_usuario_logado
 
 router = APIRouter(prefix="/pdv", tags=["PDV"])
 templates = Jinja2Templates(directory="app/templates")
-FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite"}
+FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite", "cortesia"}
 
 # O Brasil não adota horário de verão desde 2019. Usar UTC-3 evita depender do
 # pacote tzdata, que não vem instalado em algumas instalações do Windows.
@@ -238,6 +238,8 @@ def finalizar_venda(
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     observacao: str    = Form(""),
     funcionario_comprador_id: str = Form(""),
+    desconto_manual_percentual: str = Form(""),
+    cortesia: str = Form("false"),
     forma_pagamento: str = Form(""),
     forma_pagamento_2: str = Form(""),
     valor_pagamento_1: str = Form(""),
@@ -257,6 +259,14 @@ def finalizar_venda(
     """
     if filial not in FILIAIS:
         return RedirectResponse(url="/pdv?erro=filial", status_code=302)
+    cortesia_ativa = cortesia.strip().lower() in {"1", "true", "on", "sim"}
+    desconto_manual_percentual = desconto_manual_percentual.strip()
+    if cortesia_ativa:
+        if desconto_manual_percentual:
+            return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+        forma_pagamento = "cortesia"
+    elif forma_pagamento == "cortesia":
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
     if forma_pagamento not in FORMAS_PAGAMENTO:
         return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
     forma_pagamento_2 = forma_pagamento_2.strip()
@@ -279,7 +289,26 @@ def finalizar_venda(
         ).first()
         if not funcionario_comprador:
             return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
-    desconto_percentual = 15.0 if funcionario_comprador else 0.0
+    desconto_manual = None
+    if desconto_manual_percentual:
+        try:
+            desconto_manual = Decimal(desconto_manual_percentual.replace(",", "."))
+        except InvalidOperation:
+            return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+        if (
+            not desconto_manual.is_finite()
+            or desconto_manual < 0
+            or desconto_manual > 100
+            or desconto_manual != desconto_manual.quantize(Decimal("0.01"))
+        ):
+            return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+
+    if cortesia_ativa:
+        desconto_percentual = 100.0
+    elif desconto_manual is not None:
+        desconto_percentual = float(desconto_manual)
+    else:
+        desconto_percentual = 15.0 if funcionario_comprador else 0.0
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0
@@ -383,7 +412,7 @@ def finalizar_venda(
         })
 
     # ── Calcula desconto e total final
-    desconto_valor = total_bruto * (desconto_percentual / 100)
+    desconto_valor = float((Decimal(str(total_bruto)) * Decimal(str(desconto_percentual)) / Decimal("100")).quantize(Decimal("0.01")))
     total_liquido  = round(total_bruto - desconto_valor, 2)
     valor_pagamento_1_db = total_liquido
     valor_pagamento_2_db = None
@@ -409,17 +438,23 @@ def finalizar_venda(
     elif valor_pagamento_1.strip() or valor_pagamento_2.strip():
         return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
     # ── Persiste tudo em uma única transação
+    marcadores_observacao = []
+    if cortesia_ativa:
+        marcadores_observacao.append("Cortesia")
+    elif desconto_manual is not None:
+        marcadores_observacao.append(f"Desconto manual: {desconto_percentual:g}%")
     if funcionario_comprador:
-        identificacao_funcionario = f"Compra de funcion\u00e1rio: {funcionario_comprador.nome}"
-        observacao = f"{identificacao_funcionario} | {observacao.strip()}" if observacao.strip() else identificacao_funcionario
-        observacao = observacao[:255]
+        marcadores_observacao.append(f"Compra de funcion\u00e1rio: {funcionario_comprador.nome}")
+    if observacao.strip():
+        marcadores_observacao.append(observacao.strip())
+    observacao = " | ".join(marcadores_observacao)[:255] or None
 
     venda = Venda(
         usuario_id          = usuario.get("id"),
         desconto_percentual = desconto_percentual,
         total_bruto         = round(total_bruto, 2),
         total_liquido       = total_liquido,
-        observacao          = observacao or None,
+        observacao          = observacao,
         forma_pagamento     = forma_pagamento,
         valor_pagamento_1   = valor_pagamento_1_db,
         forma_pagamento_2   = forma_pagamento_2 or None,

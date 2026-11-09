@@ -447,3 +447,37 @@ html[data-theme="dark"] .item-armario.status-desativado { background: #64748b !i
         min-height: 58px;
     }
 }
+
+.item-armario { min-width: 0; padding: 8px 5px; }
+.item-armario .numero-armario { font-size: 16px; }
+.item-armario .local-armario { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 600; line-height: 1.2; }
+.item-armario .local-armario i { font-size: 10px; }
+
+
+
+/* Painel de m?quinas organizado por filial. */
+.filiais-maquinas { display: grid; gap: 24px; }
+.grupo-filial { overflow: hidden; border: 1px solid #dce5dc; border-radius: 16px; background: linear-gradient(145deg, #ffffff, #f5faf5); box-shadow: 0 10px 30px rgba(22, 54, 32, .08); }
+.grupo-filial-cabecalho { display: flex; align-items: center; gap: 14px; padding: 20px 22px 4px; }
+.grupo-filial-icone { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 14px; color: #16844a; background: #e5f7eb; font-size: 18px; }
+.grupo-filial-cabecalho h2 { color: #173b27; font-size: 20px; }
+.grupo-filial-cabecalho p { margin-top: 4px; color: #668071; font-size: 13px; }
+.grupo-filial .grid-shell { padding: 16px 20px 22px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.grid-armarios { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.item-armario { position: relative; aspect-ratio: auto; min-height: 138px; align-items: stretch; justify-content: space-between; gap: 12px; padding: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,.28); border-radius: 14px; text-align: left; box-shadow: 0 8px 18px rgba(15,23,42,.13); }
+.item-armario::after { position: absolute; right: -22px; bottom: -36px; width: 100px; height: 100px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; content: ""; }
+.maquina-card-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.maquina-card-topo > i { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: rgba(255,255,255,.18); font-size: 16px; }
+.status-maquina { border-radius: 999px; padding: 5px 8px; background: rgba(255,255,255,.18); font-size: 10px; font-weight: 800; white-space: nowrap; }
+.item-armario .numero-armario { font-size: 17px; letter-spacing: .1px; }
+.item-armario .local-armario { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.item-armario .reserva-maquina { overflow: hidden; color: rgba(255,255,255,.9); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.item-armario.status-disponivel { background: linear-gradient(135deg,#0aa95b,#087c46) !important; }
+.item-armario.status-ocupado { background: linear-gradient(135deg,#3478e5,#2454b8) !important; }
+.item-armario.status-manutencao { background: linear-gradient(135deg,#f58a28,#c65316) !important; }
+.item-armario.status-desativado { background: linear-gradient(135deg,#718096,#475569) !important; }
+.sem-maquinas { grid-column: 1 / -1; padding: 20px; color: #64748b; text-align: center; }
+html[data-theme="dark"] .grupo-filial { background: linear-gradient(145deg,#142019,#101912); border-color: #385b41; }
+html[data-theme="dark"] .grupo-filial-cabecalho h2 { color: #d7fbb3; }
+html[data-theme="dark"] .grupo-filial-cabecalho p { color: #bed0c0; }
+@media (max-width: 460px) { .grid-armarios { grid-template-columns: repeat(2,minmax(0,1fr)); } .item-armario { min-height: 132px; } }

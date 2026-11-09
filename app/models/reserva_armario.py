@@ -11,7 +11,6 @@ class ReservaArmario(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     armario_id = Column(Integer, ForeignKey("armarios.id", ondelete="CASCADE"), nullable=False, index=True)
-    associado_id = Column(Integer, ForeignKey("clientes.id", ondelete="SET NULL"), nullable=True, index=True)
     local_evento = Column(String(150), nullable=True)
     semestre = Column(String(20), nullable=False)
     inicio_em = Column(DateTime, nullable=False)
@@ -19,5 +18,4 @@ class ReservaArmario(Base):
     status = Column(String(20), nullable=False, default="ativa", index=True)
     criado_em = Column(DateTime, nullable=False, default=datetime.utcnow)
 
-    armario = relationship("Armario", backref="reservas")
-    associado = relationship("Cliente")
+    armario = relationship("Armario", back_populates="reservas")

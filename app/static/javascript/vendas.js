@@ -4,6 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarPagamentoDividido();
     const produto = document.getElementById('select-prod');
     const funcionarioComprador = document.getElementById('funcionario-comprador');
+    const descontoManualAplicado = document.getElementById('desconto-manual-aplicado');
+    const cortesiaAplicada = document.getElementById('cortesia-aplicada');
+    const painelDescontoManual = document.getElementById('painel-desconto-manual');
+    const campoDescontoManual = document.getElementById('desconto-manual-percentual');
+    const formaPagamento = document.getElementById('forma_pagamento');
+    const dividirPagamento = document.getElementById('dividir-pagamento');
     const tamanho = document.getElementById('pdv-tamanho');
     const cor = document.getElementById('pdv-cor');
     const grupoTamanho = document.getElementById('grupo-tamanho');
@@ -20,6 +26,67 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCatalogo = document.getElementById('catalogo-pdv-modal');
     const gradeCatalogo = document.getElementById('grade-catalogo-pdv');
     const buscaCatalogo = document.getElementById('busca-catalogo-pdv');
+
+    const atualizarEstadoDesconto = () => {
+        const cortesia = cortesiaAplicada?.value === 'true';
+        const descontoManual = descontoManualAplicado?.value !== '';
+        const botaoCortesia = document.getElementById('btn-cortesia');
+        botaoCortesia?.classList.toggle('ativo', cortesia);
+        botaoCortesia?.setAttribute('aria-pressed', String(cortesia));
+        const status = document.getElementById('pdv-desconto-status');
+        if (status) status.textContent = cortesia ? 'Cortesia aplicada: total zerado.' : (descontoManual ? `Desconto manual de ${descontoManualAplicado.value}% aplicado.` : '');
+        atualizarTabelaCarrinho();
+    };
+    const definirCortesia = ativa => {
+        cortesiaAplicada.value = ativa ? 'true' : 'false';
+        if (ativa) {
+            descontoManualAplicado.value = '';
+            painelDescontoManual.hidden = true;
+            formaPagamento.value = 'cortesia';
+            dividirPagamento.checked = false;
+            dividirPagamento.disabled = true;
+        } else {
+            if (formaPagamento.value === 'cortesia') formaPagamento.value = '';
+            dividirPagamento.disabled = false;
+        }
+        formaPagamento.dispatchEvent(new Event('change'));
+        dividirPagamento.dispatchEvent(new Event('change'));
+        atualizarEstadoDesconto();
+    };
+    document.getElementById('btn-desconto-manual')?.addEventListener('click', () => {
+        if (cortesiaAplicada.value === 'true') definirCortesia(false);
+        painelDescontoManual.hidden = false;
+        campoDescontoManual.value = descontoManualAplicado.value;
+        campoDescontoManual.focus();
+    });
+    document.getElementById('aplicar-desconto-manual')?.addEventListener('click', () => {
+        const valor = campoDescontoManual.value;
+        const percentual = Number(valor);
+        campoDescontoManual.setCustomValidity('');
+        if (valor === '' || !Number.isFinite(percentual) || percentual < 0 || percentual > 100) {
+            campoDescontoManual.setCustomValidity('Informe um percentual entre 0 e 100.');
+            campoDescontoManual.reportValidity();
+            return;
+        }
+        descontoManualAplicado.value = percentual.toFixed(2);
+        cortesiaAplicada.value = 'false';
+        if (formaPagamento.value === 'cortesia') formaPagamento.value = '';
+        dividirPagamento.disabled = false;
+        painelDescontoManual.hidden = true;
+        formaPagamento.dispatchEvent(new Event('change'));
+        atualizarEstadoDesconto();
+    });
+    document.getElementById('cancelar-desconto-manual')?.addEventListener('click', () => {
+        painelDescontoManual.hidden = true;
+        campoDescontoManual.setCustomValidity('');
+    });
+    document.getElementById('btn-cortesia')?.addEventListener('click', () => {
+        definirCortesia(cortesiaAplicada.value !== 'true');
+    });
+    formaPagamento?.addEventListener('change', () => {
+        if (formaPagamento.value === 'cortesia' && cortesiaAplicada.value !== 'true') definirCortesia(true);
+        else if (formaPagamento.value !== 'cortesia' && cortesiaAplicada.value === 'true') definirCortesia(false);
+    });
 
     const selecionarProduto = id => {
         produto.value = String(id);
@@ -215,12 +282,18 @@ function atualizarTabelaCarrinho() {
         const variacao = item.tamanho ? ` (Tam: ${item.tamanho} | Cor: ${item.cor})` : '';
         return `<tr><td><strong>${item.nome}${variacao}</strong></td><td>${item.quantidade}x</td><td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td><td><button type="button" onclick="removerDoCarrinho(${indice})">Remover</button></td></tr>`;
     }).join('');
+    const cortesia = document.getElementById('cortesia-aplicada')?.value === 'true';
+    const manual = document.getElementById('desconto-manual-aplicado')?.value || '';
     const compraFuncionario = Boolean(document.getElementById('funcionario-comprador')?.value);
-    const descontoValor = Math.round(total * (compraFuncionario ? 0.15 : 0) * 100) / 100;
+    const percentual = cortesia ? 100 : (manual !== '' ? Number(manual) : (compraFuncionario ? 15 : 0));
+    const descontoValor = Math.round(total * percentual) / 100;
     const totalFinal = Math.round((total - descontoValor) * 100) / 100;
+    const linhaDesconto = document.getElementById('pdv-linha-desconto');
+    const rotuloDesconto = document.getElementById('pdv-desconto-label');
+    if (rotuloDesconto) rotuloDesconto.textContent = cortesia ? 'Cortesia (100%):' : (manual !== '' ? `Desconto manual (${percentual}%):` : (compraFuncionario ? 'Desconto funcion\u00e1rio (15%):' : 'Desconto:'));
     document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('pdv-desconto').textContent = `- R$ ${descontoValor.toFixed(2).replace('.', ',')}`;
-    document.getElementById('pdv-linha-desconto').style.display = compraFuncionario && total > 0 ? 'flex' : 'none';
+    if (linhaDesconto) linhaDesconto.style.display = percentual > 0 && total > 0 ? 'flex' : 'none';
     document.getElementById('pdv-total-geral').textContent = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
     atualizarPagamentoDividido('valor_pagamento_1');
@@ -269,8 +342,11 @@ function atualizarPagamentoDividido(editado) {
     });
     if (segunda.value && segunda.value === primeira.value) segunda.value = '';
     const bruto = carrinho.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
+    const cortesia = document.getElementById('cortesia-aplicada')?.value === 'true';
+    const manual = document.getElementById('desconto-manual-aplicado')?.value || '';
     const descontoAtivo = Boolean(document.getElementById('funcionario-comprador')?.value);
-    const total = Math.round((bruto - Math.round(bruto * (descontoAtivo ? 0.15 : 0) * 100) / 100) * 100);
+    const percentual = cortesia ? 100 : (manual !== '' ? Number(manual) : (descontoAtivo ? 15 : 0));
+    const total = Math.round((bruto - Math.round(bruto * percentual) / 100) * 100);
     const emCentavos = campo => Math.round(Number(campo.value) * 100);
     if (editado) {
         const origem = editado === 'valor_pagamento_2' ? valor2 : valor1;
