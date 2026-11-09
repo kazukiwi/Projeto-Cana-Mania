@@ -76,6 +76,9 @@
                         {% for funcionario in funcionarios %}<option value="{{ funcionario.id }}">{{ funcionario.nome }}</option>{% endfor %}
                     </select>
                 </div>
+                <div class="form-group" style="margin:-4px 0 16px;">
+                    <small>Será somado ao desconto de funcionário, até o limite de 100%.</small>
+                </div>
 
                 <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 20px 0;">
 
@@ -270,8 +273,8 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=employee-buyer-2"></script>
-    <script src="/static/javascript/pix.js?v=qr-code-3"></script>
+    <script src="/static/javascript/vendas.js?v=manual-discount-1"></script>
+    <script src="/static/javascript/pix.js?v=discount-aware-1"></script>
     <script type="application/x-disabled">
         let carrinho = [];
 

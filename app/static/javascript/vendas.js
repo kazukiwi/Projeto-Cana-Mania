@@ -285,12 +285,12 @@ function atualizarTabelaCarrinho() {
     const cortesia = document.getElementById('cortesia-aplicada')?.value === 'true';
     const manual = document.getElementById('desconto-manual-aplicado')?.value || '';
     const compraFuncionario = Boolean(document.getElementById('funcionario-comprador')?.value);
-    const percentual = cortesia ? 100 : (manual !== '' ? Number(manual) : (compraFuncionario ? 15 : 0));
+    const percentual = cortesia ? 100 : Math.min(100, (compraFuncionario ? 15 : 0) + Number(manual || 0));
     const descontoValor = Math.round(total * percentual) / 100;
     const totalFinal = Math.round((total - descontoValor) * 100) / 100;
     const linhaDesconto = document.getElementById('pdv-linha-desconto');
     const rotuloDesconto = document.getElementById('pdv-desconto-label');
-    if (rotuloDesconto) rotuloDesconto.textContent = cortesia ? 'Cortesia (100%):' : (manual !== '' ? `Desconto manual (${percentual}%):` : (compraFuncionario ? 'Desconto funcion\u00e1rio (15%):' : 'Desconto:'));
+    if (rotuloDesconto) rotuloDesconto.textContent = cortesia ? 'Cortesia (100%):' : (manual !== '' ? `Desconto manual (${manual}%)${compraFuncionario ? ' + funcionário (15%)' : ''}:` : (compraFuncionario ? 'Desconto funcionário (15%):' : 'Desconto:'));
     document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('pdv-desconto').textContent = `- R$ ${descontoValor.toFixed(2).replace('.', ',')}`;
     if (linhaDesconto) linhaDesconto.style.display = percentual > 0 && total > 0 ? 'flex' : 'none';
@@ -345,7 +345,7 @@ function atualizarPagamentoDividido(editado) {
     const cortesia = document.getElementById('cortesia-aplicada')?.value === 'true';
     const manual = document.getElementById('desconto-manual-aplicado')?.value || '';
     const descontoAtivo = Boolean(document.getElementById('funcionario-comprador')?.value);
-    const percentual = cortesia ? 100 : (manual !== '' ? Number(manual) : (descontoAtivo ? 15 : 0));
+    const percentual = cortesia ? 100 : Math.min(100, (descontoAtivo ? 15 : 0) + Number(manual || 0));
     const total = Math.round((bruto - Math.round(bruto * percentual) / 100) * 100);
     const emCentavos = campo => Math.round(Number(campo.value) * 100);
     if (editado) {

@@ -173,6 +173,8 @@ def gerar_pix_carrinho(
     carrinho_json: str = Form(..., max_length=100000),
     filial: str = Form(...),
     valor_pix: str = Form(""),
+    funcionario_comprador_id: str = Form(""),
+    desconto_manual_percentual: str = Form("0"),
     db: Session = Depends(get_db),
     usuario=Depends(get_usuario_logado),
 ):
@@ -216,6 +218,27 @@ def gerar_pix_carrinho(
         if not preco.is_finite() or preco < 0:
             raise HTTPException(status_code=400, detail="Produto com preço inválido.")
         total += preco * quantidade
+
+    funcionario_comprador = None
+    funcionario_comprador_id = funcionario_comprador_id if isinstance(funcionario_comprador_id, str) else ""
+    if funcionario_comprador_id.strip():
+        try:
+            funcionario_id = int(funcionario_comprador_id)
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Funcionário inválido.") from None
+        funcionario_comprador = db.query(Usuario).filter(
+            Usuario.id == funcionario_id, Usuario.role == "funcionario", Usuario.ativo == True
+        ).first()
+        if not funcionario_comprador:
+            raise HTTPException(status_code=400, detail="Funcionário inválido.")
+    try:
+        desconto_manual = Decimal(desconto_manual_percentual.strip().replace(",", ".")) if isinstance(desconto_manual_percentual, str) else Decimal("0")
+    except (InvalidOperation, ValueError, AttributeError):
+        raise HTTPException(status_code=400, detail="Desconto inválido.") from None
+    if not desconto_manual.is_finite() or desconto_manual < 0 or desconto_manual > 100:
+        raise HTTPException(status_code=400, detail="Desconto inválido.")
+    desconto_percentual = min(Decimal("100"), (Decimal("15") if funcionario_comprador else Decimal("0")) + desconto_manual)
+    total = (total * (Decimal("100") - desconto_percentual) / Decimal("100")).quantize(Decimal("0.01"))
 
     if isinstance(valor_pix, str) and valor_pix.strip():
         try:
@@ -289,26 +312,20 @@ def finalizar_venda(
         ).first()
         if not funcionario_comprador:
             return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
-    desconto_manual = None
-    if desconto_manual_percentual:
-        try:
-            desconto_manual = Decimal(desconto_manual_percentual.replace(",", "."))
-        except InvalidOperation:
-            return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
-        if (
-            not desconto_manual.is_finite()
-            or desconto_manual < 0
-            or desconto_manual > 100
-            or desconto_manual != desconto_manual.quantize(Decimal("0.01"))
-        ):
-            return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
-
-    if cortesia_ativa:
-        desconto_percentual = 100.0
-    elif desconto_manual is not None:
-        desconto_percentual = float(desconto_manual)
-    else:
-        desconto_percentual = 15.0 if funcionario_comprador else 0.0
+    try:
+        desconto_manual = Decimal(desconto_manual_percentual.replace(",", ".")) if desconto_manual_percentual else Decimal("0")
+    except (InvalidOperation, ValueError, AttributeError):
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+    if (
+        not desconto_manual.is_finite()
+        or desconto_manual < 0
+        or desconto_manual > 100
+        or desconto_manual != desconto_manual.quantize(Decimal("0.01"))
+    ):
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+    desconto_percentual = Decimal("100") if cortesia_ativa else min(
+        Decimal("100"), (Decimal("15") if funcionario_comprador else Decimal("0")) + desconto_manual
+    )
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0
@@ -412,7 +429,7 @@ def finalizar_venda(
         })
 
     # ── Calcula desconto e total final
-    desconto_valor = float((Decimal(str(total_bruto)) * Decimal(str(desconto_percentual)) / Decimal("100")).quantize(Decimal("0.01")))
+    desconto_valor = float((Decimal(str(total_bruto)) * desconto_percentual / Decimal("100")).quantize(Decimal("0.01")))
     total_liquido  = round(total_bruto - desconto_valor, 2)
     valor_pagamento_1_db = total_liquido
     valor_pagamento_2_db = None
@@ -451,7 +468,7 @@ def finalizar_venda(
 
     venda = Venda(
         usuario_id          = usuario.get("id"),
-        desconto_percentual = desconto_percentual,
+        desconto_percentual = float(desconto_percentual),
         total_bruto         = round(total_bruto, 2),
         total_liquido       = total_liquido,
         observacao          = observacao,
