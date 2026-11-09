@@ -16,9 +16,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         evento.preventDefault();
         enviando = true;
-        form.querySelectorAll('input, button').forEach(campo => { campo.disabled = true; });
         const botao = form.querySelector('button[type="submit"]');
-        if (botao) botao.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Validando...';
+        if (botao) {
+            botao.disabled = true;
+            botao.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Validando...';
+        }
         tela.hidden = false;
         document.body.classList.add('is-entering');
         requestAnimationFrame(() => {

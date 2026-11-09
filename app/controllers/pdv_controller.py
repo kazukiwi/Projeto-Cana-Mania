@@ -37,6 +37,18 @@ FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite", "cortesia
 FUSO_HORARIO = timezone(timedelta(hours=-3), name="America/Sao_Paulo")
 
 
+def data_hora_brasilia(valor: datetime | None) -> str:
+    """Formata datas armazenadas em UTC para o horário local do recibo."""
+    if valor is None:
+        return "Não informada"
+    if valor.tzinfo is None:
+        valor = valor.replace(tzinfo=timezone.utc)
+    return valor.astimezone(FUSO_HORARIO).strftime("%d/%m/%Y %H:%M:%S")
+
+
+templates.env.filters["data_hora_brasilia"] = data_hora_brasilia
+
+
 def fechar_dia(db: Session, data_referencia: date, automatico: bool = False) -> FechamentoDiario:
     """Cria ou atualiza o resumo de vendas de uma data, inclusive quando o total é zero."""
     # SQLite grava CURRENT_TIMESTAMP em UTC. Convertemos os limites do dia de
