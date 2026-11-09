@@ -5,56 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>Esqueci minha senha | Canamania</title>
-    <link rel="stylesheet" href="/static/css/base.css?v=rodape-escuro-3">
-    <link rel="stylesheet" href="/static/css/recuperar_senha_canamania.css?v=1">
-    <link rel="stylesheet" href="/static/css/responsive.css?v=1">
-    <link rel="stylesheet" href="/static/css/footer.css?v=rodape-1">
+    <link rel="stylesheet" href="/static/css/index.css?v=canamania-5">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/static/css/theme-accents.css?v=global-theme-4">
-    <link rel="stylesheet" href="/static/css/dark-surfaces.css?v=1">
 </head>
-<body class="recovery-page">
-    <div class="background">
-        <header>
-            <nav class="navbar">
-                <a href="/" class="wordmark" aria-label="Voltar para o login"><span>Cana</span>mania<small>gestão de consumos</small></a>
-            </nav>
-        </header>
-
-        <main class="recovery-container">
-            <section class="recovery-copy">
-                <h1>Canamania</h1>
-                <p>Recupere o acesso à sua conta de forma simples e segura.</p>
-            </section>
-
-            <section class="recovery-card" aria-labelledby="titulo-recuperacao">
+<body class="canamania-login">
+    <main class="login-shell">
+        <section class="brand-panel">
+            <div class="login-orb" aria-hidden="true"></div>
+            <a class="brand" href="/"><span>Cana</span>mania</a>
+            <p class="brand-tag">gestão de consumos</p>
+            <div class="brand-copy">
+                <span>Recuperação de acesso</span>
+                <h1>Volte a cuidar da Canamania.</h1>
+                <p>Vamos ajudar você a recuperar o acesso à sua conta com segurança.</p>
+            </div>
+            <div class="flavor-chips"><b>Abre-Alas</b><b>Enredo</b><b>Maníacos por drink</b></div>
+        </section>
+        <section class="access-panel">
+            <section class="login-card" aria-labelledby="titulo-recuperacao">
                 {% if sucesso %}
-                <div class="status-icon status-icon--success"><i class="fa-solid fa-envelope-circle-check"></i></div>
-                <h1 id="titulo-recuperacao">Verifique seu e-mail</h1>
-                <p class="intro">Se houver uma conta ativa com esse endereço, enviaremos um link para redefinir sua senha. Ele é válido por 30 minutos.</p>
-                <a class="secondary-link" href="/">Voltar para o login</a>
+                <p class="eyebrow">Próxima etapa</p>
+                <h2 id="titulo-recuperacao">Verifique seu e-mail</h2>
+                <p class="login-lead">Se houver uma conta ativa com esse endereço, enviaremos um link para redefinir sua senha. O link é válido por 30 minutos.</p>
+                <p class="login-feedback login-feedback--success"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Solicitação recebida com segurança.</p>
+                <a class="recovery-back" href="/"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Voltar para o login</a>
                 {% else %}
-                <div class="status-icon"><i class="fa-solid fa-key"></i></div>
-                <h1 id="titulo-recuperacao">Esqueceu a senha?</h1>
-                <p class="intro">Informe seu e-mail e enviaremos um link seguro para criar uma nova senha.</p>
-
-                {% if erro %}<p class="feedback feedback--error">{{ erro }}</p>{% endif %}
-
+                <p class="eyebrow">Área da equipe</p>
+                <h2 id="titulo-recuperacao">Esqueceu a senha?</h2>
+                <p class="login-lead">Informe o e-mail cadastrado e enviaremos um link para criar uma nova senha.</p>
+                {% if erro %}<p class="login-feedback login-feedback--error">{{ erro }}</p>{% endif %}
                 <form action="/auth/esqueci-senha" method="post">
-                    <label for="email">E-mail cadastrado</label>
-                    <div class="input-box">
-                        <i class="fa-solid fa-envelope"></i>
-                        <input type="email" name="email" id="email" value="{{ email or '' }}" placeholder="nome@exemplo.com" autocomplete="email" required>
-                    </div>
-                    <button type="submit">Enviar link de recuperação</button>
+                    <label>E-mail cadastrado<input type="email" name="email" id="email" value="{{ email or '' }}" placeholder="voce@canamania.com" autocomplete="email" required autofocus></label>
+                    <button type="submit">Enviar link de recuperação <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></button>
                 </form>
-                <a class="secondary-link" href="/"><i class="fa-solid fa-arrow-left"></i> Voltar para o login</a>
+                <a class="recovery-back" href="/"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Voltar para o login</a>
                 {% endif %}
             </section>
-        </main>
-    </div>
-
-    <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
+        </section>
+    </main>
 <script src="/static/javascript/theme.js?v=global-theme-1"></script>
 </body>
 </html>
