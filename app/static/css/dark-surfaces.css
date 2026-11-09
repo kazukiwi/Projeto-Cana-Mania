@@ -1,0 +1,61 @@
+/* Contrast corrections for legacy pages and surfaces with inline light colors. */
+html[data-theme="dark"] .feedback-modal{background:rgba(3,11,7,.78)!important}
+html[data-theme="dark"] .feedback-modal-card{background:#141d17!important;border:1px solid #365840!important;color:#e4ebe5!important}
+html[data-theme="dark"] .feedback-modal-card h2{color:#f1f8ef!important}
+html[data-theme="dark"] .feedback-modal-card p{color:#c2d0c4!important}
+html[data-theme="dark"] .feedback-modal-icone{background:#32202b!important;color:#ff8fbd!important}
+html[data-theme="dark"] .feedback-modal-cancelar{background:#26392d!important;border:1px solid #416847!important;color:#e4ebe5!important}
+html[data-theme="dark"] .feedback-modal-confirmar{background:#ff1877!important;color:#fff!important}
+
+html[data-theme="dark"] .pix-card{background:linear-gradient(145deg,#13251b,#101812 72%)!important;border-color:#365840!important;color:#e4ebe5!important;box-shadow:0 10px 28px rgba(0,0,0,.24)!important}
+html[data-theme="dark"] .pix-card-header h3{color:#d7fbb3!important}
+html[data-theme="dark"] .pix-card-icon{background:#1d3a2c!important;color:#baf57a!important}
+html[data-theme="dark"] .pix-eyebrow,html[data-theme="dark"] .pix-intro,html[data-theme="dark"] .pix-status,html[data-theme="dark"] .pix-notice{color:#c2d0c4!important}
+html[data-theme="dark"] .pix-badge{background:#1c2b1f!important;border-color:#416847!important;color:#baf57a!important}
+html[data-theme="dark"] .pix-result{background:#141d17!important;border-color:#365840!important}
+html[data-theme="dark"] .pix-amount span,html[data-theme="dark"] .pix-scan-hint,html[data-theme="dark"] .pix-code-label{color:#c2d0c4!important}
+html[data-theme="dark"] .pix-amount strong{color:#d7fbb3!important}
+html[data-theme="dark"] .pix-button-primary{background:linear-gradient(135deg,#0c8b68,#08664f)!important;color:#fff!important;border-color:#28a67e!important}
+html[data-theme="dark"] .pix-button-secondary{background:#1b3427!important;border-color:#416847!important;color:#d7fbb3!important}
+html[data-theme="dark"] .pix-divider{color:#9fb2a4!important}
+html[data-theme="dark"] .pix-divider::before,html[data-theme="dark"] .pix-divider::after{background:#365840!important}
+html[data-theme="dark"] #pix-codigo{background:#0e1510!important;border-color:#3a5541!important;color:#e4ebe5!important}
+html[data-theme="dark"] .pix-notice i{color:#baf57a!important}
+/* Keep the QR itself on a white field so banking apps can scan it. */
+html[data-theme="dark"] .pix-qr-frame{background:#fff!important;border-color:#fff!important}
+
+html[data-theme="dark"] .tabela-produtos .produto-nome-link{color:#d7fbb3!important}
+html[data-theme="dark"] .tabela-produtos .produto-nome-link:hover{color:#ff8fbd!important}
+html[data-theme="dark"] .tabela-produtos .produto-editar-link{color:#baf57a!important;background:#1c2b1f!important;border-color:#416847!important}
+html[data-theme="dark"] .tabela-produtos .produto-editar-link:hover{color:#fff!important;background:#274a34!important}
+
+html[data-theme="dark"] .form-container{background:linear-gradient(155deg,#17231b,#111913)!important;border-color:#365840!important}
+html[data-theme="dark"] .form-container .form-group small,html[data-theme="dark"] .page-header p{color:#b8cbbd!important}
+html[data-theme="dark"] .form-container input,html[data-theme="dark"] .form-container select,html[data-theme="dark"] .form-container textarea{background:#0e1510!important;border-color:#3a5541!important;color:#f1f8ef!important}
+html[data-theme="dark"] .form-container input::placeholder{color:#91a397!important}
+html[data-theme="dark"] .form-container input[type="file"]::file-selector-button{background:#1c2b1f;color:#d7fbb3;border:1px solid #416847;border-radius:8px;padding:8px 11px;margin-right:10px;cursor:pointer}
+html[data-theme="dark"] .form-actions{border-color:#365840!important}
+html[data-theme="dark"] .form-container .btn-cancel{background:#1c2b1f!important;border-color:#416847!important;color:#e4ebe5!important}
+html[data-theme="dark"] .alert-box{background:#351d22!important;border:1px solid #6d3038!important;color:#ffc4ca!important}
+
+html[data-theme="dark"] .indicadores-grid .card-indicador,
+html[data-theme="dark"] .graficos-grid-layout .card-grafico-item,
+html[data-theme="dark"] .card-historico,
+html[data-theme="dark"] .filtros-vendas-container{background:#141d17!important;border-color:#365840!important;color:#e4ebe5!important;box-shadow:0 14px 30px rgba(0,0,0,.2)}
+html[data-theme="dark"] .card-indicador h2,html[data-theme="dark"] .card-grafico-item h3,html[data-theme="dark"] .card-historico h3{color:#f1f8ef!important}
+html[data-theme="dark"] .card-header-ind{color:#b8cbbd!important}
+html[data-theme="dark"] .card-indicador h2 span{color:#b8cbbd!important}
+html[data-theme="dark"] .card-indicador i{background:#1c2b1f!important;color:#baf57a!important}
+html[data-theme="dark"] .periodos-botoes{background:#0e1510!important}
+html[data-theme="dark"] .periodos-botoes .btn-periodo{color:#c2d0c4!important}
+html[data-theme="dark"] .periodos-botoes .btn-periodo.active{background:#ff1877!important;color:#fff!important}
+html[data-theme="dark"] .filtros-vendas-container label{color:#d7fbb3!important}
+html[data-theme="dark"] .filtros-vendas-container select{background:#0e1510!important;border-color:#3a5541!important;color:#f1f8ef!important}
+html[data-theme="dark"] .tabela-vendas th{background:#1c2b1f!important;border-color:#365840!important;color:#d7fbb3!important}
+html[data-theme="dark"] .tabela-vendas td{background:transparent!important;border-color:#2b4334!important;color:#e4ebe5!important}
+html[data-theme="dark"] .tabela-vendas td span{color:#b8cbbd!important}
+html[data-theme="dark"] .tabela-vendas td strong{color:#f1f8ef!important}
+html[data-theme="dark"] .badge-categoria{background:#1c2b1f!important;color:#baf57a!important}
+html[data-theme="dark"] .tabela-vendas td div[style*="background:#f1f5f9"]{background:#26392d!important}
+html[data-theme="dark"] .tabela-vendas td[style*="color:#16a34a"]{color:#baf57a!important}
+html[data-theme="dark"] .btn-exportar-csv{background:#c9085a!important;color:#fff!important}

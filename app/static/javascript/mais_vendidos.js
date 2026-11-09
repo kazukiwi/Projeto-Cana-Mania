@@ -69,6 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return resultado;
         }, {});
         const rotulo = ordenacao === 'receita' ? 'Receita (R$)' : 'Unidades Vendidas';
+        const escuro = document.documentElement.dataset.theme === 'dark';
+        const corTexto = escuro ? '#e4ebe5' : '#334155';
+        const corGrade = escuro ? '#365840' : '#f1f5f9';
+        Chart.defaults.color = corTexto;
         const valoresProdutos = lista.map(produto => ordenacao === 'receita' ? Number(produto.receita) : Number(produto.vendas));
         document.getElementById('titulo-grafico-categorias').textContent = ordenacao === 'receita' ? 'Receita por Categoria' : 'Vendas por Categoria';
 
@@ -77,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const ctxProdutos = document.getElementById('chartTopProdutos');
         const ctxCategorias = document.getElementById('chartCategorias');
-        if (ctxProdutos) graficoProdutos = new Chart(ctxProdutos, { type: 'bar', data: { labels: lista.map(p => p.nome), datasets: [{ label: rotulo, data: valoresProdutos, backgroundColor: '#2563eb', borderRadius: 6, barThickness: 25 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' } }, x: { grid: { display: false } } } } });
-        if (ctxCategorias) graficoCategorias = new Chart(ctxCategorias, { type: 'doughnut', data: { labels: Object.keys(dadosCategorias), datasets: [{ data: Object.values(dadosCategorias), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'], borderWidth: 2, borderColor: '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15 } } }, cutout: '70%' } });
+        if (ctxProdutos) graficoProdutos = new Chart(ctxProdutos, { type: 'bar', data: { labels: lista.map(p => p.nome), datasets: [{ label: rotulo, data: valoresProdutos, backgroundColor: escuro ? '#ff4b97' : '#2563eb', borderRadius: 6, barThickness: 25 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: corGrade } }, x: { grid: { display: false } } } } });
+        if (ctxCategorias) graficoCategorias = new Chart(ctxCategorias, { type: 'doughnut', data: { labels: Object.keys(dadosCategorias), datasets: [{ data: Object.values(dadosCategorias), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'], borderWidth: 2, borderColor: escuro ? '#141d17' : '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, color: corTexto } } }, cutout: '70%' } });
     }
 
     function atualizarTela() {
@@ -98,6 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
     seletorCategoria.addEventListener('change', atualizarTela);
     btnQuantidade.addEventListener('click', () => definirOrdenacao('quantidade'));
     btnReceita.addEventListener('click', () => definirOrdenacao('receita'));
+    new MutationObserver(mudancas => {
+        if (mudancas.some(mudanca => mudanca.attributeName === 'data-theme')) atualizarTela();
+    }).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
 
     document.querySelector('.btn-exportar-csv')?.addEventListener('click', () => {
         const linhas = [...document.querySelectorAll('table.tabela-vendas tr')].map(linha =>

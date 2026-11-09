@@ -12,6 +12,17 @@
     --success-text: #065f46;
 }
 
+html[data-theme="dark"] {
+    --bg-main: #0b100d;
+    --text-main: #f1f8ef;
+    --text-muted: #b8cbbd;
+    --border-color: #365840;
+    --primary: #ff1877;
+    --primary-hover: #c9085a;
+    --success-bg: #173523;
+    --success-text: #baf57a;
+}
+
 body {
     background-color: var(--bg-main);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -32,6 +43,9 @@ body {
     margin-bottom: 24px;
 }
 
+.page-header h1 { color: #083d2c; letter-spacing: -.045em; }
+.page-header p { color: #607067; line-height: 1.6; }
+
 /* Caixa de Alerta de Erro */
 .alert-box {
     background-color: #fee2e2;
@@ -49,10 +63,10 @@ body {
 /* Container do Formulário */
 .form-container {
     background: white;
-    border-radius: 12px;
+    border-radius: 20px;
     border: 1px solid var(--border-color);
     padding: 32px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 18px 45px rgba(8, 61, 44, 0.08);
 }
 
 .form-grid {
@@ -243,7 +257,7 @@ body {
 }
 
 .btn-submit {
-    background-color: var(--primary);
+    background: linear-gradient(135deg, #ff1877, #d90864);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -257,7 +271,7 @@ body {
     transition: background-color 0.2s;
 }
 
-.btn-submit:hover { background-color: var(--primary-hover); }
+.btn-submit:hover { background: linear-gradient(135deg, #c9085a, #083d2c); transform: translateY(-1px); }
 
 .btn-cancel {
     background-color: white;
@@ -272,6 +286,19 @@ body {
 }
 
 .btn-cancel:hover { background-color: #f1f5f9; color: var(--text-main); }
+
+html[data-theme="dark"] body { background-color: #0b100d; color: #f1f8ef; }
+html[data-theme="dark"] .page-header h1 { color: #d7fbb3; }
+html[data-theme="dark"] .page-header p { color: #b8cbbd; }
+html[data-theme="dark"] .form-container { background: linear-gradient(155deg, #17231b, #111913); border-color: #365840; box-shadow: 0 20px 48px rgba(0,0,0,.28); }
+html[data-theme="dark"] .form-group label { color: #d7fbb3; }
+html[data-theme="dark"] .form-container :is(input, select, textarea) { background: #0e1510; border-color: #3a5541; color: #f1f8ef; }
+html[data-theme="dark"] .form-container :is(input, select, textarea)::placeholder { color: #91a397; }
+html[data-theme="dark"] .form-container .current-image-container, html[data-theme="dark"] .form-container .variacoes-card, html[data-theme="dark"] .form-container .opcao-variacao { background: #1c2b1f; border-color: #365840; color: #e4ebe5; }
+html[data-theme="dark"] .form-container .current-image-container span, html[data-theme="dark"] .form-container small { color: #b8cbbd; }
+html[data-theme="dark"] .form-actions { border-color: #365840; }
+html[data-theme="dark"] .btn-cancel { background: #1c2b1f; border-color: #416847; color: #e4ebe5; }
+html[data-theme="dark"] .btn-cancel:hover { background: #274a34; color: #fff; }
 
 @media (max-width: 600px) {
     .form-grid { grid-template-columns: 1fr; }
