@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     configurarPagamentoDividido();
     const produto = document.getElementById('select-prod');
     const funcionarioComprador = document.getElementById('funcionario-comprador');
+    const descontoManual = document.getElementById('desconto-manual');
     const tamanho = document.getElementById('pdv-tamanho');
     const cor = document.getElementById('pdv-cor');
     const grupoTamanho = document.getElementById('grupo-tamanho');
@@ -172,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     document.getElementById('select-cliente')?.addEventListener('change', atualizarTabelaCarrinho);
     funcionarioComprador?.addEventListener('change', atualizarTabelaCarrinho);
+    descontoManual?.addEventListener('input', atualizarTabelaCarrinho);
     filial?.addEventListener('change', aplicarFilial);
     buscaFrozen?.addEventListener('input', () => {
         const termo = buscaFrozen.value.trim().toLocaleLowerCase('pt-BR');
@@ -216,11 +218,13 @@ function atualizarTabelaCarrinho() {
         return `<tr><td><strong>${item.nome}${variacao}</strong></td><td>${item.quantidade}x</td><td>R$ ${subtotal.toFixed(2).replace('.', ',')}</td><td><button type="button" onclick="removerDoCarrinho(${indice})">Remover</button></td></tr>`;
     }).join('');
     const compraFuncionario = Boolean(document.getElementById('funcionario-comprador')?.value);
-    const descontoValor = Math.round(total * (compraFuncionario ? 0.15 : 0) * 100) / 100;
+    const descontoManual = Math.min(100, Math.max(0, Number(document.getElementById('desconto-manual')?.value || 0)));
+    const descontoPercentual = Math.min(100, (compraFuncionario ? 15 : 0) + descontoManual);
+    const descontoValor = Math.round(total * descontoPercentual) / 100;
     const totalFinal = Math.round((total - descontoValor) * 100) / 100;
     document.getElementById('pdv-total-bruto').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
     document.getElementById('pdv-desconto').textContent = `- R$ ${descontoValor.toFixed(2).replace('.', ',')}`;
-    document.getElementById('pdv-linha-desconto').style.display = compraFuncionario && total > 0 ? 'flex' : 'none';
+    document.getElementById('pdv-linha-desconto').style.display = descontoPercentual > 0 && total > 0 ? 'flex' : 'none';
     document.getElementById('pdv-total-geral').textContent = `R$ ${totalFinal.toFixed(2).replace('.', ',')}`;
     document.getElementById('carrinho_json_input').value = JSON.stringify(carrinho);
     atualizarPagamentoDividido('valor_pagamento_1');
@@ -270,7 +274,9 @@ function atualizarPagamentoDividido(editado) {
     if (segunda.value && segunda.value === primeira.value) segunda.value = '';
     const bruto = carrinho.reduce((soma, item) => soma + item.preco * item.quantidade, 0);
     const descontoAtivo = Boolean(document.getElementById('funcionario-comprador')?.value);
-    const total = Math.round((bruto - Math.round(bruto * (descontoAtivo ? 0.15 : 0) * 100) / 100) * 100);
+    const descontoManual = Math.min(100, Math.max(0, Number(document.getElementById('desconto-manual')?.value || 0)));
+    const descontoPercentual = Math.min(100, (descontoAtivo ? 15 : 0) + descontoManual);
+    const total = Math.round((bruto - Math.round(bruto * descontoPercentual) / 100) * 100);
     const emCentavos = campo => Math.round(Number(campo.value) * 100);
     if (editado) {
         const origem = editado === 'valor_pagamento_2' ? valor2 : valor1;

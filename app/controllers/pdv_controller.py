@@ -173,6 +173,8 @@ def gerar_pix_carrinho(
     carrinho_json: str = Form(..., max_length=100000),
     filial: str = Form(...),
     valor_pix: str = Form(""),
+    funcionario_comprador_id: str = Form(""),
+    desconto_manual_percentual: str = Form("0"),
     db: Session = Depends(get_db),
     usuario=Depends(get_usuario_logado),
 ):
@@ -217,6 +219,27 @@ def gerar_pix_carrinho(
             raise HTTPException(status_code=400, detail="Produto com preço inválido.")
         total += preco * quantidade
 
+    funcionario_comprador = None
+    funcionario_comprador_id = funcionario_comprador_id if isinstance(funcionario_comprador_id, str) else ""
+    if funcionario_comprador_id.strip():
+        try:
+            funcionario_id = int(funcionario_comprador_id)
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Funcionário inválido.") from None
+        funcionario_comprador = db.query(Usuario).filter(
+            Usuario.id == funcionario_id, Usuario.role == "funcionario", Usuario.ativo == True
+        ).first()
+        if not funcionario_comprador:
+            raise HTTPException(status_code=400, detail="Funcionário inválido.")
+    try:
+        desconto_manual = Decimal(desconto_manual_percentual.strip().replace(",", ".")) if isinstance(desconto_manual_percentual, str) else Decimal("0")
+    except (InvalidOperation, ValueError, AttributeError):
+        raise HTTPException(status_code=400, detail="Desconto inválido.") from None
+    if not desconto_manual.is_finite() or desconto_manual < 0 or desconto_manual > 100:
+        raise HTTPException(status_code=400, detail="Desconto inválido.")
+    desconto_percentual = min(Decimal("100"), (Decimal("15") if funcionario_comprador else Decimal("0")) + desconto_manual)
+    total = (total * (Decimal("100") - desconto_percentual) / Decimal("100")).quantize(Decimal("0.01"))
+
     if isinstance(valor_pix, str) and valor_pix.strip():
         try:
             valor_solicitado = Decimal(valor_pix.strip().replace(",", "."))
@@ -238,6 +261,7 @@ def finalizar_venda(
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     observacao: str    = Form(""),
     funcionario_comprador_id: str = Form(""),
+    desconto_manual_percentual: str = Form("0"),
     forma_pagamento: str = Form(""),
     forma_pagamento_2: str = Form(""),
     valor_pagamento_1: str = Form(""),
@@ -279,7 +303,13 @@ def finalizar_venda(
         ).first()
         if not funcionario_comprador:
             return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
-    desconto_percentual = 15.0 if funcionario_comprador else 0.0
+    try:
+        desconto_manual = Decimal(desconto_manual_percentual.strip().replace(",", "."))
+    except (InvalidOperation, ValueError, AttributeError):
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+    if not desconto_manual.is_finite() or desconto_manual < 0 or desconto_manual > 100:
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+    desconto_percentual = min(100.0, (15.0 if funcionario_comprador else 0.0) + float(desconto_manual))
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0
@@ -383,7 +413,7 @@ def finalizar_venda(
         })
 
     # ── Calcula desconto e total final
-    desconto_valor = total_bruto * (desconto_percentual / 100)
+    desconto_valor = round(total_bruto * (desconto_percentual / 100), 2)
     total_liquido  = round(total_bruto - desconto_valor, 2)
     valor_pagamento_1_db = total_liquido
     valor_pagamento_2_db = None
