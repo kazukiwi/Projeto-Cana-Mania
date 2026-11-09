@@ -662,6 +662,56 @@ body {
     color: white;
 }
 
+@media (max-width: 600px) {
+    .vendas-container-main:has(.cupom-container) {
+        box-sizing: border-box;
+        width: 100%;
+        margin: 16px auto !important;
+        padding: 0 12px !important;
+    }
+    .recibo-acoes {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px !important;
+    }
+    .recibo-acoes > * {
+        box-sizing: border-box;
+        min-width: 0;
+        justify-content: center;
+        padding: 10px 8px !important;
+        font-size: 13px;
+        text-align: center;
+    }
+    .recibo-acoes > :last-child {
+        grid-column: 1 / -1;
+    }
+    .cupom-container {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        padding: 16px !important;
+        overflow-wrap: anywhere;
+    }
+    .cupom-container table {
+        table-layout: fixed;
+    }
+    .cupom-container th:first-child,
+    .cupom-container td:first-child {
+        width: 58%;
+        overflow-wrap: anywhere;
+    }
+    .cupom-container th:nth-child(2),
+    .cupom-container td:nth-child(2) {
+        width: 14%;
+        text-align: center;
+    }
+    .cupom-container th:last-child,
+    .cupom-container td:last-child {
+        width: 28%;
+        overflow-wrap: anywhere;
+    }
+}
+
 
 /* Pagamento Pix */
 .pix-card {

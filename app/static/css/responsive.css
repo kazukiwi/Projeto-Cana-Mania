@@ -67,3 +67,87 @@ button, input, select, textarea { font: inherit; }
   .logo img { height: 56px; }
   .btn-novo-produto, .btn-primary, .btn-create, .btn-nova-venda, .btn-finalizar-dia { min-height: 44px; }
 }
+
+/* Ajustes compartilhados para que as telas administrativas caibam em tablets e celulares. */
+*, *::before, *::after { box-sizing: border-box; }
+@media (max-width: 760px) {
+  .dashboard, .produtos-container-main, .vendas-container-main,
+  .clientes-container, .main-content, .page, .cana-page {
+    width: min(100% - 28px, 1400px) !important;
+    max-width: 100%;
+    margin-inline: auto !important;
+  }
+  .cards, .cards-resumo-container, .indicadores-grid, .summary-grid,
+  .branch-cards, .stock-grid, .graficos-grid-layout, .form-grid,
+  .form-row, .form-row-split, .reserva-form, .transfer-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .filiais-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Mantém em uma coluna os painéis que já usam esse padrão em telas estreitas. */
+  .branch-cards, .stock-grid, .transfer-form, .reserva-form,
+  .graficos-grid-layout { grid-template-columns: minmax(0, 1fr) !important; }
+  .dashboard > *, .page > *, .main-content > *, .cana-page > *,
+  .pdv-layout-split > *, .stock-grid > *, .graficos-grid-layout > * {
+    min-width: 0;
+  }
+  .table-shell, .table-container, .tabela-container, .tabela-reservas-wrap,
+  .mini-tabela-wrapper, .stock-table-wrap, .tabela-container, .historico-tabela-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .table-shell table, .table-container table, .tabela-container table,
+  .tabela-reservas, .mini-tabela-pdv, .stock-table-wrap table {
+    min-width: 680px;
+  }
+  .pdv-layout-split { display: flex !important; flex-direction: column !important; }
+  .pdv-box-cadastro, .pdv-box-carrinho, .surface, .stock-grid > * { min-width: 0; }
+  .reserva-form, .transfer-form { align-items: stretch; }
+  .filtros-vendas-container { flex-wrap: wrap; gap: 12px; }
+  .filtros-vendas-container > *, .periodos-botoes { min-width: 0; flex-wrap: wrap; }
+  .card-grafico-item, .canvas-chart-container { min-width: 0; max-width: 100%; }
+  .navbar { max-width: 100%; }
+  .modal-finalizar-dia, .modal-confirmacao-acao, .modal-overlay {
+    overflow-y: auto;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .cards, .cards-resumo-container, .indicadores-grid, .summary-grid,
+  .branch-cards, .stock-grid, .graficos-grid-layout, .form-grid,
+  .form-row, .form-row-split, .reserva-form, .transfer-form {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .filiais-grid { grid-template-columns: minmax(0, 1fr); }
+  .filtros-vendas-container { align-items: stretch; flex-direction: column; }
+  .filtros-vendas-container > *, .filtros-vendas-container select,
+  .periodos-botoes, .periodos-botoes button { width: 100%; }
+  .periodos-botoes { display: grid; grid-template-columns: 1fr 1fr; }
+  .podium-panel { overflow: visible; }
+  .podium-lista { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+  .cana-heading, .table-title, .header, .header-produtos, .page-header,
+  .header-vendas, .topo, .acoes-historico, .listagem-acoes {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .cana-heading > *, .table-title > *, .header-vendas > *, .page-header > *,
+  .acoes-historico > *, .listagem-acoes > * { width: 100%; min-width: 0; }
+  .filters, .filtros, .filtros-container, .historico-filtros {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .filters > *, .filtros > *, .filtros-container > *, .historico-filtros > * { width: 100% !important; }
+  .surface, .card, .modal-card { padding: 16px; }
+  .form-actions, .modal-actions, .confirmacao-acoes, .confirmacao-acao-botoes {
+    flex-wrap: wrap;
+  }
+  .form-actions > *, .modal-actions > *, .confirmacao-acoes > *,
+  .confirmacao-acao-botoes > * { flex: 1 1 140px; }
+  input, select, textarea, button { max-width: 100%; }
+}
+
+@media (max-width: 620px) {
+  .filiais-grid { grid-template-columns: minmax(0, 1fr) !important; }
+}
