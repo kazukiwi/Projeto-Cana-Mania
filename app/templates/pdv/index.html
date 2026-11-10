@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>PDV - Nova Venda</title>
-    <link rel="stylesheet" href="/static/css/vendas.css?v=pix-visual-1">
+    <link rel="stylesheet" href="/static/css/vendas.css?v=pdv-ux-3">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="/static/javascript/confirmar_saida.js" defer></script>
 </head>
@@ -93,7 +93,7 @@
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label for="busca-frozen" style="display:block; font-weight:bold; margin-bottom:5px;">Produto</label>
                         <input id="busca-frozen" type="search" placeholder="Digite para procurar um consumo..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="resultado-busca-frozen" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
-                        <div id="resultado-busca-frozen" class="resultado-busca-frozen" aria-live="polite"></div>
+                        <div id="resultado-busca-frozen" class="resultado-busca-frozen" role="listbox" aria-label="Resultados de produtos" aria-live="polite"></div>
                         <button type="button" id="abrir-catalogo-pdv" style="width:100%; margin-top:10px; padding:10px; border:1px solid #1e1b4b; border-radius:6px; background:#f5f3ff; color:#1e1b4b; font-weight:bold; cursor:pointer;"><i class="fa-solid fa-images"></i> Escolher produto pelo catálogo</button>
                     </div>
                     <div class="form-group" style="margin-bottom: 15px;">
@@ -149,17 +149,18 @@
             <div class="pdv-box-carrinho" style="flex: 1.2; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display:flex; flex-direction:column; justify-content:space-between;">
                 <div>
                     <h3 style="margin-top:0;">Itens da Venda Atual</h3>
+                    <p class="pdv-ajuda-carrinho">Ajuste as quantidades aqui. O estoque é conferido antes de finalizar.</p>
                     <div class="mini-tabela-wrapper" style="max-height: 250px; overflow-y:auto; margin-bottom:20px; border: 1px solid #e5e7eb; border-radius:6px;">
                         <table class="mini-tabela-pdv" style="width:100%; border-collapse:collapse; text-align:left;">
                             <thead style="background:#f9fafb; position:sticky; top:0;">
                                 <tr>
                                     <th style="padding:10px; border-bottom:1px solid #e5e7eb;">Item</th>
-                                    <th style="padding:10px; border-bottom:1px solid #e5e7eb;">Qtd</th>
+                                    <th style="padding:10px; border-bottom:1px solid #e5e7eb;">Quantidade</th>
                                     <th style="padding:10px; border-bottom:1px solid #e5e7eb;">Subtotal</th>
                                     <th style="padding:10px; border-bottom:1px solid #e5e7eb; text-align: center;">Remover</th>
                                 </tr>
                             </thead>
-                            <tbody id="corpo-carrinho-pdv">
+                            <tbody id="corpo-carrinho-pdv" aria-live="polite" aria-relevant="all">
                                 </tbody>
                         </table>
                     </div>
@@ -248,17 +249,31 @@
                             <div><input type="number" id="desconto-manual-percentual" min="0" max="100" step="0.01" placeholder="Ex.: 10"><button type="button" id="aplicar-desconto-manual">Aplicar</button><button type="button" id="cancelar-desconto-manual">Cancelar</button></div>
                         </div>
                         <p id="pdv-desconto-status" class="pdv-desconto-status" aria-live="polite"></p>
-                        <div class="linha-total" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:18px;">
-                            <span>Total Final:</span>
-                            <strong id="pdv-total-geral" style="font-size:24px; color:#1e1b4b;">R$ 0,00</strong>
+                        <div class="pdv-finalizar-sticky">
+                            <div class="linha-total" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; font-size:18px;">
+                                <span>Total Final:</span>
+                                <strong id="pdv-total-geral" style="font-size:24px; color:#1e1b4b;">R$ 0,00</strong>
+                            </div>
+                            <button type="submit" id="btn-salvar-venda-banco" class="btn-salvar-venda-final" disabled style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer; opacity:0.6;">
+                                <i class="fa-solid fa-check"></i> Finalizar e Emitir Cupom
+                            </button>
                         </div>
-                        <button type="submit" id="btn-salvar-venda-banco" class="btn-salvar-venda-final" disabled style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer; opacity:0.6;">
-                            <i class="fa-solid fa-check"></i> Finalizar e Emitir Cupom
-                        </button>
                     </div>
                 </form>
             </div>
         </div>
+    </div>
+
+    <div id="pdv-confirmacao-modal" class="pdv-confirmacao-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="pdv-confirmacao-titulo">
+        <section class="pdv-confirmacao-card">
+            <h2 id="pdv-confirmacao-titulo">Confirme os dados da venda</h2>
+            <p id="pdv-confirmacao-loja"></p><p id="pdv-confirmacao-cliente"></p>
+            <ul id="pdv-confirmacao-itens"></ul>
+            <p id="pdv-confirmacao-desconto"></p>
+            <p class="pdv-confirmacao-total">Total: <strong id="pdv-confirmacao-total"></strong></p>
+            <p id="pdv-confirmacao-pagamento"></p>
+            <div class="pdv-confirmacao-acoes"><button type="button" id="pdv-confirmacao-cancelar">Voltar e revisar</button><button type="button" id="pdv-confirmacao-confirmar">Confirmar venda</button></div>
+        </section>
     </div>
 
     <div id="catalogo-pdv-modal" hidden role="dialog" aria-modal="true" aria-labelledby="catalogo-pdv-titulo" style="position:fixed; inset:0; z-index:1000; background:rgba(15,23,42,.6); padding:24px; overflow:auto;">
@@ -273,7 +288,7 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=manual-discount-1"></script>
+    <script src="/static/javascript/vendas.js?v=pdv-ux-3"></script>
     <script src="/static/javascript/pix.js?v=discount-aware-2"></script>
     <script type="application/x-disabled">
         let carrinho = [];

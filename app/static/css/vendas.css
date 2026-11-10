@@ -733,3 +733,49 @@ body {
 .pdv-desconto-status { margin:0 0 10px; color:#6b21a8; font-size:13px; font-weight:700; }
 .pdv-desconto-erro { margin:12px 0; color:#b91c1c; font-weight:700; }
 @media (max-width:520px) { .pdv-acoes-desconto { flex-direction:column; } .pdv-desconto-manual > div { flex-wrap:wrap; } }
+
+/* Ajustes de uso do PDV, mantendo as cores e superfícies do tema Cana Mania. */
+.pdv-ajuda-carrinho { margin: -8px 0 12px; color: #647267; font-size: .88rem; }
+.pdv-qtd-carrinho { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.pdv-qtd-carrinho button { min-width: 34px; min-height: 34px; padding: 4px 9px; border: 1px solid #d5ddd7; border-radius: 8px; background: #f5f8f5; color: #173c2a; font-weight: 800; cursor: pointer; }
+.pdv-qtd-carrinho input { width: 58px; min-height: 34px; padding: 4px; border: 1px solid #d5ddd7; border-radius: 7px; text-align: center; }
+.pdv-remover-texto { white-space: nowrap; }
+#resultado-busca-frozen [role="option"]:focus-visible, #grade-catalogo-pdv button:focus-visible { outline: 3px solid #ff1877; outline-offset: 2px; }
+#resultado-busca-frozen [role="option"] small { text-align: right; }
+#pagamento-dividido-resumo { min-height: 1.4em; font-weight: 650; }
+html[data-theme="dark"] .pdv-ajuda-carrinho { color: #b7c8bb; }
+html[data-theme="dark"] .pdv-qtd-carrinho button { background: #1c2b1f; color: #e8f2e9; border-color: #416847; }
+html[data-theme="dark"] .pdv-qtd-carrinho input { background: #0e1510; color: #f5f7f4; border-color: #416847; }
+html[data-theme="dark"] #catalogo-pdv-modal > section { background: #141d17 !important; color: #edf5ec; }
+html[data-theme="dark"] #catalogo-pdv-modal [data-produto-id] { background: #18251c !important; color: #edf5ec !important; border-color: #365840 !important; }
+html[data-theme="dark"] #catalogo-pdv-modal input { background: #0e1510 !important; color: #f5f7f4 !important; border-color: #3a5541 !important; }
+.pdv-qtd-carrinho button { background: #f5f8f5 !important; color: #173c2a !important; border: 1px solid #d5ddd7 !important; box-shadow: none !important; }
+.pdv-confirmacao-overlay { position: fixed; inset: 0; z-index: 1100; display: grid; place-items: center; padding: 18px; background: rgba(10,20,14,.68); }
+.pdv-confirmacao-overlay[hidden] { display: none; }
+.pdv-confirmacao-card { width: min(100%, 520px); max-height: min(85vh, 720px); overflow: auto; padding: 24px; border: 1px solid #dce5dd; border-radius: 16px; background: #fff; color: #17251b; box-shadow: 0 24px 70px rgba(0,0,0,.3); }
+.pdv-confirmacao-card h2 { margin: 0 0 16px; color: #083d2c; }
+.pdv-confirmacao-card p { margin: 8px 0; }
+.pdv-confirmacao-card ul { max-height: 220px; overflow: auto; padding: 12px 12px 12px 30px; border-radius: 9px; background: #f4f8f4; }
+.pdv-confirmacao-total { padding-top: 10px; border-top: 1px solid #dce5dd; font-size: 1.15rem; }
+.pdv-confirmacao-acoes { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.pdv-confirmacao-acoes button { min-height: 44px; padding: 10px 14px; }
+html[data-theme="dark"] .pdv-confirmacao-card { background: #141d17; color: #edf5ec; border-color: #365840; }
+html[data-theme="dark"] .pdv-confirmacao-card h2 { color: #d7fbb3; }
+html[data-theme="dark"] .pdv-confirmacao-card ul { background: #0e1510; }
+html[data-theme="dark"] .pdv-confirmacao-total { border-color: #365840; }
+html[data-theme="dark"] .pdv-qtd-carrinho button { background: #1c2b1f !important; color: #e8f2e9 !important; border-color: #416847 !important; }
+@media (max-width: 640px) {
+  .pdv-box-carrinho { overflow: visible; }
+  .mini-tabela-pdv { min-width: 0 !important; table-layout: fixed; }
+  .mini-tabela-pdv th, .mini-tabela-pdv td { padding: 7px !important; overflow-wrap: anywhere; }
+  .pdv-qtd-carrinho { gap: 3px; }
+  .pdv-qtd-carrinho button { min-width: 30px; min-height: 38px; }
+  .pdv-qtd-carrinho input { width: 44px; min-height: 38px; }
+  .pdv-remover-texto { display: none; }
+  .pdv-finalizar-sticky { position: sticky; bottom: 0; z-index: 5; margin: 0 -16px -16px; padding: 12px 16px max(12px, env(safe-area-inset-bottom)); border-top: 1px solid #d8e2da; border-radius: 0 0 12px 12px; background: var(--cana-surface, #fff); box-shadow: 0 -10px 24px rgba(8,61,44,.12); }
+  .pdv-finalizar-sticky .linha-total { margin-bottom: 8px !important; }
+  .pdv-finalizar-sticky #pdv-total-geral { font-size: 22px !important; }
+  html[data-theme="dark"] .pdv-finalizar-sticky { border-color: #365840; background: #141d17; box-shadow: 0 -10px 24px rgba(0,0,0,.35); }
+  .pdv-confirmacao-acoes { flex-direction: column-reverse; }
+  .pdv-confirmacao-acoes button { width: 100%; }
+}
