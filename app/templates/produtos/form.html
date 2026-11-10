@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ "Editar consumo" if editando else "Novo consumo" }} | Canamania</title>
-    <link rel="stylesheet" href="/static/css/form_produtos.css?v=canamania-2">
+    <link rel="stylesheet" href="/static/css/form_produtos.css?v=consumo-editor-3">
     <link rel="stylesheet" href="/static/css/responsive.css?v=1">
 </head>
 <body>
@@ -18,7 +18,7 @@
                     <div class="form-group"><label for="preco">Preço de venda (R$)</label><input id="preco" name="preco" type="number" step="0.01" min="0" required value="{{ editando.preco if editando else (valores.preco if valores else '0.00') }}"></div>
                     <div class="form-group"><label for="estoque_atual">Estoque inicial</label><input id="estoque_atual" name="estoque_atual" type="number" min="0" required value="{{ editando.estoque_atual if editando else (valores.estoque_atual if valores else '0') }}"><small>Depois, distribua o estoque entre as filiais.</small></div>
                     <div class="form-group full-width"><label for="categoria_id">Categoria</label><select id="categoria_id" name="categoria_id"><option value="0">Sem categoria</option>{% for categoria in categorias %}<option value="{{ categoria.id }}" {{ 'selected' if (editando and editando.categoria_id == categoria.id) or (valores and valores.categoria_id == categoria.id) else '' }}>{{ categoria.nome }}</option>{% endfor %}</select></div>
-                    <div class="form-group full-width">{% if editando and editando.imagem_path %}<div class="current-image-container"><img src="{{ editando.imagem_url }}" alt="{{ editando.nome }}" class="current-image-preview"><span>Envie outra imagem somente se quiser substituí-la.</span></div>{% endif %}<label for="imagem">Imagem do consumo</label><input id="imagem" name="imagem" type="file" accept=".jpg,.jpeg,.png,.webp"></div>
+                    <div class="form-group full-width">{% if editando and editando.imagem_path %}<div class="current-image-container"><img src="{{ editando.imagem_url }}" alt="{{ editando.nome }}" class="current-image-preview"><span>Envie outra imagem somente se quiser substituí-la.</span></div>{% endif %}<label for="imagem">Imagem do consumo</label><input id="imagem" name="imagem" type="file" accept=".jpg,.jpeg,.png,.webp,.avif,image/avif"><small>Formatos aceitos: JPG, PNG, WebP e AVIF.</small></div>
                 </div>
                 <div class="form-actions"><button class="btn-submit" type="submit">{{ "Salvar alterações" if editando else "Criar consumo" }}</button><a class="btn-cancel" href="/produtos">Cancelar</a></div>
             </form>
