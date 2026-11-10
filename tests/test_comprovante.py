@@ -32,8 +32,17 @@ class ComprovanteTests(unittest.TestCase):
                 self.assertIn("Cookie", html)
                 self.assertIn("Imprimir Recibo", html)
                 if dividido:
-                    self.assertIn("Pix (R$ 10,25)", html)
-                    self.assertIn("Dinheiro (R$ 10,25)", html)
+                    dinheiro = html.index("<span>Dinheiro</span>")
+                    primeiro_valor = html.index("<strong>R$ 10,25</strong>", dinheiro)
+                    pix = html.index("<span>Pix</span>", primeiro_valor)
+                    segundo_valor = html.index("<strong>R$ 10,25</strong>", pix)
+                    self.assertLess(dinheiro, primeiro_valor)
+                    self.assertLess(primeiro_valor, pix)
+                    self.assertLess(pix, segundo_valor)
+                else:
+                    dinheiro = html.index("<span>Dinheiro</span>")
+                    valor = html.index("<strong>R$ 20,50</strong>", dinheiro)
+                    self.assertLess(dinheiro, valor)
 
 
 if __name__ == "__main__":

@@ -735,6 +735,15 @@ body {
 @media (max-width:520px) { .pdv-acoes-desconto { flex-direction:column; } .pdv-desconto-manual > div { flex-wrap:wrap; } }
 
 /* Ajustes de uso do PDV, mantendo as cores e superfícies do tema Cana Mania. */
+.cupom-pagamentos { display: grid; gap: 8px; margin-top: 10px; }
+.cupom-pagamentos-titulo { display: block; }
+.cupom-pagamento-item { display: flex; flex-direction: column; gap: 2px; padding: 7px 9px; border-left: 3px solid #ff1877; background: #f7faf7; }
+.cupom-pagamento-item strong { font-size: 1.05em; }
+.pdv-confirmacao-pagamentos { display: grid; gap: 8px; margin-top: 12px; }
+.pdv-confirmacao-pagamento-item { display: flex; flex-direction: column; gap: 3px; padding: 10px 12px; border-left: 3px solid #ff1877; border-radius: 7px; background: #f4f8f4; }
+.pdv-confirmacao-pagamento-item strong { font-size: 1.05rem; }
+html[data-theme="dark"] .cupom-pagamento-item,
+html[data-theme="dark"] .pdv-confirmacao-pagamento-item { background: #0e1510; color: #edf5ec; }
 .pdv-ajuda-carrinho { margin: -8px 0 12px; color: #647267; font-size: .88rem; }
 .pdv-qtd-carrinho { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .pdv-qtd-carrinho button { min-width: 34px; min-height: 34px; padding: 4px 9px; border: 1px solid #d5ddd7; border-radius: 8px; background: #f5f8f5; color: #173c2a; font-weight: 800; cursor: pointer; }

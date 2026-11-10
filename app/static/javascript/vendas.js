@@ -228,16 +228,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!formulario.reportValidity()) return;
         const descontoConfirmacao = document.getElementById('pdv-linha-desconto').style.display !== 'none'
             ? `\n${document.getElementById('pdv-desconto-label').textContent} ${document.getElementById('pdv-desconto').textContent}` : '';
-        const pagamentoConfirmacao = dividirPagamento.checked
-            ? `${document.getElementById('forma_pagamento').selectedOptions[0]?.text}: R$ ${document.getElementById('valor_pagamento_1').value} + ${document.getElementById('forma_pagamento_2').selectedOptions[0]?.text}: R$ ${document.getElementById('valor_pagamento_2').value}`
-            : document.getElementById('forma_pagamento').selectedOptions[0]?.text;
+        const pagamento1 = document.getElementById('forma_pagamento');
+        const pagamentosConfirmacao = [{
+            forma: pagamento1.selectedOptions[0]?.text.trim(),
+            valor: dividirPagamento.checked ? Number(document.getElementById('valor_pagamento_1').value) : Number(document.getElementById('pdv-total-geral').textContent.replace(/[^\d,.]/g, '').replace(/\./g, '').replace(',', '.')),
+        }];
+        if (dividirPagamento.checked) {
+            const pagamento2 = document.getElementById('forma_pagamento_2');
+            pagamentosConfirmacao.push({ forma: pagamento2.selectedOptions[0]?.text.trim(), valor: Number(document.getElementById('valor_pagamento_2').value) });
+        }
         const confirmado = await confirmarVendaPDV({
             loja: filial.value,
             cliente: document.getElementById('select-cliente').selectedOptions[0]?.text.trim(),
             itens: carrinho.map(item => `${item.quantidade} x ${item.nome}${item.tamanho ? ` (${item.tamanho}, ${item.cor})` : ''}`),
             desconto: descontoConfirmacao,
             total: document.getElementById('pdv-total-geral').textContent,
-            pagamento: pagamentoConfirmacao,
+            pagamentos: pagamentosConfirmacao,
         });
         if (!confirmado) return;
 
@@ -346,7 +352,13 @@ function confirmarVendaPDV(dados) {
     document.getElementById('pdv-confirmacao-itens').replaceChildren(...dados.itens.map(item => { const li = document.createElement('li'); li.textContent = item; return li; }));
     document.getElementById('pdv-confirmacao-desconto').textContent = dados.desconto.trim();
     document.getElementById('pdv-confirmacao-total').textContent = dados.total;
-    document.getElementById('pdv-confirmacao-pagamento').textContent = `Pagamento: ${dados.pagamento}`;
+    const listaPagamentos = document.getElementById('pdv-confirmacao-pagamento');
+    listaPagamentos.replaceChildren(...dados.pagamentos.map(pagamento => {
+        const item = document.createElement('div'); item.className = 'pdv-confirmacao-pagamento-item';
+        const forma = document.createElement('span'); forma.textContent = pagamento.forma;
+        const valor = document.createElement('strong'); valor.textContent = Number(pagamento.valor).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+        item.append(forma, valor); return item;
+    }));
     modal.hidden = false;
     botaoCancelar.focus();
     return new Promise(resolve => {
