@@ -7,10 +7,14 @@
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>Comprovante de Venda #{{ venda.id }}</title>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <link rel="stylesheet" href="/static/css/vendas.css?v=recibo-mobile-1">
     <link rel="stylesheet" href="/static/css/feedback.css?v=1">
 =======
     <link rel="stylesheet" href="/static/css/vendas.css?v=receipt-dark-1">
+=======
+    <link rel="stylesheet" href="/static/css/vendas.css?v=payment-stack-1">
+>>>>>>> 5ccfec966c898054f2852d09b45ec19e4b112eb1
     <link rel="stylesheet" href="/static/css/feedback.css?v=3">
     <link rel="stylesheet" href="/static/css/feedback-progress.css?v=2">
 >>>>>>> 75340af54b69bca606789c08f603f9f25e3ed4b4
@@ -91,7 +95,21 @@
                 <strong>DATA/HORA:</strong> {{ venda.criado_em|data_hora_brasilia }}<br>
                 <strong>CLIENTE:</strong> {{ venda.cliente.nome if venda.cliente else "Consumidor Geral" }}<br>
                 <strong>OPERADOR:</strong> {{ venda.usuario.nome if venda.usuario else "Não informado" }}
-                {% if venda.forma_pagamento %}<br><strong>PAGAMENTO:</strong> {{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite', 'cortesia': 'Cortesia'}.get(venda.forma_pagamento, venda.forma_pagamento) }}{% if venda.forma_pagamento_2 %} (R$ {{ '%.2f'|format(venda.valor_pagamento_1 or 0)|replace('.', ',') }}) + {{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite'}.get(venda.forma_pagamento_2, venda.forma_pagamento_2) }} (R$ {{ '%.2f'|format(venda.valor_pagamento_2 or 0)|replace('.', ',') }}){% endif %}{% endif %}
+                {% if venda.forma_pagamento %}
+                <div class="cupom-pagamentos">
+                    <strong class="cupom-pagamentos-titulo">PAGAMENTO</strong>
+                    <div class="cupom-pagamento-item">
+                        <span>{{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite', 'cortesia': 'Cortesia'}.get(venda.forma_pagamento, venda.forma_pagamento) }}</span>
+                        <strong>R$ {{ '%.2f'|format(venda.valor_pagamento_1 if venda.forma_pagamento_2 else venda.total_liquido)|replace('.', ',') }}</strong>
+                    </div>
+                    {% if venda.forma_pagamento_2 %}
+                    <div class="cupom-pagamento-item">
+                        <span>{{ {'credito': 'Cartão de crédito', 'debito': 'Cartão de débito', 'dinheiro': 'Dinheiro', 'pix': 'Pix', 'convite': 'Convite'}.get(venda.forma_pagamento_2, venda.forma_pagamento_2) }}</span>
+                        <strong>R$ {{ '%.2f'|format(venda.valor_pagamento_2 or 0)|replace('.', ',') }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
 
             <div style="border-bottom: 1px dashed #ccc; margin: 15px 0;"></div>

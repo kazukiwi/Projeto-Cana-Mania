@@ -1,3 +1,5 @@
+window.__logoutConfirmInitialized = true;
+
 document.addEventListener('DOMContentLoaded', () => {
     const boasVindas = document.getElementById('feedback-bem-vindo');
 

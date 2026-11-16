@@ -2,6 +2,16 @@
 html { -webkit-text-size-adjust: 100%; }
 img, svg, video, canvas { max-width: 100%; height: auto; }
 button, input, select, textarea { font: inherit; }
+html, body { max-width: 100%; }
+main, section, article, aside, form, fieldset, header, footer, nav,
+.container, .page, .main-content, .main-content > *, .page-header > *,
+.form-container, .card, .panel, .surface, .dashboard, .produtos-container-main,
+.vendas-container-main, .clientes-container, .armarios-page { min-width: 0; }
+input, select, textarea, button { max-width: 100%; }
+pre, code, a, p, td, th, label, small { overflow-wrap: anywhere; }
+.table-shell, .table-container, .tabela, .tabela-container, .tabela-vendas,
+.table-shell, .tabela-reservas-wrap, .mini-tabela-wrapper, .stock-table-wrap,
+.table-responsive, .table-wrapper { min-width: 0; }
 .menu-toggle { display: none; }
 .table-shell, .table-container, .tabela, .tabela-container,
 .tabela-reservas-wrap, .mini-tabela-wrapper, .stock-table-wrap {
@@ -14,6 +24,12 @@ button, input, select, textarea { font: inherit; }
   .dashboard, .produtos-container-main, .clientes-container, .vendas-container-main, .main-content, .page { padding-left: 24px !important; padding-right: 24px !important; }
   .armarios-page { width: min(100% - 32px, 1180px); }
   .cards-resumo-container, .indicadores-grid, .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .branch-cards { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .stock-grid, .graficos-grid-layout, .variacoes-preview-panel { grid-template-columns: 1fr !important; }
+  .product-container, .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .filtros-container, .filtros-vendas-container, .historico-filtros { flex-wrap: wrap; }
+  .filtros-container > *, .filtros-vendas-container > *, .historico-filtros > * { min-width: 0; }
+  .transfer-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .table-shell table, .table-container table, .tabela table, .tabela-container table, .tabela-reservas, .mini-tabela-pdv { min-width: 680px; }
   .modal-content, .modal-content-pdv, .modal-card { max-height: calc(100vh - 32px); overflow-y: auto; }
 }
@@ -21,14 +37,26 @@ button, input, select, textarea { font: inherit; }
 @media (max-width: 640px) {
   body { overflow-x: hidden; }
   main, section, article, form, fieldset { min-width: 0; }
+  .main-content, .cana-page, .page, .erro-page { width: 100%; max-width: 100%; }
+  .main-content { padding: 24px 14px !important; }
+  .cana-page, .page { padding: 24px 14px !important; }
+  .form-container, .surface, .card, .panel, .table-container, .tabela-container { max-width: 100%; }
+  .form-container, .surface { padding: 18px !important; }
   .dashboard, .produtos-container-main, .clientes-container, .vendas-container-main, .main-content, .page { padding: 22px 16px !important; }
   .armarios-page { width: min(100% - 24px, 1180px); padding-top: 24px; }
   h1, .page-title h1, .header h1, .header-produtos h1 { font-size: clamp(24px, 7vw, 30px) !important; }
   .cards-resumo-container, .indicadores-grid, .summary-grid { grid-template-columns: 1fr !important; }
+  .branch-cards, .stock-grid, .graficos-grid-layout, .product-container,
+  .variacoes-preview-panel, .form-grid, .transfer-form { grid-template-columns: 1fr !important; }
+  .transfer-form button { grid-column: auto; }
   .header, .header-produtos, .page-header, .header-vendas, .topo, .acoes-historico { flex-direction: column; align-items: stretch !important; }
   .header-produtos > *, .page-header > *, .header-vendas > *, .acoes-historico > *, .topo > * { width: 100%; justify-content: center; }
   .filtros-container, .filters, .filtros, .historico-filtros, .listagem-acoes { flex-direction: column; align-items: stretch; }
   .filtros-container input, .filtros-container select, .filters input, .filters select, .historico-filtros input, .historico-filtros select, .listagem-ordem { width: 100% !important; }
+  .filtros-container > *, .filtros-vendas-container > *, .historico-filtros > *, .transfer-form > * { width: 100%; }
+  .form-actions, .form-actions button, .form-actions a, .page-header a, .page-header button { min-height: 44px; }
+  .current-image-container img, .image-wrapper img { max-height: 320px; object-fit: contain; }
+  .product-container { gap: 18px !important; }
   .paginacao { justify-content: center; text-align: center; }
   .paginacao div { justify-content: center; flex-wrap: wrap; }
   .modal-overlay, .modal-finalizar-dia, .modal-confirmacao-acao { padding: 12px; }
@@ -36,19 +64,33 @@ button, input, select, textarea { font: inherit; }
   .form-grid, .form-row, .form-row-split, .pdv-layout-split { grid-template-columns: 1fr !important; flex-direction: column; }
   .form-actions, .modal-actions, .feedback-modal-acoes { flex-wrap: wrap; }
   .form-actions > *, .modal-actions > *, .feedback-modal-acoes > * { flex: 1 1 150px; }
+  .erro-acoes { flex-direction: column; }
+  .erro-acoes > * { width: 100%; }
+  .filtros-vendas-container { align-items: stretch; }
+  .filtros-vendas-container input, .filtros-vendas-container select, .filtros-vendas-container button { width: 100%; }
+}
+
+@media (max-width: 380px) {
+  .dashboard, .produtos-container-main, .clientes-container, .vendas-container-main,
+  .main-content, .page, .cana-page { padding-left: 12px !important; padding-right: 12px !important; }
+  .form-container, .surface { padding: 14px !important; }
+  .table-shell table, .table-container table, .tabela table, .tabela-container table,
+  .tabela-reservas, .mini-tabela-pdv { min-width: 600px; }
 }
 
 /* Navegação recolhível e painéis fluidos em celulares. */
-@media (max-width: 760px) {
-  .navbar { min-height: 68px !important; padding: 12px 16px !important; flex-direction: row !important; flex-wrap: wrap; gap: 8px !important; }
-  .menu-toggle { display: inline-grid; place-items: center; width: 44px; height: 44px; border: 1px solid #dbe5df; border-radius: 10px; background: var(--cana-surface); color: var(--cana-green); font-size: 20px; cursor: pointer; }
-  .menu-toggle:focus-visible { outline: 3px solid rgba(255,24,119,.28); outline-offset: 2px; }
-  .menu { display: none !important; width: 100%; order: 3; padding: 10px 0 2px !important; border-top: 1px solid rgba(8,61,44,.12); }
-  .menu.menu-aberto { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px !important; }
-  .menu li { min-width: 0; }
-  .menu a, .menu .theme-toggle { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; padding: 8px !important; text-align: center; }
-  .menu .btn-sair { justify-content: center; }
-  .theme-toggle { margin-inline: auto; }
+@media (max-width: 900px) {
+  header .navbar { width: 100%; min-height: 68px !important; height: auto !important; padding: 10px 16px !important; flex-direction: row !important; flex-wrap: wrap; justify-content: space-between !important; gap: 8px !important; }
+  header .navbar .logo { flex: 1 1 auto; min-width: 0; }
+  header .navbar .wordmark { display: inline-block; font-size: clamp(1.2rem, 5vw, 1.55rem); }
+  header .navbar .menu-toggle { display: inline-grid !important; flex: 0 0 44px; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #dbe5df; border-radius: 10px; background: var(--cana-surface); color: var(--cana-green); font-size: 20px; cursor: pointer; }
+  header .navbar .menu-toggle:focus-visible { outline: 3px solid rgba(255,24,119,.28); outline-offset: 2px; }
+  header .navbar .menu { display: none !important; flex: 0 0 100%; width: 100%; order: 3; margin: 0; padding: 10px 0 2px !important; border-top: 1px solid rgba(8,61,44,.12); }
+  header .navbar .menu.menu-aberto { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 12px !important; }
+  header .navbar .menu li { min-width: 0; }
+  header .navbar .menu a, header .navbar .menu .theme-toggle { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: center; padding: 8px !important; text-align: center; }
+  header .navbar .menu .btn-sair { justify-content: center; }
+  header .navbar .theme-toggle { margin-inline: auto; }
   .pdv-layout-split { display: flex !important; flex-direction: column !important; gap: 14px !important; }
   .pdv-box-cadastro, .pdv-box-carrinho { width: 100%; min-width: 0; padding: 16px !important; }
   #catalogo-pdv-modal { padding: 10px !important; }
@@ -58,12 +100,12 @@ button, input, select, textarea { font: inherit; }
 }
 
 @media (max-width: 420px) {
-  .menu.menu-aberto { grid-template-columns: 1fr; }
+  header .navbar .menu.menu-aberto { grid-template-columns: 1fr; }
   #grade-catalogo-pdv { grid-template-columns: 1fr !important; }
   .vendas-container-main [style*="justify-content:space-between"] { gap: 10px; flex-wrap: wrap; }
   .vendas-container-main [style*="display:flex"] { min-width: 0; }
   .main-footer { padding: 16px 12px; }
-  .menu { gap: 10px 14px; }.menu a { font-size: 14px; }
+  header .navbar .menu { gap: 10px 14px; } header .navbar .menu a { font-size: 14px; }
   .logo img { height: 56px; }
   .btn-novo-produto, .btn-primary, .btn-create, .btn-nova-venda, .btn-finalizar-dia { min-height: 44px; }
 }
