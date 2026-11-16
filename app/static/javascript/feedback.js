@@ -2,23 +2,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const boasVindas = document.getElementById('feedback-bem-vindo');
 
     if (boasVindas) {
-        boasVindas.classList.add('feedback-bem-vindo');
-        window.setTimeout(() => {
+        boasVindas.classList.add('feedback-bem-vindo', 'feedback-bem-vindo-ativo');
+        const fecharBoasVindas = () => {
             boasVindas.classList.add('feedback-bem-vindo-saindo');
             window.setTimeout(() => boasVindas.remove(), 350);
-        }, 2200);
+        };
+        boasVindas.querySelector('.feedback-bem-vindo-continuar')?.addEventListener('click', fecharBoasVindas);
+        window.setTimeout(() => {
+            if (document.body.contains(boasVindas)) fecharBoasVindas();
+        }, 4200);
     }
 
     let processando = false;
 
-    function mostrarProcessando(mensagem = 'Aguarde enquanto concluímos sua solicitação.') {
+    function mostrarProcessando(mensagem = 'Aguarde enquanto concluímos sua solicitação.', titulo = 'Processando...') {
         if (processando) return;
         processando = true;
         const modal = document.createElement('div');
         modal.className = 'feedback-processando-modal';
         modal.setAttribute('role', 'status');
         modal.setAttribute('aria-live', 'assertive');
-        modal.innerHTML = '<div class="feedback-processando-card"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><h2>Processando...</h2><p></p></div>';
+        modal.innerHTML = '<div class="feedback-processando-card"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><h2></h2><p></p><div class="feedback-processando-trilha" aria-hidden="true"><span></span></div></div>';
+        modal.querySelector('h2').textContent = titulo;
         modal.querySelector('p').textContent = mensagem;
         document.body.appendChild(modal);
     }
@@ -41,9 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('a[href]').forEach((link) => {
         link.addEventListener('click', (evento) => {
             const destino = link.getAttribute('href');
-            if (evento.defaultPrevented || !destino || destino.startsWith('#') || link.target === '_blank' || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) return;
+            if (evento.defaultPrevented || evento.button !== 0 || !destino || destino.startsWith('#') || link.target === '_blank' || link.hasAttribute('download') || evento.metaKey || evento.ctrlKey || evento.shiftKey || evento.altKey) return;
+            if (/^(mailto:|tel:|javascript:)/i.test(destino) || link.href === window.location.href) return;
             if (link.classList.contains('btn-sair')) return;
-            mostrarProcessando('Carregando a página solicitada.');
+            const texto = (link.textContent || '').trim().replace(/\s+/g, ' ');
+            mostrarProcessando(texto ? `Abrindo ${texto}...` : 'Preparando a próxima tela.', 'Carregando página...');
         });
     });
 
@@ -58,11 +65,16 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.innerHTML = '<div class="feedback-modal-card" role="dialog" aria-modal="true" aria-labelledby="feedback-saida-titulo"><div class="feedback-modal-icone"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i></div><h2 id="feedback-saida-titulo">Sair da conta?</h2><p>Você precisará entrar novamente para acessar o sistema.</p><div class="feedback-modal-acoes"><button type="button" class="feedback-modal-cancelar">Cancelar</button><button type="button" class="feedback-modal-confirmar">Sair</button></div></div>';
             document.body.appendChild(modal);
 
-            const fechar = () => modal.remove();
+            const fechar = () => { modal.remove(); link.focus(); };
             modal.querySelector('.feedback-modal-cancelar').addEventListener('click', fechar);
             modal.addEventListener('click', (clique) => { if (clique.target === modal) fechar(); });
-            modal.querySelector('.feedback-modal-confirmar').addEventListener('click', () => {
-                mostrarProcessando('Encerrando sua sessão.');
+            const confirmar = modal.querySelector('.feedback-modal-confirmar');
+            confirmar.focus();
+            modal.addEventListener('keydown', clique => { if (clique.key === 'Escape') fechar(); });
+            confirmar.addEventListener('click', () => {
+                confirmar.disabled = true;
+                confirmar.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Saindo...';
+                mostrarProcessando('Encerrando sua sessão.', 'Saindo da conta...');
                 window.location.assign(link.href);
             });
         });

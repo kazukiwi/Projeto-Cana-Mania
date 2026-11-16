@@ -48,11 +48,13 @@
     {% include "partials/navbar.html" %}
 
     {% if request.query_params.get('login') == 'ok' %}
-    <div id="feedback-bem-vindo" aria-hidden="false">
-        <div class="feedback-bem-vindo-card" role="status" aria-labelledby="feedback-bem-vindo-titulo">
+    <div id="feedback-bem-vindo" class="feedback-bem-vindo" aria-hidden="false">
+        <div class="feedback-bem-vindo-card" role="dialog" aria-modal="true" aria-labelledby="feedback-bem-vindo-titulo">
             <div class="feedback-bem-vindo-icone"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
             <h2 id="feedback-bem-vindo-titulo">Acesso realizado com sucesso!</h2>
             <p>Bem-vindo, {{ usuario.nome or 'ao sistema' }}. Seu acesso foi confirmado.</p>
+            <div class="feedback-bem-vindo-progresso" aria-hidden="true"><span></span></div>
+            <button type="button" class="feedback-bem-vindo-continuar">Continuar <i class="fa-solid fa-arrow-right"></i></button>
         </div>
     </div>
     {% endif %}
