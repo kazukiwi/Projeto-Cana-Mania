@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Insights | Canamania{% endblock %}
+{% block styles %}
+<style>
+.insights{max-width:1200px;margin:32px auto;padding:0 20px;color:#243229}.insights h1{margin:0 0 6px;font-size:clamp(1.6rem,3vw,2.2rem)}.insights .intro{color:#68756c;margin:0 0 24px}.insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:20px 0}.insight-card,.panel{background:#fff;border:1px solid #e1e9e2;border-radius:16px;padding:20px;box-shadow:0 5px 18px #1d39200a}.insight-card span{display:block;color:#68756c;font-size:.9rem}.insight-card strong{display:block;color:#174c31;font-size:1.8rem;margin-top:9px}.panel{margin:18px 0}.panel h2{font-size:1.15rem;margin:0 0 16px;color:#174c31}.client-form{display:flex;gap:10px;flex-wrap:wrap}.client-form input{min-width:200px;flex:1;border:1px solid #d3ded5;border-radius:10px;padding:12px;font:inherit}.insights button,.action{border:0;border-radius:10px;padding:11px 16px;background:#175b37;color:white;font:inherit;font-weight:700;text-decoration:none;cursor:pointer}.customer{margin-top:16px;padding:16px;border-radius:12px;background:#f1f8f2}.customer a{margin:8px 8px 0 0;display:inline-block}.bars{height:210px;display:grid;grid-template-columns:repeat(7,1fr);gap:12px;align-items:end;border-bottom:1px solid #dce6de;padding:8px 0}.bar-col{height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:6px;font-size:.78rem;color:#657267}.bar{width:min(42px,70%);min-height:8px;border-radius:8px 8px 2px 2px;background:linear-gradient(#a0d957,#397c36)}.bar-col b{font-size:.7rem}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:600px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #edf1ed}th{color:#637067;font-size:.84rem}.pill{display:inline-block;padding:5px 9px;border-radius:99px;background:#eaf5eb;color:#245c36;font-weight:700}.muted{color:#748078;font-size:.9rem}.dark-mode .insight-card,.dark-mode .panel{background:#202821;border-color:#39453b;color:#eef5ef}.dark-mode .insights{color:#eef5ef}.dark-mode .insights .intro,.dark-mode .insight-card span,.dark-mode .muted{color:#b4c0b5}.dark-mode .customer{background:#29382d}.dark-mode th,.dark-mode td{border-color:#39453b}.dark-mode .bars{border-color:#39453b}@media(max-width:760px){.insight-grid{grid-template-columns:1fr}.insights{margin:20px auto;padding:0 14px}.bars{gap:4px}}
+</style>
+{% endblock %}
+{% block content %}
+<main class="insights">
+  <h1>Visão da loja</h1><p class="intro">Vendas recentes, estimativas de demanda e apoio para reposição de estoque.</p>
+  <section class="insight-grid" aria-label="Resumo de vendas">
+    <article class="insight-card"><span>Vendas nos últimos 30 dias</span><strong>{{ vendas_30 }}</strong></article>
+    <article class="insight-card"><span>Faturamento nos últimos 30 dias</span><strong>R$ {{ '%.2f'|format(receita_30)|replace('.', ',') }}</strong></article>
+    <article class="insight-card"><span>Previsão de vendas para 7 dias</span><strong>{{ previsao_7 }}</strong><span>estimativa baseada na média dos últimos 30 dias</span></article>
+  </section>
+  <section class="panel"><h2>Vendas por dia</h2><div class="bars" role="img" aria-label="Gráfico de faturamento dos últimos sete dias">
+    {% for dia in grafico %}<div class="bar-col" title="{{ dia.vendas }} vendas"><b>R$ {{ '%.0f'|format(dia.receita) }}</b><div class="bar" style="height:{{ dia.altura }}%"></div><span>{{ dia.dia }}</span></div>{% endfor %}
+  </div></section>
+  <section class="panel"><h2>Chamar cliente pelo ID</h2><p class="muted">Informe o ID cadastrado para localizar o telefone e iniciar uma ligação ou conversa.</p>
+    <form class="client-form" method="get" action="/insights/"><input name="cliente_id" type="number" min="1" required placeholder="ID do cliente" value="{{ cliente_id or '' }}"><button type="submit">Buscar cliente</button></form>
+    {% if cliente_id and not cliente %}<p role="status">Cliente ativo com esse ID não foi encontrado.</p>{% endif %}
+    {% if cliente %}<div class="customer"><strong>{{ cliente.nome }}</strong> <span class="muted">· ID {{ cliente.id }}</span><p>{{ cliente.telefone or 'Telefone não cadastrado' }}</p>{% if telefone_limpo %}<a class="action" href="tel:{{ telefone_limpo }}">Ligar</a>{% if whatsapp %}<a class="action" href="{{ whatsapp }}" target="_blank" rel="noopener">WhatsApp</a>{% endif %}{% endif %}</div>{% endif %}
+  </section>
+  <section class="panel"><h2>Reposição sugerida</h2><p class="muted">Sugestão para cobrir 14 dias de demanda, calculada pela venda dos últimos 30 dias e o saldo atual. Use como referência antes de comprar.</p>
+    <div class="table-wrap"><table><thead><tr><th>Produto</th><th>Vendido em 30 dias</th><th>Estoque atual</th><th>Previsão (7 dias)</th><th>Reposição sugerida</th></tr></thead><tbody>
+    {% for item in recomendacoes %}<tr><td>{{ item.nome }}</td><td>{{ item.vendidos }}</td><td>{{ item.estoque }}</td><td>{{ item.previsao }}</td><td>{% if item.sugerido %}<span class="pill">{{ item.sugerido }} unidades</span>{% else %}<span class="muted">Estoque suficiente</span>{% endif %}</td></tr>{% else %}<tr><td colspan="5">Ainda não há vendas de produtos nos últimos 30 dias para calcular sugestões.</td></tr>{% endfor %}
+    </tbody></table></div><p><a class="action" href="/estoque/">Abrir gerenciamento de estoque</a></p>
+  </section>
+</main>
+{% endblock %}
