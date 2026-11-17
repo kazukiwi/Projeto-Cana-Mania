@@ -18,6 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const buscaReserva = document.getElementById("busca-reserva");
     const filtroSemestre = document.getElementById("filtro-semestre");
     const btnDesativarArmario = document.getElementById("btn-desativar-armario");
+    const btnAtivarArmario = document.getElementById("btn-ativar-armario");
+    const btnSalvarArmario = form ? form.querySelector("button[type='submit']") : null;
     const modalConfirmacao = document.getElementById("modal-confirmacao");
     const formConfirmacao = document.getElementById("form-confirmacao");
     const textoConfirmacao = document.getElementById("confirmacao-texto");
@@ -63,11 +65,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const filial = card.getAttribute("data-filial") || "";
         const observacoes = card.getAttribute("data-observacoes") || "";
 
-        if (modalTitulo) modalTitulo.textContent = "M?quina " + numero;
+        const desativada = status === "desativado";
+        if (modalTitulo) modalTitulo.textContent = "M\u00e1quina " + numero;
         if (modalSubtitulo) modalSubtitulo.textContent = "Estado atual: " + status;
         if (modalInfo) modalInfo.textContent = "Filial: " + filial;
         if (inputArmarioId) inputArmarioId.value = card.getAttribute("data-id") || "";
-        if (selectStatus) selectStatus.value = status;
+        if (selectStatus) {
+            selectStatus.value = desativada ? "disponivel" : status;
+            selectStatus.disabled = desativada;
+        }
+        if (btnDesativarArmario) btnDesativarArmario.hidden = desativada;
+        if (btnAtivarArmario) btnAtivarArmario.hidden = !desativada;
+        if (btnSalvarArmario) btnSalvarArmario.hidden = desativada;
         if (selectFilial) selectFilial.value = filial;
         if (inputObservacoes) inputObservacoes.value = observacoes;
 
@@ -128,6 +137,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (modal) {
         modal.addEventListener("click", function (event) {
             if (event.target === modal) fecharModal();
+        });
+    }
+    if (btnAtivarArmario) {
+        btnAtivarArmario.addEventListener("click", function () {
+            const id = inputArmarioId?.value;
+            const numero = modalTitulo?.textContent.replace("M\u00e1quina ", "") || "";
+            if (id) abrirConfirmacao(`/armarios/${id}/ativar`, "Ativar m\u00e1quina?", `A m\u00e1quina ${numero} voltar\u00e1 a ficar dispon\u00edvel.`, "Ativar m\u00e1quina");
         });
     }
     if (btnDesativarArmario) {

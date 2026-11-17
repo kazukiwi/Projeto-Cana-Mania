@@ -91,7 +91,7 @@ body {
 .header-vendas p { 
     color: #64748b; 
     font-size: 14px; 
-    margin-top: 4px; 
+    margin-top: 9px; 
 }
 
 .btn-nova-venda {
@@ -794,7 +794,8 @@ body {
 .pdv-confirmacao-pagamento-item strong { font-size: 1.05rem; }
 html[data-theme="dark"] .cupom-pagamento-item,
 html[data-theme="dark"] .pdv-confirmacao-pagamento-item { background: #0e1510; color: #edf5ec; }
-.pdv-ajuda-carrinho { margin: -8px 0 12px; color: #647267; font-size: .88rem; }
+.pdv-box-carrinho > div:first-child > h3 { margin: 0 0 6px; line-height: 1.3; }
+.pdv-box-carrinho > div:first-child > .pdv-ajuda-carrinho { margin: 0 0 14px; color: #647267; font-size: .88rem; line-height: 1.45; }
 .pdv-qtd-carrinho { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
 .pdv-qtd-carrinho button { min-width: 34px; min-height: 34px; padding: 4px 9px; border: 1px solid #d5ddd7; border-radius: 8px; background: #f5f8f5; color: #173c2a; font-weight: 800; cursor: pointer; }
 .pdv-qtd-carrinho input { width: 58px; min-height: 34px; padding: 4px; border: 1px solid #d5ddd7; border-radius: 7px; text-align: center; }

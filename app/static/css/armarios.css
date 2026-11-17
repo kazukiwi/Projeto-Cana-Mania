@@ -492,3 +492,15 @@ html[data-theme="dark"] .grupo-filial-resumo span { color: #d5e4d7; background: 
 html[data-theme="dark"] .grupo-filial-resumo .resumo-total { color: #d7fbb3; background: #203425; border-color: #426b4a; }
 @media (max-width: 460px) { .grid-armarios { grid-template-columns: repeat(2,minmax(0,1fr)); } .item-armario { min-height: 132px; } }
 @media (max-width: 720px) { .grupo-filial-cabecalho { align-items: flex-start; flex-direction: column; } .grupo-filial-resumo { justify-content: flex-start; } }
+
+/* Status colors stay consistent between cards, legend and both themes. */
+.dot-disponivel { background: #0aa95b; }
+.dot-ocupado { background: #3478e5; }
+.dot-manutencao { background: #f58a28; }
+.dot-desativado { background: #718096; }
+html[data-theme="dark"] .armarios-page .item-armario { color: #fff !important; }
+html[data-theme="dark"] .armarios-page .item-armario span { color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-disponivel { background: linear-gradient(135deg,#0aa95b,#087c46) !important; }
+html[data-theme="dark"] .item-armario.status-ocupado { background: linear-gradient(135deg,#3478e5,#2454b8) !important; }
+html[data-theme="dark"] .item-armario.status-manutencao { background: linear-gradient(135deg,#f58a28,#c65316) !important; }
+html[data-theme="dark"] .item-armario.status-desativado { background: linear-gradient(135deg,#718096,#475569) !important; }

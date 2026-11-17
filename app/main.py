@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
 from datetime import date, datetime
@@ -55,12 +56,18 @@ async def rotina_fechamento_diario():
 
 
 # 1º: CRIAR A INSTÂNCIA DO APP
-app = FastAPI(title="Sistema Estoque")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    tarefa_fechamento = asyncio.create_task(rotina_fechamento_diario())
+    try:
+        yield
+    finally:
+        tarefa_fechamento.cancel()
+        with suppress(asyncio.CancelledError):
+            await tarefa_fechamento
 
 
-@app.on_event("startup")
-async def iniciar_rotina_fechamento_diario():
-    asyncio.create_task(rotina_fechamento_diario())
+app = FastAPI(title="Sistema Estoque", lifespan=lifespan)
 
 # 2º: CONFIGURAR ARQUIVOS ESTÁTICOS E TEMPLATES
 APP_DIR = Path(__file__).resolve().parent
@@ -516,9 +523,16 @@ def cadastrar_armario(
     numero = numero.strip()
     if filial not in FILIAIS:
         return RedirectResponse(url="/armarios?erro=filial", status_code=303)
-    if not numero or db.query(Armario).filter(Armario.numero == numero).first():
+    try:
+        numero_inteiro = int(numero)
+    except (TypeError, ValueError):
         return RedirectResponse(url="/armarios?erro=numero", status_code=303)
-    db.add(Armario(numero=numero.zfill(2), status="disponivel", filial=filial))
+    if not 1 <= numero_inteiro <= 9999:
+        return RedirectResponse(url="/armarios?erro=numero", status_code=303)
+    numero = str(numero_inteiro).zfill(2)
+    if db.query(Armario).filter(Armario.numero == numero).first():
+        return RedirectResponse(url="/armarios?erro=numero", status_code=303)
+    db.add(Armario(numero=numero, status="disponivel", filial=filial))
     db.commit()
     return RedirectResponse(url="/armarios?armario=ok", status_code=303)
 
