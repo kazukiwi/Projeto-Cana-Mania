@@ -839,3 +839,31 @@ html[data-theme="dark"] .pdv-qtd-carrinho button { background: #1c2b1f !importan
   .pdv-confirmacao-acoes { flex-direction: column-reverse; }
   .pdv-confirmacao-acoes button { width: 100%; }
 }
+
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled) { background: #0b5c37 !important; color: #fff !important; border: 1px solid #083d2c !important; opacity: 1 !important; }
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover { background: #083d2c !important; }
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: #52695c !important; color: #edf4ef !important; border: 1px solid #43584b !important; opacity: .9 !important; cursor: not-allowed !important; }
+html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: #3b5144 !important; color: #e6efe8 !important; border-color: #52685a !important; }
+
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final { background: linear-gradient(135deg,#ff1877,#d90864) !important; color: #fff !important; border: 1px solid rgba(255,255,255,.34) !important; }
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover { background: linear-gradient(135deg,#c9085a,#083d2c) !important; }
+html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final { background: linear-gradient(135deg,#ff3c91,#71405c) !important; border-color: rgba(186,245,122,.22) !important; }
+html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover { background: linear-gradient(135deg,#baf57a,#0c6a42) !important; color: #061e15 !important; }
+
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: linear-gradient(135deg,#ff1877,#d90864) !important; color: #fff !important; border: 1px solid rgba(255,255,255,.34) !important; opacity: 1 !important; }
+html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: linear-gradient(135deg,#ff3c91,#71405c) !important; border-color: rgba(186,245,122,.22) !important; opacity: 1 !important; }
+
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: linear-gradient(135deg,#a84c70,#853b5b) !important; color: #fff !important; border-color: #78334f !important; opacity: 1 !important; cursor: not-allowed !important; }
+html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: linear-gradient(135deg,#87405f,#63324a) !important; color: #f1e7ec !important; border-color: #713751 !important; }
+
+html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final { background: linear-gradient(135deg,#ff1877,#d90864) !important; color: #fff !important; border-color: rgba(255,255,255,.34) !important; }
+html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: linear-gradient(135deg,#ff1877,#d90864) !important; color: #fff !important; border-color: rgba(255,255,255,.34) !important; }
+html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover { background: linear-gradient(135deg,#d90864,#a80750) !important; color: #fff !important; }
+
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final { background: linear-gradient(135deg,#ff1493,#ff007f) !important; color: #fff !important; border-color: rgba(255,255,255,.36) !important; }
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: linear-gradient(135deg,#ff1493,#ff007f) !important; color: #fff !important; border-color: rgba(255,255,255,.36) !important; }
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover { background: linear-gradient(135deg,#e60073,#cc0066) !important; color: #fff !important; }
+
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final { background: linear-gradient(135deg,#ff1877,#d90864) !important; color: #fff !important; border-color: rgba(255,255,255,.34) !important; }
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: linear-gradient(135deg,#ff1877,#d90864) !important; color: #fff !important; border-color: rgba(255,255,255,.34) !important; }
+body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover { background: linear-gradient(135deg,#d90864,#b50754) !important; color: #fff !important; }

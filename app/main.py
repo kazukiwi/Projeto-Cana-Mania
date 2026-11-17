@@ -465,6 +465,7 @@ def listar_armarios(
     disponiveis = db.query(Armario).filter(Armario.status == "disponivel").count()
     ocupados = db.query(Armario).filter(Armario.status == "ocupado").count()
     manutencao = db.query(Armario).filter(Armario.status == "manutencao").count()
+    desativados = db.query(Armario).filter(Armario.status == "desativado").count()
     armarios = db.query(Armario).order_by(Armario.id).all()
     reservas = (
         db.query(ReservaArmario)
@@ -483,6 +484,7 @@ def listar_armarios(
             "armarios_disponiveis": disponiveis,
             "armarios_ocupados": ocupados,
             "armarios_manutencao": manutencao,
+            "armarios_desativados": desativados,
             "filiais": FILIAIS,
             "reservas": reservas,
         }

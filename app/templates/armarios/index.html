@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>M&#225;quinas | Canamania</title>
-    <link rel="stylesheet" href="/static/css/armarios.css?v=8">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="/static/javascript/confirmar_saida.js" defer></script>
 </head>
 <body>
     {% include "partials/navbar.html" %}
+    <link rel="stylesheet" href="/static/css/armarios.css?v=24">
     <main class="armarios-page">
         <section class="page-title">
             <h1>M&#225;quinas Canamania</h1>
@@ -70,12 +70,14 @@
                 <div class="card-resumo card-disponivel"><div><span>Dispon&#237;veis</span><strong>{{ armarios_disponiveis }}</strong></div><i class="fa-solid fa-circle-check"></i></div>
                 <div class="card-resumo card-ocupado"><div><span>Em uso</span><strong>{{ armarios_ocupados }}</strong></div><i class="fa-solid fa-gears"></i></div>
                 <div class="card-resumo card-manutencao"><div><span>Manuten&#231;&#227;o</span><strong>{{ armarios_manutencao }}</strong></div><i class="fa-solid fa-screwdriver-wrench"></i></div>
+                <div class="card-resumo card-desativado"><div><span>Desativadas</span><strong>{{ armarios_desativados }}</strong></div><i class="fa-solid fa-power-off"></i></div>
             </section>
             <section class="filtro-bar"><span>Filtrar:</span>
                 <button type="button" class="btn-filtro active" data-filtro="">Todas</button>
                 <button type="button" class="btn-filtro" data-filtro="disponivel">Dispon&#237;veis</button>
                 <button type="button" class="btn-filtro" data-filtro="ocupado">Em uso</button>
                 <button type="button" class="btn-filtro" data-filtro="manutencao">Manuten&#231;&#227;o</button>
+                <button type="button" class="btn-filtro" data-filtro="desativado">Desativadas</button>
             </section>
             <section class="legenda-bar"><span>Estados:</span>
                 <span class="legenda-item"><i class="dot dot-disponivel"></i> Dispon&#237;vel</span>
@@ -89,6 +91,7 @@
                 {% set disponiveis_filial = maquinas_filial|selectattr('status', 'equalto', 'disponivel')|list %}
                 {% set ocupadas_filial = maquinas_filial|selectattr('status', 'equalto', 'ocupado')|list %}
                 {% set manutencao_filial = maquinas_filial|selectattr('status', 'equalto', 'manutencao')|list %}
+                {% set desativadas_filial = maquinas_filial|selectattr('status', 'equalto', 'desativado')|list %}
                 <section class="grupo-filial" aria-labelledby="titulo-filial-{{ loop.index }}">
                     <header class="grupo-filial-cabecalho">
                         <div class="grupo-filial-identidade"><div class="grupo-filial-icone"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></div><div><h2 id="titulo-filial-{{ loop.index }}">{{ filial }}</h2><p>Local das m&#225;quinas Canamania</p></div></div>
@@ -97,6 +100,7 @@
                             <span class="resumo-disponiveis"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> {{ disponiveis_filial|length }} dispon&#237;veis</span>
                             <span class="resumo-ocupadas"><i class="fa-solid fa-gears" aria-hidden="true"></i> {{ ocupadas_filial|length }} em uso</span>
                             <span class="resumo-manutencao"><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> {{ manutencao_filial|length }} em manuten&#231;&#227;o</span>
+                            <span class="resumo-desativadas"><i class="fa-solid fa-power-off" aria-hidden="true"></i> {{ desativadas_filial|length }} desativadas</span>
                         </div>
                     </header>
                     <div class="grid-shell"><div class="grid-armarios" id="grid-armarios-{{ loop.index }}">

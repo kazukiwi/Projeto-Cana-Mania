@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>PDV - Nova Venda</title>
-    <link rel="stylesheet" href="/static/css/vendas.css?v=pdv-ux-6">
+    <link rel="stylesheet" href="/static/css/vendas.css?v=pdv-ux-13">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="/static/javascript/confirmar_saida.js" defer></script>
 </head>
@@ -254,7 +254,7 @@
                                 <span>Total Final:</span>
                                 <strong id="pdv-total-geral" style="font-size:24px; color:#1e1b4b;">R$ 0,00</strong>
                             </div>
-                            <button type="submit" id="btn-salvar-venda-banco" class="btn-salvar-venda-final" disabled style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer; opacity:0.6;">
+                            <button type="submit" id="btn-salvar-venda-banco" class="btn-salvar-venda-final" disabled style="width:100%; padding:14px; background:#10b981; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer; opacity:1;">
                                 <i class="fa-solid fa-check"></i> Finalizar e Emitir Cupom
                             </button>
                         </div>
@@ -288,7 +288,7 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=pdv-ux-3"></script>
+    <script src="/static/javascript/vendas.js?v=pdv-ux-4"></script>
     <script src="/static/javascript/pix.js?v=discount-aware-2"></script>
     <script type="application/x-disabled">
         let carrinho = [];
@@ -448,7 +448,7 @@
             
             if (btnFinalizar) {
                 btnFinalizar.disabled = carrinho.length === 0;
-                btnFinalizar.style.opacity = carrinho.length === 0 ? "0.6" : "1";
+                btnFinalizar.style.opacity = "1";
             }
         }
 
