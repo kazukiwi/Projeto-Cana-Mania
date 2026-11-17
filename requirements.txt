@@ -11,3 +11,4 @@ python-jose[cryptography]
 psycopg2
 psycopg2-binary
 qrcode==8.2
+pyserial>=3.5,<4.0

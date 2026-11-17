@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Comprovante RFID de demonstração{% endblock %}
+{% block styles %}<style>
+.rfid-receipt{max-width:620px;margin:36px auto;padding:26px;border:1px solid #dfe8e0;border-radius:16px;background:#fff;color:#213329;box-shadow:0 8px 30px #1d392012}.rfid-receipt h1{margin-top:0}.rfid-receipt dl{display:grid;grid-template-columns:1fr auto;gap:12px}.rfid-receipt dt{color:#68756c}.rfid-receipt dd{margin:0;font-weight:700}.rfid-demo-warning{padding:12px;border-radius:9px;background:#fff5dc;color:#76520b}.rfid-receipt a{display:inline-block;padding:11px 16px;border-radius:9px;background:#17633d;color:#fff;text-decoration:none;font-weight:700}.dark-mode .rfid-receipt{background:#202821;color:#eef5ef;border-color:#39453b}.dark-mode .rfid-receipt dt{color:#b4c0b5}
+</style>{% endblock %}
+{% block content %}<main class="rfid-receipt">
+  <h1>Comprovante de compra simulada</h1>
+  <p class="rfid-demo-warning">Demonstração de saldo RFID. Não é pagamento bancário, não gera receita e não altera estoque.</p>
+  <dl><dt>Operação</dt><dd>{{ operacao.operacao_id }}</dd><dt>UID do cartão</dt><dd>{{ operacao.uid }}</dd><dt>Valor simulado</dt><dd>R$ {{ "%.2f"|format(operacao.valor_centavos / 100) }}</dd><dt>Saldo restante</dt><dd>R$ {{ "%.2f"|format((operacao.saldo_depois or 0) / 100) }}</dd><dt>Resultado</dt><dd>{{ operacao.status }}</dd></dl>
+  <a href="/pdv/">Voltar ao PDV</a>
+</main>{% endblock %}

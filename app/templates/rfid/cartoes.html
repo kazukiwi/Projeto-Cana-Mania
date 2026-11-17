@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Cartões RFID | Canamania{% endblock %}
+{% block styles %}
+<style>
+.rfid-page{max-width:1100px;margin:32px auto;padding:0 18px;color:#213329}.rfid-page h1{margin-bottom:6px}.rfid-muted{color:#68756c}.rfid-panel{background:#fff;border:1px solid #dfe8e0;border-radius:14px;padding:20px;margin:18px 0;box-shadow:0 5px 18px #1d39200a}.rfid-actions,.rfid-form{display:flex;flex-wrap:wrap;gap:10px;align-items:end}.rfid-page button{border:0;border-radius:9px;background:#17633d;color:#fff;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer}.rfid-page button:disabled{opacity:.6;cursor:wait}.rfid-page input{padding:10px;border:1px solid #cbd8cd;border-radius:8px;font:inherit}.rfid-page label{display:grid;gap:6px;font-size:.9rem;font-weight:700}.rfid-form label{flex:1;min-width:180px}.rfid-status{min-height:24px;color:#245c36}.rfid-card{padding:14px;background:#f1f8f2;border-radius:10px;margin-top:14px}.rfid-table{width:100%;border-collapse:collapse;margin-top:12px}.rfid-table th,.rfid-table td{text-align:left;padding:9px;border-bottom:1px solid #e5ece6}.rfid-hidden[hidden]{display:none}.rfid-sim-note{font-size:.85rem;color:#68756c}.dark-mode .rfid-page{color:#eef5ef}.dark-mode .rfid-panel{background:#202821;border-color:#39453b}.dark-mode .rfid-card{background:#29382d}.dark-mode .rfid-muted,.dark-mode .rfid-sim-note{color:#b4c0b5}
+</style>
+{% endblock %}
+{% block content %}
+<main class="rfid-page">
+  <h1>Cartões RFID</h1>
+  <p class="rfid-muted">Cadastre cartões de demonstração, consulte saldos fictícios e registre recargas. O saldo fica no banco do sistema, nunca no chip.</p>
+  <section class="rfid-panel">
+    <div class="rfid-actions"><button type="button" id="rfid-ler">Ler cartão</button><button type="button" id="rfid-cancelar" hidden>Cancelar leitura</button><button type="button" id="rfid-ping">Testar conexão</button></div>
+    <p class="rfid-status" id="rfid-status" role="status" aria-live="polite">Conecte o Arduino e inicie uma leitura para identificar um cartão.</p>
+    <div id="rfid-cartao-atual" class="rfid-card rfid-hidden" hidden></div>
+  </section>
+  <section class="rfid-panel">
+    <h2>Cartões cadastrados</h2>
+    {% if cartoes %}<div style="overflow-x:auto"><table class="rfid-table"><thead><tr><th>Nome</th><th>UID</th><th>Saldo fictício</th><th>Estado</th></tr></thead><tbody>
+      {% for cartao in cartoes %}<tr><td>{{ cartao.nome }}</td><td><code>{{ cartao.uid }}</code></td><td>R$ {{ "%.2f"|format(cartao.saldo_centavos / 100) }}</td><td>{{ "Ativo" if cartao.ativo else "Inativo" }}</td></tr>{% endfor %}
+    </tbody></table></div>{% else %}<p class="rfid-muted">Ainda não há cartões cadastrados.</p>{% endif %}
+  </section>
+  <p class="rfid-sim-note">Estas operações são apenas de demonstração. Não registram vendas, receita ou baixa de estoque.</p>
+</main>
+{% endblock %}
+{% block scripts %}<script src="/static/javascript/rfid_admin.js?v=1" defer></script>{% endblock %}

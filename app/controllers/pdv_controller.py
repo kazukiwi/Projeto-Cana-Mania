@@ -512,7 +512,6 @@ def finalizar_venda(
                 item["estoque_variacao"].estoque_atual -= item["quantidade"]
 
     db.commit()
-
     return RedirectResponse(
         url=f"/pdv/venda/{venda.id}?sucesso=ok",
         status_code=302

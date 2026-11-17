@@ -23,6 +23,7 @@
             <li><a href="/maquinas" class="{{ 'active' if caminho.startswith('/maquinas') else '' }}">Máquinas</a></li>
             <li><a href="/usuarios" class="{{ 'active' if caminho.startswith('/usuarios') else '' }}">Funcionários</a></li>
             <li><a href="/categorias" class="{{ 'active' if caminho.startswith('/categorias') else '' }}">Categorias</a></li>
+            <li><a href="/admin/cartoes-rfid" class="{{ 'active' if caminho.startswith('/admin/cartoes-rfid') else '' }}">Cartões RFID</a></li>
             <li><button type="button" class="theme-toggle" aria-label="Alternar tema"><i class="fa-solid fa-moon"></i></button></li>
             {% endif %}
             <li><a href="/auth/logout" data-logout-confirm class="btn-sair"><i class="fa-solid fa-right-from-bracket"></i> Sair</a></li>

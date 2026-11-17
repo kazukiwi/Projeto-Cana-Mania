@@ -35,9 +35,11 @@ from app.controllers import (
     tamanhos_controller,
     estoque_controller,
     insights_controller,
+    rfid_admin_controller,
 )
 
 from app.auth import get_usuario_opcional, get_usuario_logado
+from app.services.rfid_service import fechar_rfid
 
 
 # Mantém instalações locais que ainda não passaram por todas as migrações
@@ -66,6 +68,7 @@ async def lifespan(app: FastAPI):
         tarefa_fechamento.cancel()
         with suppress(asyncio.CancelledError):
             await tarefa_fechamento
+        fechar_rfid()
 
 
 app = FastAPI(title="Sistema Estoque", lifespan=lifespan)
@@ -196,6 +199,7 @@ app.include_router(categorias_controller.router)
 app.include_router(produto_controller.router)
 app.include_router(movimentacao_controller.router)
 app.include_router(pdv_controller.router)
+app.include_router(rfid_admin_controller.router)
 app.include_router(tamanhos_controller.router)
 app.include_router(estoque_controller.router)
 app.include_router(insights_controller.router)
