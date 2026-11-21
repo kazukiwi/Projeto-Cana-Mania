@@ -14,13 +14,24 @@ No PDV, selecione débito, crédito, Pix ou cortesia. A confirmação por cartã
 
 Para usar o QR Code no celular, o computador e o celular precisam estar na mesma rede, o servidor deve aceitar conexões nessa rede e o PDV deve ser acessado pelo endereço IP do computador, não por `localhost`. O código usa o mesmo endereço pelo qual o PDV foi aberto e expira após dois minutos. Reiniciar o servidor invalida confirmações pendentes.
 
+## Pedidos pelo celular e fila
+
+1. Na conta da equipe, abra **QR para clientes** no menu. Clientes podem criar sua própria conta, entrar em uma conta existente ou continuar como visitantes sem cadastro. O administrador também pode criar contas em **Usuários → Novo usuário**, com perfil **Cliente**.
+2. No computador conectado ao Arduino, inicie o sistema com `uvicorn app.main:app --host 0.0.0.0 --port 8000`. Use um único processo, pois a porta USB e a fila pertencem a esse processo.
+3. Com os aparelhos na mesma rede, leia o QR Code ou consulte o IPv4 do computador com `ipconfig` e acesse `http://IP-DO-COMPUTADOR:8000/acesso/` pelo celular. O firewall precisa permitir essa conexão na rede local. Cada cliente vê o catálogo e os próprios comprovantes. O comprovante do visitante fica disponível somente durante a sessão; uma conta cadastrada permite consultá-lo novamente depois do login.
+4. Para débito ou crédito simulados, os pedidos aguardam em fila. O cliente acompanha a posição e recebe um código quando chega sua vez. O visor alterna entre a instrução para aproximar o cartão e o código do pedido: confira os códigos antes de encostar o cartão. É necessário carregar novamente este sketch no Arduino para exibir o código.
+
+O código no visor ajuda a identificar o pedido, mas o leitor não verifica se o cartão pertence à conta do cliente. A equipe deve conferir o código antes de cada leitura. Os pagamentos são fictícios. A fila fica na memória: uma reinicialização interrompe os pedidos ainda pendentes, que devem ser feitos novamente. Use essa configuração de rede apenas para testes controlados; para disponibilizar o sistema ao público, configure HTTPS, uma chave `SECRET_KEY` forte e persistente e uma implantação apropriada.
+
+O QR Code usa o endereço pelo qual a página foi aberta, ou tenta descobrir o IPv4 local quando acessada por `localhost`. Se houver mais de uma rede ou proxy, defina `ACESSO_PUBLICO_URL` com o endereço base correto, por exemplo `http://192.168.1.10:8000`, e reinicie o servidor.
+
 ## Protocolo serial (9600 baud, linhas terminadas em LF)
 
 | Servidor → Arduino | Arduino → servidor |
 | --- | --- |
 | `PING` | `PONG` |
 | `IDENTIFICAR` | `AGUARDANDO|IDENTIFICAR`, depois `TAG|UID` |
-| `PAGAR|centavos` (0 para cortesia) | `AGUARDANDO|PAGAR`, depois `TAG|UID` |
+| `PAGAR|centavos|codigo` (0 para cortesia) | `AGUARDANDO|PAGAR`, depois `TAG|UID` |
 | `CADASTRO_OK|saldo_total` | `RESULT|CADASTRO_OK` |
 | `RECARGA_OK|saldo_total` | `RESULT|RECARGA_OK` |
 | `SALDO|saldo_total` | `RESULT|SALDO` |

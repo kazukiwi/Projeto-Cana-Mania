@@ -17,7 +17,7 @@ def listar_usuarios(
     db: Session = Depends(get_db),
     admin = Depends(get_admin)
 ):
-    usuarios = db.query(Usuario).order_by(Usuario.nome)
+    usuarios = db.query(Usuario).filter(Usuario.role != "visitante").order_by(Usuario.nome)
     return templates.TemplateResponse(
         request,
         "users/index.html",

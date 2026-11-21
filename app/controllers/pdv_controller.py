@@ -531,7 +531,7 @@ def detalhe_venda(
     """Comprovante da venda — exibido imediatamente após finalizar."""
     venda = db.query(Venda).filter(Venda.id == venda_id).first()
 
-    if not venda or (usuario.get("role") == "cliente" and venda.usuario_id != usuario.get("id")):
+    if not venda or (usuario.get("role") in {"cliente", "visitante"} and venda.usuario_id != usuario.get("id")):
         raise HTTPException(status_code=404, detail="Comprovante não encontrado.")
 
     return templates.TemplateResponse(

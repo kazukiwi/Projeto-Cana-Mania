@@ -20,6 +20,15 @@ class ConfirmacaoQR:
     def expirar(self, operation_id):
         with self.lock:
             pending = self.pending.get(operation_id)
+            if not pending:
+                db = self.sessions()
+                try:
+                    db.query(OperacaoRFID).filter_by(operacao_id=operation_id, status="aguardando_qr").update(
+                        {"status": "erro_comunicacao", "erro": "Servidor reiniciado; faça o pedido novamente."})
+                    db.commit()
+                finally:
+                    db.close()
+                return
             if pending and time.monotonic() >= pending[0]:
                 db = self.sessions()
                 try:

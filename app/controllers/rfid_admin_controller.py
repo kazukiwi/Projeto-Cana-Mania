@@ -52,7 +52,7 @@ async def iniciar(request: Request, usuario=Depends(get_usuario_logado), db: Ses
     except ValueError:
         raise HTTPException(400, "JSON invalido.") from None
     tipo = data.get("tipo") if isinstance(data, dict) else None
-    if usuario.get("role") == "cliente":
+    if usuario.get("role") in {"cliente", "visitante"}:
         if tipo != "pagar" or data.get("forma_pagamento") not in {"debito", "credito", "pix"}:
             raise HTTPException(403, "Operação não permitida para clientes.")
         if data.get("cortesia", "false") != "false" or data.get("desconto_manual_percentual") or data.get("funcionario_comprador_id"):

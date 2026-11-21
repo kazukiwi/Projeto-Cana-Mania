@@ -9,15 +9,32 @@ from app.database import get_db
 from app.models.categoria import Categoria
 from app.models.filial import FILIAIS
 from app.models.produtos import Produto, CATEGORIAS_PDV
-from app.models.venda import Venda
+from app.models.venda import Venda, ItemVenda
 
 router = APIRouter(prefix="/cliente", tags=["Pedidos"])
 templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/")
+def dashboard(request: Request, db: Session = Depends(get_db), usuario=Depends(get_usuario_logado)):
+    if usuario.get("role") not in {"cliente", "visitante"}:
+        raise HTTPException(403, "Área exclusiva para clientes.")
+    def ranking(pessoal=False):
+        query = (db.query(ItemVenda.produto_id, ItemVenda.produto_nome,
+                          func.sum(ItemVenda.quantidade).label("quantidade"))
+                 .join(Venda, Venda.id == ItemVenda.venda_id))
+        if pessoal:
+            query = query.filter(Venda.usuario_id == usuario["id"])
+        return (query.group_by(ItemVenda.produto_id, ItemVenda.produto_nome)
+                .order_by(func.sum(ItemVenda.quantidade).desc(), ItemVenda.produto_nome.asc()).limit(3).all())
+    return templates.TemplateResponse(request, "cliente/dashboard.html", {
+        "request": request, "usuario": usuario, "mais_vendidos": ranking(), "mais_comprados": ranking(True),
+    })
+
+
+@router.get("/pdv")
 def pedidos(request: Request, db: Session = Depends(get_db), usuario=Depends(get_usuario_logado)):
-    if usuario.get("role") != "cliente":
+    if usuario.get("role") not in {"cliente", "visitante"}:
         raise HTTPException(403, "Área exclusiva para clientes.")
     produtos = (db.query(Produto).join(Categoria).filter(
         Produto.ativo.is_(True), func.lower(Categoria.nome).in_(CATEGORIAS_PDV)

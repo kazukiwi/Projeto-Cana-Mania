@@ -237,7 +237,7 @@ def redefinir_senha(
 def tela_login(request: Request):
     return templates.TemplateResponse(
         request,
-        "auth/login.html",
+        "index.html",
         {"request": request}
     )
 
@@ -246,6 +246,7 @@ def login_usuario(
     request: Request,
     email: str = Form(...),
     senha: str = Form(...),
+    origem: str = Form(""),
     db: Session = Depends(get_db)
 ):
     #Verificar se o usuário existe
@@ -253,17 +254,20 @@ def login_usuario(
     if not usuario or not verificar_senha(senha, usuario.senha_hash):
         return templates.TemplateResponse(
             request,
-            "index.html",
+            "acesso/usuario.html" if origem == "cliente" else "index.html",
             {"request": request, "erro": "E-mail ou senha inválidos"}
         )
     
     if not usuario.ativo:
         return templates.TemplateResponse(
             request,
-            "index.html",
+            "acesso/usuario.html" if origem == "cliente" else "index.html",
             {"request": request, "erro": "Usuário inativo. Contate o administrador."}
         )
     
+    if origem == "cliente" and usuario.role != "cliente":
+        return templates.TemplateResponse(request, "acesso/usuario.html", {"request": request, "erro": "Use o acesso da equipe para esta conta."}, status_code=403)
+
     #Criar token de acesso
     token_data = {
         "sub": usuario.email,

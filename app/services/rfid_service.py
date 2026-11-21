@@ -93,6 +93,10 @@ class RFIDSerialService:
         with self._lock:
             self._connect()
             busy = bool(self._active and self._active.get("status") in ATIVOS)
+            if usuario and usuario.get("role") in {"cliente", "visitante"}:
+                pendentes = ([self._active] if busy else []) + list(self._queue)
+                if any(int(ctx.get("usuario", {}).get("id", -1)) == operador_id for ctx in pendentes):
+                    raise ValueError("Você já tem um pedido aguardando na maquininha.")
             if tipo == "identificar" and (busy or self._queue):
                 raise ValueError("A maquininha está ocupada com outros pedidos.")
             op_id = uuid.uuid4().hex
@@ -142,16 +146,14 @@ class RFIDSerialService:
                     self._finish_error(ctx["id"], "desconectado")
 
     def consultar(self, op_id: str, operador_id: int):
+        with self._lock:
+            position = next((i for i, ctx in enumerate(self._queue, 1) if ctx["id"] == op_id), None)
         db = self._sessions()
         try:
             op = db.query(OperacaoRFID).filter_by(operacao_id=op_id, operador_id=operador_id).first()
             if not op:
                 return None
             card = db.query(CartaoRFID).filter_by(id=op.cartao_id).first() if op.cartao_id else None
-            position = None
-            if op.status == "na_fila":
-                with self._lock:
-                    position = next((i for i, ctx in enumerate(self._queue, 1) if ctx["id"] == op_id), None)
             return {"id": op.operacao_id, "tipo": op.tipo, "status": op.status, "uid": op.uid,
                     "posicao": position,
                     "valor_centavos": op.valor_centavos, "saldo_centavos": op.saldo_depois,
@@ -386,6 +388,7 @@ class RFIDSerialService:
                     if self._active and self._active["status"] in ATIVOS:
                         self._finish_error(self._active["id"], "desconectado")
                     self._serial = None
+                    self._proximo()
                 return
             self._expire()
             if not line:
@@ -416,6 +419,13 @@ def obter_rfid() -> RFIDSerialService:
     global _service
     with _service_lock:
         if _service is None:
+            db = SessionLocal()
+            try:
+                db.query(OperacaoRFID).filter(OperacaoRFID.status.in_(["na_fila", "aguardando_tag", "tag_recebida"])).update(
+                    {"status": "erro_comunicacao", "erro": "Servidor reiniciado; faça o pedido novamente."}, synchronize_session=False)
+                db.commit()
+            finally:
+                db.close()
             _service = RFIDSerialService()
         return _service
 

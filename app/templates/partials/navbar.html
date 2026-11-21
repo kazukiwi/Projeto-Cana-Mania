@@ -12,13 +12,15 @@
         <div class="logo"><a href="/" class="wordmark"><span>Cana</span>mania<small>gestão de consumos</small></a></div>
         <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-controls="menu-principal" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
         <ul class="menu" id="menu-principal">
-            {% if usuario.role == 'cliente' %}
-            <li><a href="/cliente/">Meus pedidos</a></li>
+            {% if usuario.role in ['cliente', 'visitante'] %}
+            <li><a href="/cliente/" class="{{ 'active' if caminho == '/cliente/' else '' }}">Dashboard</a></li>
+            <li><a href="/cliente/pdv" class="{{ 'active' if caminho.startswith('/cliente/pdv') else '' }}">Ponto de venda</a></li>
             <li><a href="/auth/logout" class="btn-sair">Sair</a></li>
             {% else %}
             <li><a href="/" class="{{ 'active' if caminho == '/' else '' }}">Dashboard</a></li>
             <li><a href="/produtos" class="{{ 'active' if caminho.startswith('/produtos') else '' }}">Consumos</a></li>
             <li><a href="/pdv/" class="{{ 'active' if caminho.startswith('/pdv') else '' }}">PDV</a></li>
+            <li><a href="/acesso/qr">QR para clientes</a></li>
             <li><a href="/insights/" class="{{ 'active' if caminho.startswith('/insights') else '' }}">Insights</a></li>
             {% if usuario.role in ['admin', 'funcionario'] %}
             <li><a href="/estoque/" class="{{ 'active' if caminho.startswith('/estoque') else '' }}">Estoque</a></li>

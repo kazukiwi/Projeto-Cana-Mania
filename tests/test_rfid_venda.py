@@ -147,4 +147,34 @@ class RFIDVendaTests(unittest.TestCase):
         self.assertEqual({v.usuario_id for v in db.query(Venda)}, {1, 2})
         db.close()
 
+    def test_cancelamento_na_fila_nao_interrompe_pedido_ativo(self):
+        dados = {'carrinho_json': '[{"produto_id":1,"quantidade":1}]', 'observacao': '',
+                 'funcionario_comprador_id': '', 'desconto_manual_percentual': '', 'cortesia': 'false',
+                 'forma_pagamento': 'debito', 'forma_pagamento_2': '', 'valor_pagamento_1': '',
+                 'valor_pagamento_2': '', 'filial': 'Pinheiros'}
+        self.service._connect = lambda: None
+        primeira = self.service.iniciar('pagar', 1, 1000, dados, {'id': 1})
+        segunda = self.service.iniciar('pagar', 2, 1000, dados, {'id': 2})
+        with self.assertRaises(ValueError):
+            self.service.cancelar(segunda['id'], 1)
+        self.assertEqual(self.service.cancelar(segunda['id'], 2)['status'], 'cancelado')
+        self.assertEqual(self.service.consultar(primeira['id'], 1)['status'], 'aguardando_tag')
+        self.service._handle_tag('AABBCCDD')
+        self.assertEqual(self.service.consultar(primeira['id'], 1)['status'], 'aprovado')
+        self.assertEqual(self.service.consultar(segunda['id'], 2)['status'], 'cancelado')
+
+    def test_recusa_avanca_fila_sem_criar_venda(self):
+        dados = {'carrinho_json': '[{"produto_id":1,"quantidade":1}]', 'observacao': '',
+                 'funcionario_comprador_id': '', 'desconto_manual_percentual': '', 'cortesia': 'false',
+                 'forma_pagamento': 'debito', 'forma_pagamento_2': '', 'valor_pagamento_1': '',
+                 'valor_pagamento_2': '', 'filial': 'Pinheiros'}
+        self.service._connect = lambda: None
+        db = self.sessions(); db.query(CartaoRFID).one().saldo_centavos = 100; db.commit(); db.close()
+        primeira = self.service.iniciar('pagar', 1, 1000, dados, {'id': 1})
+        segunda = self.service.iniciar('pagar', 2, 1000, dados, {'id': 2})
+        self.service._handle_tag('AABBCCDD')
+        self.assertEqual(self.service.consultar(primeira['id'], 1)['status'], 'negado_saldo_insuficiente')
+        self.assertEqual(self.service.consultar(segunda['id'], 2)['status'], 'aguardando_tag')
+        db = self.sessions(); self.assertEqual(db.query(Venda).count(), 0); db.close()
+
 if __name__ == '__main__': unittest.main()

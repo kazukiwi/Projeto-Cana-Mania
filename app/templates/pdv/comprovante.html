@@ -63,10 +63,10 @@
     <div class="vendas-container-main" style="max-width: 600px; margin: 40px auto; padding: 0 20px;">
         
         <div class="no-print recibo-acoes" style="display:flex; justify-content:space-between; margin-bottom:20px;">
-            {% if usuario.role != 'cliente' %}<a href="/pdv/historico" class="btn-nova-venda" style="background:#4b5563; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+            {% if usuario.role not in ['cliente', 'visitante'] %}<a href="/pdv/historico" class="btn-nova-venda" style="background:#4b5563; text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
                 <i class="fa-solid fa-arrow-left"></i> Histórico
             </a>{% endif %}
-            <a href="{{ '/cliente/' if usuario.role == 'cliente' else '/pdv/' }}" class="btn-nova-venda" style="background:#10b981; color:white; padding:10px 16px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:bold;">
+            <a href="{{ '/cliente/pdv' if usuario.role in ['cliente', 'visitante'] else '/pdv/' }}" class="btn-nova-venda" style="background:#10b981; color:white; padding:10px 16px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-weight:bold;">
                 <i class="fa-solid fa-plus"></i> Fazer outra venda
             </a>
             <button onclick="window.print()" style="padding:10px 20px; background:#1e1b4b; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">

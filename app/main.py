@@ -37,6 +37,7 @@ from app.controllers import (
     insights_controller,
     rfid_admin_controller,
     cliente_pedido_controller,
+    acesso_controller,
 )
 
 from app.services.rfid_service import fechar_rfid
@@ -78,11 +79,19 @@ app = FastAPI(title="Sistema Estoque", lifespan=lifespan)
 @app.middleware("http")
 async def limitar_acesso_cliente(request: Request, call_next):
     usuario = get_usuario_opcional(request)
-    if usuario and usuario.get("role") == "cliente":
+    if usuario and usuario.get("role") in {"cliente", "visitante"}:
         import re
+        from app.database import Session as SessionLocal
+        db = SessionLocal()
+        try:
+            ativo = db.query(Usuario.id).filter_by(id=usuario.get("id"), role=usuario.get("role"), ativo=True).first()
+        finally:
+            db.close()
+        if not ativo:
+            return JSONResponse({"detail": "Conta desativada."}, status_code=403)
         path = request.url.path
         allowed = (path.startswith("/static/") or path.startswith("/auth/") or
-                   path.startswith("/cliente/") or path == "/rfid/operacoes" or
+                   path.startswith("/cliente/") or path.startswith("/acesso/") or path == "/rfid/operacoes" or
                    bool(re.fullmatch(r"/rfid/operacoes/[0-9a-f]{32}(?:/cancelar)?", path)) or
                    bool(re.fullmatch(r"/pdv/venda/\d+", path)) or path.startswith("/confirmar-qr/"))
         if not allowed:
@@ -217,6 +226,7 @@ app.include_router(movimentacao_controller.router)
 app.include_router(pdv_controller.router)
 app.include_router(rfid_admin_controller.router)
 app.include_router(cliente_pedido_controller.router)
+app.include_router(acesso_controller.router)
 app.include_router(tamanhos_controller.router)
 app.include_router(estoque_controller.router)
 app.include_router(insights_controller.router)
@@ -248,7 +258,7 @@ def home(
     db: Session = Depends(get_db)
 ):
     if usuario is None:
-        return templates.TemplateResponse(name="index.html", request=request)
+        return RedirectResponse(url="/acesso/", status_code=303)
 
     produtos_ativos = (
         db.query(Produto)
