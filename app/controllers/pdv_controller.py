@@ -9,9 +9,10 @@
 # ============================================================
 
 import json
+from decimal import Decimal, InvalidOperation
 from datetime import date, datetime, time, timedelta, timezone
-from fastapi import APIRouter, Depends, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, Depends, Request, Form, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -22,16 +23,30 @@ from app.models.produtos import Produto, EstoqueTamanho, EstoqueVariacao, Tamanh
 from app.models.categoria import Categoria
 from app.models.produtos import CATEGORIAS_PDV
 from app.models.filial import EstoqueFilial, FILIAIS
+from app.models.usuario import Usuario
 from app.controllers.estoque_controller import garantir_estoque_filiais
+from app.pix import gerar_pix
 from app.auth import get_usuario_logado
 
 router = APIRouter(prefix="/pdv", tags=["PDV"])
 templates = Jinja2Templates(directory="app/templates")
-FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite"}
+FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite", "cortesia"}
 
 # O Brasil não adota horário de verão desde 2019. Usar UTC-3 evita depender do
 # pacote tzdata, que não vem instalado em algumas instalações do Windows.
 FUSO_HORARIO = timezone(timedelta(hours=-3), name="America/Sao_Paulo")
+
+
+def data_hora_brasilia(valor: datetime | None) -> str:
+    """Formata datas armazenadas em UTC para o horário local do recibo."""
+    if valor is None:
+        return "Não informada"
+    if valor.tzinfo is None:
+        valor = valor.replace(tzinfo=timezone.utc)
+    return valor.astimezone(FUSO_HORARIO).strftime("%d/%m/%Y %H:%M:%S")
+
+
+templates.env.filters["data_hora_brasilia"] = data_hora_brasilia
 
 
 def fechar_dia(db: Session, data_referencia: date, automatico: bool = False) -> FechamentoDiario:
@@ -160,8 +175,96 @@ def tela_pdv(
                 )
             },
             "vendas_hoje": vendas_hoje,
+            "funcionarios": db.query(Usuario).filter(Usuario.role == "funcionario", Usuario.ativo == True).order_by(Usuario.nome).all(),
         }
     )
+
+
+@router.post("/pix")
+def gerar_pix_carrinho(
+    carrinho_json: str = Form(..., max_length=100000),
+    filial: str = Form(...),
+    valor_pix: str = Form(""),
+    funcionario_comprador_id: str = Form(""),
+    desconto_manual_percentual: str = Form("0"),
+    db: Session = Depends(get_db),
+    usuario=Depends(get_usuario_logado),
+):
+    """Gera um QR Code Pix para o total da venda ou para a parcela Pix."""
+    if filial not in FILIAIS:
+        raise HTTPException(status_code=400, detail="Loja inválida.")
+    try:
+        itens = json.loads(carrinho_json)
+        if not isinstance(itens, list) or not 1 <= len(itens) <= 500:
+            raise ValueError()
+        quantidades = {}
+        for item in itens:
+            if not isinstance(item, dict):
+                raise ValueError()
+            produto_id, quantidade = item.get("produto_id"), item.get("quantidade")
+            if type(produto_id) is not int or type(quantidade) is not int or produto_id <= 0 or not 1 <= quantidade <= 100000:
+                raise ValueError()
+            quantidades[produto_id] = quantidades.get(produto_id, 0) + quantidade
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="Carrinho inválido. Confira os itens e quantidades.") from None
+
+    total = Decimal("0")
+    for produto_id, quantidade in quantidades.items():
+        produto = (
+            db.query(Produto).join(Categoria, Produto.categoria_id == Categoria.id)
+            .filter(Produto.id == produto_id, Produto.ativo == True, func.lower(Categoria.nome).in_(CATEGORIAS_PDV))
+            .first()
+        )
+        if not produto:
+            raise HTTPException(status_code=400, detail="Um produto não está mais disponível.")
+        if not produto.eh_consumo:
+            saldo = db.query(EstoqueFilial).filter(
+                EstoqueFilial.produto_id == produto_id, EstoqueFilial.filial == filial,
+            ).first()
+            if not saldo or saldo.quantidade < quantidade:
+                raise HTTPException(status_code=400, detail="Estoque insuficiente na loja selecionada.")
+        try:
+            preco = Decimal(str(produto.preco))
+        except InvalidOperation:
+            raise HTTPException(status_code=400, detail="Produto sem preço válido.") from None
+        if not preco.is_finite() or preco < 0:
+            raise HTTPException(status_code=400, detail="Produto com preço inválido.")
+        total += preco * quantidade
+
+    funcionario_comprador = None
+    funcionario_comprador_id = funcionario_comprador_id if isinstance(funcionario_comprador_id, str) else ""
+    if funcionario_comprador_id.strip():
+        try:
+            funcionario_id = int(funcionario_comprador_id)
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Funcionário inválido.") from None
+        funcionario_comprador = db.query(Usuario).filter(
+            Usuario.id == funcionario_id, Usuario.role == "funcionario", Usuario.ativo == True
+        ).first()
+        if not funcionario_comprador:
+            raise HTTPException(status_code=400, detail="Funcionário inválido.")
+    try:
+        desconto_manual = Decimal(desconto_manual_percentual.strip().replace(",", ".")) if isinstance(desconto_manual_percentual, str) else Decimal("0")
+    except (InvalidOperation, ValueError, AttributeError):
+        raise HTTPException(status_code=400, detail="Desconto inválido.") from None
+    if not desconto_manual.is_finite() or desconto_manual < 0 or desconto_manual > 100:
+        raise HTTPException(status_code=400, detail="Desconto inválido.")
+    desconto_percentual = min(Decimal("100"), (Decimal("15") if funcionario_comprador else Decimal("0")) + desconto_manual)
+    total = (total * (Decimal("100") - desconto_percentual) / Decimal("100")).quantize(Decimal("0.01"))
+
+    if isinstance(valor_pix, str) and valor_pix.strip():
+        try:
+            valor_solicitado = Decimal(valor_pix.strip().replace(",", "."))
+        except InvalidOperation:
+            raise HTTPException(status_code=400, detail="Valor Pix inválido.") from None
+        if not valor_solicitado.is_finite() or valor_solicitado <= 0 or valor_solicitado > total:
+            raise HTTPException(status_code=400, detail="Valor Pix inválido.")
+        total = valor_solicitado
+
+    try:
+        return JSONResponse(gerar_pix(total), headers={"Cache-Control": "no-store"})
+    except ValueError as erro:
+        raise HTTPException(status_code=400, detail=str(erro)) from None
 
 
 @router.post("/finalizar")
@@ -169,7 +272,13 @@ def finalizar_venda(
     request: Request,
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     observacao: str    = Form(""),
+    funcionario_comprador_id: str = Form(""),
+    desconto_manual_percentual: str = Form(""),
+    cortesia: str = Form("false"),
     forma_pagamento: str = Form(""),
+    forma_pagamento_2: str = Form(""),
+    valor_pagamento_1: str = Form(""),
+    valor_pagamento_2: str = Form(""),
     filial: str        = Form("Pinheiros"),
     db: Session        = Depends(get_db),
     usuario            = Depends(get_usuario_logado)
@@ -185,9 +294,17 @@ def finalizar_venda(
     """
     if filial not in FILIAIS:
         return RedirectResponse(url="/pdv?erro=filial", status_code=302)
+    cortesia_ativa = cortesia.strip().lower() in {"1", "true", "on", "sim"}
+    desconto_manual_percentual = desconto_manual_percentual.strip()
+    if cortesia_ativa:
+        if desconto_manual_percentual:
+            return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+        forma_pagamento = "cortesia"
+    elif forma_pagamento == "cortesia":
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
     if forma_pagamento not in FORMAS_PAGAMENTO:
         return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
-
+    forma_pagamento_2 = forma_pagamento_2.strip()
     try:
         itens = json.loads(carrinho_json)
     except (json.JSONDecodeError, ValueError):
@@ -196,7 +313,31 @@ def finalizar_venda(
     if not isinstance(itens, list) or not itens:
         return RedirectResponse(url="/pdv?erro=vazio", status_code=302)
 
-    desconto_percentual = 0.0
+    funcionario_comprador = None
+    if funcionario_comprador_id.strip():
+        try:
+            funcionario_id = int(funcionario_comprador_id)
+        except (TypeError, ValueError):
+            return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
+        funcionario_comprador = db.query(Usuario).filter(
+            Usuario.id == funcionario_id, Usuario.role == "funcionario", Usuario.ativo == True
+        ).first()
+        if not funcionario_comprador:
+            return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
+    try:
+        desconto_manual = Decimal(desconto_manual_percentual.replace(",", ".")) if desconto_manual_percentual else Decimal("0")
+    except (InvalidOperation, ValueError, AttributeError):
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+    if (
+        not desconto_manual.is_finite()
+        or desconto_manual < 0
+        or desconto_manual > 100
+        or desconto_manual != desconto_manual.quantize(Decimal("0.01"))
+    ):
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+    desconto_percentual = Decimal("100") if cortesia_ativa else min(
+        Decimal("100"), (Decimal("15") if funcionario_comprador else Decimal("0")) + desconto_manual
+    )
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0
@@ -300,17 +441,53 @@ def finalizar_venda(
         })
 
     # ── Calcula desconto e total final
-    desconto_valor = total_bruto * (desconto_percentual / 100)
-    total_liquido  = total_bruto - desconto_valor
-
+    desconto_valor = float((Decimal(str(total_bruto)) * desconto_percentual / Decimal("100")).quantize(Decimal("0.01")))
+    total_liquido  = round(total_bruto - desconto_valor, 2)
+    valor_pagamento_1_db = total_liquido
+    valor_pagamento_2_db = None
+    if forma_pagamento_2:
+        if forma_pagamento_2 not in FORMAS_PAGAMENTO or forma_pagamento_2 == forma_pagamento:
+            return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
+        try:
+            valor_1 = Decimal(valor_pagamento_1.strip().replace(",", "."))
+            valor_2 = Decimal(valor_pagamento_2.strip().replace(",", "."))
+            centavos_1 = valor_1.quantize(Decimal("0.01"))
+            centavos_2 = valor_2.quantize(Decimal("0.01"))
+        except (InvalidOperation, ValueError):
+            return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
+        if (
+            not valor_1.is_finite() or not valor_2.is_finite()
+            or valor_1 != centavos_1 or valor_2 != centavos_2
+            or centavos_1 <= 0 or centavos_2 <= 0
+            or centavos_1 + centavos_2 != Decimal(str(total_liquido))
+        ):
+            return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
+        valor_pagamento_1_db = float(centavos_1)
+        valor_pagamento_2_db = float(centavos_2)
+    elif valor_pagamento_1.strip() or valor_pagamento_2.strip():
+        return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
     # ── Persiste tudo em uma única transação
+    marcadores_observacao = []
+    if cortesia_ativa:
+        marcadores_observacao.append("Cortesia")
+    elif desconto_manual is not None:
+        marcadores_observacao.append(f"Desconto manual: {desconto_percentual:g}%")
+    if funcionario_comprador:
+        marcadores_observacao.append(f"Compra de funcion\u00e1rio: {funcionario_comprador.nome}")
+    if observacao.strip():
+        marcadores_observacao.append(observacao.strip())
+    observacao = " | ".join(marcadores_observacao)[:255] or None
+
     venda = Venda(
         usuario_id          = usuario.get("id"),
-        desconto_percentual = desconto_percentual,
+        desconto_percentual = float(desconto_percentual),
         total_bruto         = round(total_bruto, 2),
-        total_liquido       = round(total_liquido, 2),
-        observacao          = observacao or None,
+        total_liquido       = total_liquido,
+        observacao          = observacao,
         forma_pagamento     = forma_pagamento,
+        valor_pagamento_1   = valor_pagamento_1_db,
+        forma_pagamento_2   = forma_pagamento_2 or None,
+        valor_pagamento_2   = valor_pagamento_2_db,
     )
     db.add(venda)
     db.flush()  # gera o venda.id sem commitar ainda

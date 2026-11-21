@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
 from datetime import date, datetime
@@ -8,7 +9,7 @@ from fastapi import FastAPI, Request, Depends, Form
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session, joinedload, selectinload
 from sqlalchemy import func
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -33,6 +34,7 @@ from app.controllers import (
     pdv_controller,
     tamanhos_controller,
     estoque_controller,
+    insights_controller,
 )
 
 from app.auth import get_usuario_opcional, get_usuario_logado
@@ -55,12 +57,18 @@ async def rotina_fechamento_diario():
 
 
 # 1º: CRIAR A INSTÂNCIA DO APP
-app = FastAPI(title="Sistema Estoque")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    tarefa_fechamento = asyncio.create_task(rotina_fechamento_diario())
+    try:
+        yield
+    finally:
+        tarefa_fechamento.cancel()
+        with suppress(asyncio.CancelledError):
+            await tarefa_fechamento
 
 
-@app.on_event("startup")
-async def iniciar_rotina_fechamento_diario():
-    asyncio.create_task(rotina_fechamento_diario())
+app = FastAPI(title="Sistema Estoque", lifespan=lifespan)
 
 # 2º: CONFIGURAR ARQUIVOS ESTÁTICOS E TEMPLATES
 APP_DIR = Path(__file__).resolve().parent
@@ -98,6 +106,8 @@ def suporte(request: Request):
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if request.url.path.rstrip("/") == "/pdv/pix":
+        return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers={**(exc.headers or {}), "Cache-Control": "no-store"})
     if exc.status_code == 401:
         return templates.TemplateResponse(
             name="auth/nao_autenticado.html",
@@ -140,6 +150,8 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    if request.url.path.rstrip("/") == "/pdv/pix":
+        return JSONResponse({"detail": "Confira os itens e a loja selecionada e tente novamente."}, status_code=422, headers={"Cache-Control": "no-store"})
     """Evita expor uma resposta técnica quando um filtro ou formulário é inválido."""
     return templates.TemplateResponse(
         name="erro_generico.html",
@@ -158,6 +170,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.exception_handler(Exception)
 async def unexpected_exception_handler(request: Request, exc: Exception):
+    if request.url.path.rstrip("/") == "/pdv/pix":
+        logger.exception("Pix endpoint failed", exc_info=exc)
+        return JSONResponse({"detail": "Não foi possível gerar o Pix. Confira a configuração e tente novamente."}, status_code=500, headers={"Cache-Control": "no-store"})
     """Mostra uma tela clara ao usuário e preserva o detalhe técnico no log."""
     logger.exception("Erro não tratado em %s", request.url.path, exc_info=exc)
     return templates.TemplateResponse(
@@ -183,6 +198,7 @@ app.include_router(movimentacao_controller.router)
 app.include_router(pdv_controller.router)
 app.include_router(tamanhos_controller.router)
 app.include_router(estoque_controller.router)
+app.include_router(insights_controller.router)
 
 
 # --- BANCO DE DADOS TEMPORÁRIO PARA OS ARMÁRIOS (ESTRUTURA INDESTRUTÍVEL) ---
@@ -191,29 +207,13 @@ def garantir_armarios_iniciais(db: Session):
         return
 
     for i in range(1, 51):
-        if i in [1, 5, 12, 25]:
-            status_inicial = "ocupado"
-            nome_mock = "Maria Santos"
-            obs_mock = ""
-        elif i == 20:
-            status_inicial = "manutencao"
-            nome_mock = ""
-            obs_mock = "Fechadura com defeito"
-        else:
-            status_inicial = "disponivel"
-            nome_mock = ""
-            obs_mock = ""
-        
+        status_inicial = "manutencao" if i == 20 else "disponivel"
+        indice_filial = min((i - 1) // 17, len(FILIAIS) - 1)
         db.add(Armario(
             numero=str(i).zfill(2),
             status=status_inicial,
-            associado_nome=nome_mock,
-            associado_id=None,
-            associado_email="maria.santos@email.com" if status_inicial == "ocupado" else "",
-            associado_telefone="(11) 97654-3210" if status_inicial == "ocupado" else "",
-            associado_matricula="AAPM-002" if status_inicial == "ocupado" else "",
-            atribuido_em="04/03/2026" if status_inicial == "ocupado" else "",
-            observacoes=obs_mock
+            filial=FILIAIS[indice_filial],
+            observacoes="M\u00e1quina em manuten\u00e7\u00e3o" if status_inicial == "manutencao" else "",
         ))
 
     db.commit()
@@ -459,11 +459,6 @@ def listar_armarios(
     for reserva in reservas_ativas:
         if reserva.armario and reserva.armario.status == "disponivel":
             reserva.armario.status = "ocupado"
-            if reserva.associado:
-                reserva.armario.associado_id = reserva.associado.id
-                reserva.armario.associado_nome = reserva.associado.nome
-                reserva.armario.associado_telefone = reserva.associado.telefone or ""
-                reserva.armario.associado_matricula = reserva.associado.matricula or ""
             alterou_status = True
     if alterou_status:
         db.commit()
@@ -472,16 +467,8 @@ def listar_armarios(
     disponiveis = db.query(Armario).filter(Armario.status == "disponivel").count()
     ocupados = db.query(Armario).filter(Armario.status == "ocupado").count()
     manutencao = db.query(Armario).filter(Armario.status == "manutencao").count()
+    desativados = db.query(Armario).filter(Armario.status == "desativado").count()
     armarios = db.query(Armario).order_by(Armario.id).all()
-    associados = (
-        db.query(Cliente)
-        .filter(
-            Cliente.ativo == True,
-            Cliente.is_associado == True
-        )
-        .order_by(Cliente.nome)
-        .all()
-    )
     reservas = (
         db.query(ReservaArmario)
         .order_by(ReservaArmario.inicio_em.desc(), ReservaArmario.id.desc())
@@ -499,7 +486,8 @@ def listar_armarios(
             "armarios_disponiveis": disponiveis,
             "armarios_ocupados": ocupados,
             "armarios_manutencao": manutencao,
-            "associados": associados,
+            "armarios_desativados": desativados,
+            "filiais": FILIAIS,
             "reservas": reservas,
         }
     )
@@ -510,7 +498,7 @@ def listar_armarios(
 def alterar_status_armario(
     armario_id: int = Form(...),
     novo_status: str = Form(...),
-    associado_id: int = Form(0),
+    filial: str = Form(...),
     observacoes: str = Form(None),
     usuario=Depends(get_usuario_opcional),
     db: Session = Depends(get_db)
@@ -518,57 +506,37 @@ def alterar_status_armario(
     armario = db.query(Armario).filter(Armario.id == armario_id).first()
     if not armario:
         return RedirectResponse(url="/armarios?erro=armario", status_code=303)
+    if filial not in FILIAIS:
+        return RedirectResponse(url="/armarios?erro=filial", status_code=303)
+    if novo_status not in {"disponivel", "ocupado", "manutencao"}:
+        return RedirectResponse(url="/armarios?erro=status", status_code=303)
 
-    if novo_status == "ocupado":
-        associado = None
-        if associado_id:
-            associado = db.query(Cliente).filter(
-                Cliente.id == associado_id,
-                Cliente.ativo == True,
-                Cliente.is_associado == True
-            ).first()
-
-        if not associado:
-            return RedirectResponse(url="/armarios?erro=associado", status_code=303)
-
-        armario.status = novo_status
-        armario.associado_id = associado.id
-        armario.associado_nome = associado.nome
-        armario.associado_email = ""
-        armario.associado_telefone = associado.telefone or ""
-        armario.associado_matricula = associado.matricula or ""
-        armario.atribuido_em = "04/03/2026"
-        armario.observacoes = ""
-    elif novo_status == "manutencao":
-        armario.status = novo_status
-        armario.associado_id = None
-        armario.associado_nome = ""
-        armario.associado_email = ""
-        armario.associado_telefone = ""
-        armario.associado_matricula = ""
-        armario.atribuido_em = ""
-        armario.observacoes = observacoes if (observacoes and observacoes.strip()) else "Fechadura com defeito"
-    else:
-        armario.status = "disponivel"
-        armario.associado_id = None
-        armario.associado_nome = ""
-        armario.associado_email = ""
-        armario.associado_telefone = ""
-        armario.associado_matricula = ""
-        armario.atribuido_em = ""
-        armario.observacoes = ""
-
+    armario.status = novo_status
+    armario.filial = filial
+    armario.observacoes = (observacoes or "").strip() if novo_status == "manutencao" else ""
+    if novo_status == "manutencao" and not armario.observacoes:
+        armario.observacoes = "M\u00e1quina em manuten\u00e7\u00e3o"
     db.commit()
-            
     return RedirectResponse(url="/armarios", status_code=303)
 
-
 @app.post("/armarios")
-def cadastrar_armario(numero: str = Form(...), db: Session = Depends(get_db), usuario=Depends(get_usuario_opcional)):
+def cadastrar_armario(
+    numero: str = Form(...), filial: str = Form(...),
+    db: Session = Depends(get_db), usuario=Depends(get_usuario_opcional)
+):
     numero = numero.strip()
-    if not numero or db.query(Armario).filter(Armario.numero == numero).first():
+    if filial not in FILIAIS:
+        return RedirectResponse(url="/armarios?erro=filial", status_code=303)
+    try:
+        numero_inteiro = int(numero)
+    except (TypeError, ValueError):
         return RedirectResponse(url="/armarios?erro=numero", status_code=303)
-    db.add(Armario(numero=numero.zfill(2), status="disponivel"))
+    if not 1 <= numero_inteiro <= 9999:
+        return RedirectResponse(url="/armarios?erro=numero", status_code=303)
+    numero = str(numero_inteiro).zfill(2)
+    if db.query(Armario).filter(Armario.numero == numero).first():
+        return RedirectResponse(url="/armarios?erro=numero", status_code=303)
+    db.add(Armario(numero=numero, status="disponivel", filial=filial))
     db.commit()
     return RedirectResponse(url="/armarios?armario=ok", status_code=303)
 
@@ -585,12 +553,6 @@ def desativar_armario(
     if armario.status == "ocupado":
         return RedirectResponse(url="/armarios?erro=ocupado", status_code=303)
     armario.status = "desativado"
-    armario.associado_id = None
-    armario.associado_nome = ""
-    armario.associado_email = ""
-    armario.associado_telefone = ""
-    armario.associado_matricula = ""
-    armario.atribuido_em = ""
     db.commit()
     return RedirectResponse(url="/armarios?armario=desativado", status_code=303)
 
@@ -610,12 +572,6 @@ def ativar_armario(
         return RedirectResponse(url="/armarios?erro=status", status_code=303)
 
     armario.status = "disponivel"
-    armario.associado_id = None
-    armario.associado_nome = ""
-    armario.associado_email = ""
-    armario.associado_telefone = ""
-    armario.associado_matricula = ""
-    armario.atribuido_em = ""
     armario.observacoes = ""
     db.commit()
     return RedirectResponse(url="/armarios?armario=ativado", status_code=303)
@@ -655,7 +611,6 @@ def criar_reserva_armario(
 
     db.add(ReservaArmario(
         armario_id=armario.id,
-        associado_id=None,
         local_evento=local_evento,
         semestre=local_evento,
         inicio_em=inicio,
@@ -665,11 +620,6 @@ def criar_reserva_armario(
     # A disponibilidade usa o status do próprio armário. Mantemos os dois
     # módulos sincronizados para que uma reserva não apareça como disponível.
     armario.status = "ocupado"
-    armario.associado_id = None
-    armario.associado_nome = local_evento
-    armario.associado_telefone = ""
-    armario.associado_matricula = ""
-    armario.atribuido_em = inicio_em.strftime("%d/%m/%Y")
     armario.observacoes = ""
     db.commit()
     return RedirectResponse(url="/armarios?reserva=ok", status_code=303)
@@ -691,12 +641,6 @@ def cancelar_reserva_armario(
         ).first()
         if not ainda_reservado and reserva.armario:
             reserva.armario.status = "disponivel"
-            reserva.armario.associado_id = None
-            reserva.armario.associado_nome = ""
-            reserva.armario.associado_email = ""
-            reserva.armario.associado_telefone = ""
-            reserva.armario.associado_matricula = ""
-            reserva.armario.atribuido_em = ""
             reserva.armario.observacoes = ""
         db.commit()
     return RedirectResponse(url="/armarios?reserva=cancelada", status_code=303)

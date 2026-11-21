@@ -1,0 +1,20 @@
+/* Shared Canamania footer. */
+.main-footer {
+    width: 100%;
+    flex: 0 0 auto;
+    margin-top: auto;
+    padding: 18px 24px;
+    background: #083d2c;
+    color: #fff;
+    text-align: center;
+    font: 13px/1.5 Arial, sans-serif;
+}
+.main-footer p { margin: 0; color: inherit; }
+.main-footer .footer-content {
+    display: block !important;
+    width: auto;
+    padding: 0 !important;
+    color: inherit !important;
+}
+.main-footer .footer-links { display: none !important; }
+html[data-theme="dark"] .main-footer { background: #061e15; color: #fff; }

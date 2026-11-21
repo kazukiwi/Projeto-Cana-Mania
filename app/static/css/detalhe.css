@@ -140,7 +140,7 @@ body {
     color: #10b981;
 }
 
-/* Estoque dos produtos com variaÃ§Ãµes de tamanho */
+/* Estoque dos produtos com variações de tamanho */
 .tamanhos-lista {
     display: flex;
     flex-wrap: wrap;

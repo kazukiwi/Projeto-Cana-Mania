@@ -1,8 +1,12 @@
 {% set caminho = request.url.path if request is defined else '' %}
-<link rel="stylesheet" href="/static/css/base.css?v=1">
+<link rel="stylesheet" href="/static/css/base.css?v=rodape-escuro-3">
+<link rel="stylesheet" href="/static/css/footer.css?v=rodape-1">
 <link rel="stylesheet" href="/static/css/ui.css?v=1">
-<link rel="stylesheet" href="/static/css/responsive.css?v=3">
-<link rel="stylesheet" href="/static/css/feedback.css?v=1">
+<link rel="stylesheet" href="/static/css/responsive.css?v=6">
+<link rel="stylesheet" href="/static/css/feedback.css?v=3">
+<link rel="stylesheet" href="/static/css/feedback-progress.css?v=2">
+<link rel="stylesheet" href="/static/css/theme-accents.css?v=global-theme-3">
+<link rel="stylesheet" href="/static/css/dark-surfaces.css?v=dark-audit-motion-2">
 <header>
     <nav class="navbar">
         <div class="logo"><a href="/" class="wordmark"><span>Cana</span>mania<small>gestão de consumos</small></a></div>
@@ -11,7 +15,10 @@
             <li><a href="/" class="{{ 'active' if caminho == '/' else '' }}">Dashboard</a></li>
             <li><a href="/produtos" class="{{ 'active' if caminho.startswith('/produtos') else '' }}">Consumos</a></li>
             <li><a href="/pdv/" class="{{ 'active' if caminho.startswith('/pdv') else '' }}">PDV</a></li>
+            <li><a href="/insights/" class="{{ 'active' if caminho.startswith('/insights') else '' }}">Insights</a></li>
+            {% if usuario.role in ['admin', 'funcionario'] %}
             <li><a href="/estoque/" class="{{ 'active' if caminho.startswith('/estoque') else '' }}">Estoque</a></li>
+            {% endif %}
             {% if usuario.role == 'admin' %}
             <li><a href="/maquinas" class="{{ 'active' if caminho.startswith('/maquinas') else '' }}">Máquinas</a></li>
             <li><a href="/usuarios" class="{{ 'active' if caminho.startswith('/usuarios') else '' }}">Funcionários</a></li>
@@ -22,6 +29,6 @@
         </ul>
     </nav>
 </header>
-<script src="/static/javascript/feedback.js?v=2"></script>
+<script src="/static/javascript/feedback.js?v=4"></script>
 <script src="/static/javascript/theme.js"></script>
 <script src="/static/javascript/navigation.js" defer></script>

@@ -1,0 +1,119 @@
+﻿/* Shared corner accents and dark-theme contrast for every screen. */
+body {
+    isolation: isolate;
+}
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        radial-gradient(circle at 0 0, #ffb7d5 0, transparent 34rem),
+        radial-gradient(circle at 100% 0, #d4f5a5 0, transparent 34rem);
+}
+html[data-theme="dark"] body::before {
+    background-image:
+        radial-gradient(circle at 0 0, #3a142a 0, transparent 34rem),
+        radial-gradient(circle at 100% 0, #17321d 0, transparent 34rem);
+}
+html[data-theme="dark"] body {
+    color: #f5f7f4;
+    background-color: #0b100d !important;
+    color-scheme: dark;
+}
+html[data-theme="dark"] :is(
+    .card, .panel, .surface, .branch-card, .table-container, .table-wrap,
+    .table-card, .tabela-container, .filtros-container, .form-card,
+    .form-section, .form-container, .create-card, .stock-table-wrap, .armarios-panel,
+    .card-historico, .pdv-box-cadastro, .pdv-box-carrinho, .card-indicador,
+    .login-card, .recovery-card, .erro-card, .modal-finalizar-dia-card, article
+) {
+    color: #f5f7f4;
+    background-color: #141d17 !important;
+    border-color: #2b4334 !important;
+    box-shadow: 0 18px 35px rgba(0, 0, 0, .24);
+}
+html[data-theme="dark"] :is(h1, h2, h3, h4, label, th, legend) {
+    color: #f1f8ef;
+}
+html[data-theme="dark"] :is(p, td, small, .muted, .text-muted, .form-text, .page-subtitle, .empty-state, .empty-message, .helper-text, .login-lead, .recovery-copy p, .erro-subtexto) {
+    color: #c2d0c4;
+}
+html[data-theme="dark"] :is(input, select, textarea, .input-readonly) {
+    color: #f5f7f4 !important;
+    background-color: #0e1510 !important;
+    border-color: #3a5541 !important;
+}
+html[data-theme="dark"] :is(.login-card label, .recovery-card label, .card-title, .card-title h2, .cana-heading h1, .surface h2, .branch-card span) {
+    color: #d7fbb3 !important;
+}
+html[data-theme="dark"] .login-card a,
+html[data-theme="dark"] .secondary-link {
+    color: #ff8fbd;
+}
+html[data-theme="dark"] .canamania-login .access-panel {
+    background: radial-gradient(circle at 90% 5%, rgba(255, 24, 119, .16), transparent 22rem), #0b100d;
+}
+html[data-theme="dark"] .canamania-login .login-card input {
+    color: #f5f7f4;
+    background: #0e1510;
+    border-color: #3a5541;
+}
+html[data-theme="dark"] .background {
+    background: radial-gradient(circle at 0 0, rgba(255, 24, 119, .18), transparent 32rem),
+                radial-gradient(circle at 100% 0, rgba(186, 245, 122, .14), transparent 32rem), #0b100d;
+}
+html[data-theme="dark"] .recovery-copy p { color: #e4ebe5; text-shadow: none; }
+html[data-theme="dark"] .erro-card { background-color: #141d17; }
+html[data-theme="dark"] .balao-fala {
+    color: #d7fbb3;
+    background: #1c2b1f;
+    border-color: #365840;
+}
+html[data-theme="dark"] .balao-fala::before {
+    background: #1c2b1f;
+    border-color: #365840;
+}
+
+/* Tables, filters and checkout surfaces need explicit dark colors. */
+html[data-theme="dark"] :is(.filtros, .tabela, .filtros-container, .tabela-container, .tabela-vendas, .mini-tabela-wrapper, .pdv-totalizador-rodape) {
+    color: #e4ebe5;
+    background-color: #141d17 !important;
+    border-color: #2b4334 !important;
+}
+html[data-theme="dark"] table thead th {
+    color: #d7fbb3 !important;
+    background-color: #1c2b1f !important;
+    border-color: #365840 !important;
+}
+html[data-theme="dark"] table tbody td {
+    color: #e4ebe5 !important;
+    background-color: transparent !important;
+    border-color: #2b4334 !important;
+}
+html[data-theme="dark"] :is(.linha-total, .linha-total strong, .pdv-box-carrinho h3, .pdv-box-carrinho h4) {
+    color: #e4ebe5 !important;
+}
+html[data-theme="dark"] .tabela-produtos tbody tr:hover,
+html[data-theme="dark"] .tabela-vendas tbody tr:hover {
+    background-color: #1c2b1f !important;
+}
+html[data-theme="dark"] :is(.paginacao, .listagem-acoes, .listagem-ordem) {
+    color: #c2d0c4;
+}
+html[data-theme="dark"] .listagem-ordem,
+html[data-theme="dark"] .paginacao button {
+    color: #f5f7f4;
+    background-color: #18231b;
+    border-color: #365840;
+}
+
+html[data-theme="dark"] .form-container { background: #141d17 !important; border-color: #2b4334 !important; }
+html[data-theme="dark"] article { color: #e4ebe5; }
+html[data-theme="dark"] article h1, html[data-theme="dark"] article h2 { color: #f1f8ef; }
+html[data-theme="dark"] .voltar { color: #ff8fbd; }
+html[data-theme="dark"] .form-group label { color: #d7fbb3 !important; }
+html[data-theme="dark"] .form-container :is(.current-image-container, .variacoes-card, .opcao-variacao) { background-color: #1c2b1f !important; border-color: #365840 !important; }
+html[data-theme="dark"] .form-container .btn-cancel { color: #e4ebe5; background-color: #1c2b1f; border-color: #365840; }
+

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Canamania</title>
 
-    <link rel="stylesheet" href="/static/css/dashboard.css?v=podio-bronze-1">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=maquinas-status-6">
     <link rel="stylesheet" href="/static/css/welcome_toast.css?v=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
@@ -48,11 +48,13 @@
     {% include "partials/navbar.html" %}
 
     {% if request.query_params.get('login') == 'ok' %}
-    <div id="feedback-bem-vindo" aria-hidden="false">
-        <div class="feedback-bem-vindo-card" role="status" aria-labelledby="feedback-bem-vindo-titulo">
+    <div id="feedback-bem-vindo" class="feedback-bem-vindo" aria-hidden="false">
+        <div class="feedback-bem-vindo-card" role="dialog" aria-modal="true" aria-labelledby="feedback-bem-vindo-titulo">
             <div class="feedback-bem-vindo-icone"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></div>
             <h2 id="feedback-bem-vindo-titulo">Acesso realizado com sucesso!</h2>
             <p>Bem-vindo, {{ usuario.nome or 'ao sistema' }}. Seu acesso foi confirmado.</p>
+            <div class="feedback-bem-vindo-progresso" aria-hidden="true"><span></span></div>
+            <button type="button" class="feedback-bem-vindo-continuar">Continuar <i class="fa-solid fa-arrow-right"></i></button>
         </div>
     </div>
     {% endif %}
@@ -103,7 +105,7 @@
 
         <h2>Lojas e operação</h2>
         <div class="cards">
-            <a class="card card-link azul" href="/maquinas" aria-label="Ver máquinas em operação">
+            <a class="card card-link maquinas-ocupadas" href="/maquinas" aria-label="Ver máquinas em operação">
                 <div>
                     <span>Máquinas em operação</span>
                     <h3 id="armarios-ocupados">{{ armarios_ocupados | default(0) }}</h3>
@@ -111,7 +113,7 @@
                 <i class="fa-solid fa-lock"></i>
             </a>
 
-            <a class="card card-link verde" href="/maquinas" aria-label="Ver máquinas disponíveis">
+            <a class="card card-link maquinas-disponiveis" href="/maquinas" aria-label="Ver máquinas disponíveis">
                 <div>
                     <span>Máquinas disponíveis</span>
                     <h3 id="armarios-disponiveis">{{ armarios_disponiveis | default(0) }}</h3>
@@ -119,7 +121,7 @@
                 <i class="fa-solid fa-lock-open"></i>
             </a>
 
-            <a class="card card-link vermelho" href="/maquinas" aria-label="Ver máquinas em manutenção">
+            <a class="card card-link maquinas-manutencao" href="/maquinas" aria-label="Ver máquinas em manutenção">
                 <div>
                     <span>Máquinas em manutenção</span>
                     <h3 id="armarios-manutencao">{{ armarios_manutencao | default(0) }}</h3>
@@ -170,7 +172,7 @@
                                 </section>
                             {% endfor %}
                         {% else %}
-                            <div style="color: #6b7280; padding: 15px;">Nenhum produto cadastrado.</div>
+                            <div class="estado-vazio-categoria">Nenhum produto cadastrado.</div>
                         {% endif %}
                     </div>
                 </div>
@@ -210,11 +212,7 @@
 
     </div>
 
-    <footer class="main-footer">
-        <div class="footer-content" style="text-align:center; padding:20px; color:#ffffff;">
-            <p>&copy; 2026 Canamania. Gestão de consumos.</p>
-        </div>
-    </footer>
+    <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
 
     <script src="/static/javascript/dashboard.js?v=4"></script>
 

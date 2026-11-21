@@ -13,55 +13,7 @@ body {
     color: #020617;
 }
 
-html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .page-title h1{color:#d7fbb3}html[data-theme="dark"] .page-title p{color:#bed0c0}html[data-theme="dark"] :is(.armarios-panel,.card-resumo,.filtro-bar,.legenda-bar,.grid-shell,.modal-card,.confirmacao-card){background:#142019!important;border-color:#385b41!important;color:#edf7eb!important}html[data-theme="dark"] :is(.armarios-page input,.armarios-page select){background:#0d1510!important;color:#edf7eb!important;border-color:#416847!important}html[data-theme="dark"] :is(.armarios-page th,.armarios-page td,.armarios-page label,.armarios-page span,.armarios-page p,.armarios-page small){color:#d5e4d5!important}html[data-theme="dark"] .item-armario{background:#101913!important;border-color:#416847!important;color:#baf57a!important}html[data-theme="dark"] .armarios-tab{background:#1a2920!important;color:#d5e4d5!important;border-color:#385b41!important}html[data-theme="dark"] .armarios-tab.active{background:#ff1877!important;color:#fff!important;border-color:#ff70ad!important}
-
-.navbar {
-    width: 100%;
-    min-height: 80px;
-    height: auto;
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 60px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.logo img {
-    height: 65px;
-    width: auto;
-    display: block;
-}
-
-.menu {
-    display: flex;
-    gap: 28px;
-    list-style: none;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.menu a {
-    text-decoration: none;
-    color: #6b7280;
-    font-size: 17px;
-    transition: 0.3s;
-}
-
-.menu a:hover,
-.menu a.active {
-    color: #09145c;
-    font-weight: 700;
-}
-
-.menu a.btn-sair {
-    color: #dc2626;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
+html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .page-title h1{color:#d7fbb3}html[data-theme="dark"] .page-title p{color:#bed0c0}html[data-theme="dark"] :is(.armarios-panel,.card-resumo,.filtro-bar,.legenda-bar,.grid-shell,.modal-card,.confirmacao-card){background:#142019!important;border-color:#385b41!important;color:#edf7eb!important}html[data-theme="dark"] :is(.armarios-page input,.armarios-page select){background:#0d1510!important;color:#edf7eb!important;border-color:#416847!important}html[data-theme="dark"] :is(.armarios-page th,.armarios-page td,.armarios-page label,.armarios-page span,.armarios-page p,.armarios-page small){color:#d5e4d5!important}html[data-theme="dark"] .armarios-tab{background:#1a2920!important;color:#d5e4d5!important;border-color:#385b41!important}html[data-theme="dark"] .armarios-tab.active{background:#ff1877!important;color:#fff!important;border-color:#ff70ad!important}
 
 .armarios-page {
     flex: 1;
@@ -261,16 +213,21 @@ html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .pa
 .alerta-sucesso { background: #dcfce7; border: 1px solid #86efac; color: #166534; border-radius: 6px; font-size: 14px; font-weight: 700; margin-bottom: 16px; padding: 12px 16px; }
 .armarios-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
 .armarios-tab { border: 1px solid #d9dee7; background: #fff; color: #334155; border-radius: 6px; padding: 10px 14px; cursor: pointer; font-weight: 700; }
-.armarios-tab.active { background: #09145c; color: #fff; border-color: #09145c; }
+.armarios-tab.active { background: #083d2c; color: #fff; border-color: #09145c; }
 .armarios-panel { background: #fff; border: 1px solid #d9dee7; border-radius: 6px; box-shadow: 0 1px 2px rgba(15,23,42,.12); padding: 22px; margin-bottom: 16px; }
 .panel-heading { margin-bottom: 18px; }.panel-heading h2 { font-size: 20px; margin-bottom: 5px; }.panel-heading p { color: #64748b; font-size: 14px; }
 .reserva-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: end; }.reserva-form label, .cadastro-armario-form label { display: grid; gap: 6px; color: #334155; font-size: 13px; font-weight: 700; }.reserva-form input, .reserva-form select, .cadastro-armario-form input, .historico-filtros input, .historico-filtros select { width: 100%; border: 1px solid #d1d5db; border-radius: 6px; padding: 10px; font-size: 14px; background: #fff; }.cadastro-armario-form { display: flex; align-items: end; gap: 14px; }.cadastro-armario-form label { width: min(280px,100%); }
 .historico-filtros { display: flex; gap: 12px; margin-bottom: 16px; }.historico-filtros label { position: relative; flex: 1; }.historico-filtros label i { position: absolute; left: 12px; top: 12px; color: #64748b; }.historico-filtros input { padding-left: 34px; }.historico-filtros select { width: 180px; }.tabela-reservas-wrap { overflow-x: auto; }.tabela-reservas { width: 100%; border-collapse: collapse; text-align: left; }.tabela-reservas th, .tabela-reservas td { padding: 13px; border-bottom: 1px solid #e5e7eb; font-size: 14px; }.tabela-reservas th { color: #64748b; background: #f8fafc; }.status-reserva { text-transform: capitalize; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700; }.status-reserva.ativa { background: #dcfce7; color: #166534; }.status-reserva.cancelada { background: #fee2e2; color: #991b1b; }.btn-cancelar-reserva { background: none; color: #b91c1c; border: 0; font-weight: 700; cursor: pointer; }.empty-reservas { text-align: center; color: #64748b; }
 
-.status-disponivel { background: #00c853; }
-.status-ocupado { background: #3b73f6; }
-.status-manutencao { background: #ff6d00; }
-.status-desativado { background: #64748b; }
+.item-armario.status-disponivel { background: #00c853 !important; }
+.item-armario.status-ocupado { background: #3b73f6 !important; }
+.item-armario.status-manutencao { background: #ff6d00 !important; }
+.item-armario.status-desativado { background: #64748b !important; }
+
+html[data-theme="dark"] .item-armario.status-disponivel { background: #00a84f !important; border-color: #00a84f !important; color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-ocupado { background: #2563eb !important; border-color: #2563eb !important; color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-manutencao { background: #ea580c !important; border-color: #ea580c !important; color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-desativado { background: #64748b !important; border-color: #64748b !important; color: #fff !important; }
 
 .btn-ativar-armario { margin-right: auto; border: 1px solid #86efac; border-radius: 6px; padding: 10px 14px; background: #f0fdf4; color: #166534; font-weight: 700; cursor: pointer; }
 .btn-ativar-armario:hover { background: #dcfce7; }
@@ -389,7 +346,7 @@ html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .pa
 .main-footer {
     margin-top: auto;
     width: 100%;
-    background: #09145c;
+    background: #083d2c;
     color: #fff;
     text-align: center;
     padding: 20px;
@@ -442,3 +399,135 @@ html[data-theme="dark"] .armarios-page{color:#edf7eb}html[data-theme="dark"] .pa
         min-height: 58px;
     }
 }
+
+.item-armario { min-width: 0; padding: 8px 5px; }
+.item-armario .numero-armario { font-size: 16px; }
+.item-armario .local-armario { display: block; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 600; line-height: 1.2; }
+.item-armario .local-armario i { font-size: 10px; }
+
+
+
+/* Painel de m?quinas organizado por filial. */
+.filiais-maquinas { display: grid; gap: 24px; }
+.grupo-filial { overflow: hidden; border: 1px solid #dce5dc; border-radius: 16px; background: linear-gradient(145deg, #ffffff, #f5faf5); box-shadow: 0 10px 30px rgba(22, 54, 32, .08); }
+.grupo-filial-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px 22px 4px; }
+.grupo-filial-identidade { display: flex; min-width: 190px; align-items: center; gap: 14px; }
+.grupo-filial-icone { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 14px; color: #16844a; background: #e5f7eb; font-size: 18px; }
+.grupo-filial-cabecalho h2 { color: #173b27; font-size: 20px; }
+.grupo-filial-cabecalho p { margin-top: 4px; color: #668071; font-size: 13px; }
+.grupo-filial-resumo { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.grupo-filial-resumo span { display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; border: 1px solid #e2ebe3; border-radius: 999px; background: #fff; color: #496253; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.grupo-filial-resumo .resumo-total { color: #183b27; background: #eef8ee; border-color: #d4e9d5; }
+.grupo-filial-resumo .resumo-total strong { font-size: 15px; }
+.grupo-filial-resumo .resumo-disponiveis i { color: #16844a; }
+.grupo-filial-resumo .resumo-ocupadas i { color: #3478e5; }
+.grupo-filial-resumo .resumo-manutencao i { color: #e87924; }
+.grupo-filial .grid-shell { padding: 16px 20px 22px; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.grid-armarios { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+.item-armario { position: relative; aspect-ratio: auto; min-height: 138px; align-items: stretch; justify-content: space-between; gap: 12px; padding: 15px; overflow: hidden; border: 1px solid rgba(255,255,255,.28); border-radius: 14px; text-align: left; box-shadow: 0 8px 18px rgba(15,23,42,.13); }
+.item-armario::after { position: absolute; right: -22px; bottom: -36px; width: 100px; height: 100px; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; content: ""; }
+.maquina-card-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.maquina-card-topo > i { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: rgba(255,255,255,.18); font-size: 16px; }
+.status-maquina { border-radius: 999px; padding: 5px 8px; background: rgba(255,255,255,.18); font-size: 10px; font-weight: 800; white-space: nowrap; }
+.item-armario .numero-armario { font-size: 17px; letter-spacing: .1px; }
+.item-armario .local-armario { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.item-armario .reserva-maquina { overflow: hidden; color: rgba(255,255,255,.9); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.armarios-page .item-armario.status-disponivel { background: linear-gradient(135deg,#0aa95b,#087c46) !important; border-color: #087c46 !important; color: #fff !important; }
+.item-armario.status-ocupado { background: linear-gradient(135deg,#3478e5,#2454b8) !important; }
+.armarios-page .item-armario.status-manutencao { background: linear-gradient(135deg,#f58a28,#c65316) !important; border-color: #c65316 !important; color: #fff !important; }
+.item-armario.status-desativado { background: linear-gradient(135deg,#718096,#475569) !important; }
+.sem-maquinas { grid-column: 1 / -1; padding: 20px; color: #64748b; text-align: center; }
+html[data-theme="dark"] .grupo-filial { background: linear-gradient(145deg,#142019,#101912); border-color: #385b41; }
+html[data-theme="dark"] .grupo-filial-cabecalho h2 { color: #d7fbb3; }
+html[data-theme="dark"] .grupo-filial-cabecalho p { color: #bed0c0; }
+html[data-theme="dark"] .grupo-filial-resumo span { color: #d5e4d7; background: #17231a; border-color: #38513d; }
+html[data-theme="dark"] .grupo-filial-resumo .resumo-total { color: #d7fbb3; background: #203425; border-color: #426b4a; }
+@media (max-width: 460px) { .grid-armarios { grid-template-columns: repeat(2,minmax(0,1fr)); } .item-armario { min-height: 132px; } }
+@media (max-width: 720px) { .grupo-filial-cabecalho { align-items: flex-start; flex-direction: column; } .grupo-filial-resumo { justify-content: flex-start; } }
+
+/* Status colors stay consistent between cards, legend and both themes. */
+.dot-disponivel { background: #0aa95b; }
+.dot-ocupado { background: #3478e5; }
+.dot-manutencao { background: #f58a28; }
+.dot-desativado { background: #718096; }
+html[data-theme="dark"] .armarios-page .item-armario { color: #fff !important; }
+html[data-theme="dark"] .armarios-page .item-armario span { color: #fff !important; }
+html[data-theme="dark"] .armarios-page .item-armario.status-disponivel { background: linear-gradient(135deg,#0aa95b,#087c46) !important; border-color: #087c46 !important; color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-ocupado { background: linear-gradient(135deg,#3478e5,#2454b8) !important; }
+html[data-theme="dark"] .armarios-page .item-armario.status-manutencao { background: linear-gradient(135deg,#f58a28,#c65316) !important; border-color: #c65316 !important; color: #fff !important; }
+html[data-theme="dark"] .item-armario.status-desativado { background: linear-gradient(135deg,#718096,#475569) !important; }
+
+
+/* Cores alinhadas à identidade visual Canamania. */
+.armarios-page .item-armario.status-disponivel { background: linear-gradient(135deg,#16844a,#0b5c37) !important; border-color: #0b5c37 !important; color: #fff !important; }
+.armarios-page .item-armario.status-manutencao { background: linear-gradient(135deg,#fff0f6,#ffd6e7) !important; border-color: #f4b5ce !important; color: #8d174f !important; }
+.armarios-page .item-armario.status-manutencao .reserva-maquina { color: #8d174f !important; }
+.dot-disponivel { background: #baf57a; }
+.dot-manutencao { background: #ffd6e7; }
+html[data-theme="dark"] .armarios-page .item-armario.status-disponivel { background: linear-gradient(135deg,#16844a,#0b5c37) !important; border-color: #0b5c37 !important; color: #fff !important; }
+html[data-theme="dark"] .armarios-page .item-armario.status-disponivel span { color: #fff !important; }
+html[data-theme="dark"] .armarios-page .item-armario.status-manutencao { background: linear-gradient(135deg,#fff0f6,#ffd6e7) !important; border-color: #f4b5ce !important; color: #8d174f !important; }
+html[data-theme="dark"] .armarios-page .item-armario.status-manutencao span { color: #8d174f !important; }
+
+.armarios-page .item-armario.status-desativado { background: linear-gradient(135deg,#d8dfda,#b8c3bb) !important; border-color: #aab6ad !important; color: #58665d !important; opacity: .78; }
+html[data-theme="dark"] .armarios-page .item-armario.status-desativado { background: linear-gradient(135deg,#66736a,#4b584f) !important; border-color: #56645a !important; color: #e0e7e2 !important; }
+html[data-theme="dark"] .armarios-page .item-armario.status-desativado span { color: #e0e7e2 !important; }
+
+.cards-resumo-container { grid-template-columns: repeat(5,minmax(0,1fr)); }
+.card-desativado { border-color: #cbd5ce; }
+.card-desativado strong, .card-desativado i { color: #69776e; }
+.card-desativado i { background: #edf1ee; }
+.dot-disponivel { background: #0b5c37; }
+.dot-manutencao { background: #ffd6e7; }
+.grupo-filial-resumo .resumo-disponiveis i { color: #0b5c37; }
+.grupo-filial-resumo .resumo-manutencao i { color: #d85c91; }
+.grupo-filial-resumo .resumo-desativadas i { color: #849188; }
+@media (max-width: 760px) { .cards-resumo-container { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 460px) { .cards-resumo-container { grid-template-columns: 1fr; } }
+
+.card-disponivel { border-color: #0b5c37 !important; }
+.card-disponivel strong, .card-disponivel i { color: #0b5c37 !important; }
+.card-disponivel i { background: #e5f4eb !important; }
+.card-manutencao { border-color: #f4b5ce !important; }
+.card-manutencao strong, .card-manutencao i { color: #d85c91 !important; }
+.card-manutencao i { background: #fff0f6 !important; }
+
+/* Em uso usa o rosa da marca em todos os indicadores. */
+.armarios-page .item-armario.status-ocupado { background: linear-gradient(135deg,#ff4d91,#d90864) !important; border-color: #d90864 !important; color: #fff !important; }
+html[data-theme="dark"] .armarios-page .item-armario.status-ocupado { background: linear-gradient(135deg,#ff4d91,#d90864) !important; border-color: #d90864 !important; color: #fff !important; }
+.dot-ocupado { background: #ff1877 !important; }
+.card-ocupado { border-color: #ff9fc4 !important; }
+.card-ocupado strong, .card-ocupado i { color: #d90864 !important; }
+.card-ocupado i { background: #ffe5f0 !important; }
+.grupo-filial-resumo .resumo-ocupadas i { color: #d90864 !important; }
+
+.maquina-card-topo { min-width: 0; }
+.maquina-card-topo > i { flex: 0 0 34px; }
+.status-maquina { min-width: 0; white-space: normal; text-align: center; line-height: 1.15; }
+
+.item-armario .status-maquina { flex: 0 1 auto; min-width: 0; max-width: calc(100% - 42px); padding: 5px 7px; font-size: 10px !important; white-space: normal; overflow-wrap: anywhere; text-align: center; line-height: 1.15; }
+
+.item-armario .status-maquina { font-size: 12px !important; overflow-wrap: normal; }
+
+/* Filtros usam a mesma paleta dos respectivos estados. */
+.btn-filtro[data-filtro=""] { background: #f1f5f2 !important; color: #425148 !important; }
+.btn-filtro[data-filtro="disponivel"] { background: #0b5c37 !important; color: #fff !important; }
+.btn-filtro[data-filtro="ocupado"] { background: #ff1877 !important; color: #fff !important; }
+.btn-filtro[data-filtro="manutencao"] { background: #ffd6e7 !important; color: #8d174f !important; }
+.btn-filtro[data-filtro="desativado"] { background: #b8c3bb !important; color: #58665d !important; }
+.btn-filtro.active { box-shadow: 0 0 0 2px #083d2c inset, 0 4px 10px rgba(8,61,44,.15); }
+.dot-desativado { background: #b8c3bb !important; }
+
+/* Filtros com tons suaves e estados visuais consistentes. */
+.btn-filtro[data-filtro=""] { background: #fff !important; color: #425148 !important; border: 1px solid #d9e3dc !important; box-shadow: none !important; }
+.btn-filtro[data-filtro="disponivel"] { background: #e8f5ec !important; color: #0b5c37 !important; border: 1px solid #b9d9c4 !important; box-shadow: none !important; }
+.btn-filtro[data-filtro="ocupado"] { background: #fff0f6 !important; color: #d90864 !important; border: 1px solid #ffc1d9 !important; box-shadow: none !important; }
+.btn-filtro[data-filtro="manutencao"] { background: #fff5f8 !important; color: #8d174f !important; border: 1px solid #f4c5d7 !important; box-shadow: none !important; }
+.btn-filtro[data-filtro="desativado"] { background: #f0f3f1 !important; color: #58665d !important; border: 1px solid #d0d8d2 !important; box-shadow: none !important; }
+.btn-filtro.active { box-shadow: 0 0 0 2px currentColor inset !important; }
+
+html[data-theme="dark"] .armarios-page .filtro-bar .btn-filtro[data-filtro=""] { background: #243128 !important; color: #d5e4d7 !important; border-color: #405447 !important; }
+html[data-theme="dark"] .armarios-page .filtro-bar .btn-filtro[data-filtro="disponivel"] { background: #1d3d2b !important; color: #baf57a !important; border-color: #426b4a !important; }
+html[data-theme="dark"] .armarios-page .filtro-bar .btn-filtro[data-filtro="ocupado"] { background: #4a1e34 !important; color: #ff9fc4 !important; border-color: #873757 !important; }
+html[data-theme="dark"] .armarios-page .filtro-bar .btn-filtro[data-filtro="manutencao"] { background: #432536 !important; color: #ffc2d8 !important; border-color: #754158 !important; }
+html[data-theme="dark"] .armarios-page .filtro-bar .btn-filtro[data-filtro="desativado"] { background: #303b34 !important; color: #c4cec7 !important; border-color: #4a594f !important; }
