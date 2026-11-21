@@ -99,6 +99,7 @@
                                 (valores and valores.role=='funcionario' ) else '' }}>Funcionário</option>
                             <option value="admin" {{ 'selected' if (editando and editando.role=='admin' ) or (valores
                                 and valores.role=='admin' ) else '' }}>Administrador</option>
+                            <option value="cliente" {{ 'selected' if editando and editando.role == 'cliente' else '' }}>Cliente</option>
                         </select>
                     </div>
                 </div>

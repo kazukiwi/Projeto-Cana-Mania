@@ -35,8 +35,11 @@ from app.controllers import (
     tamanhos_controller,
     estoque_controller,
     insights_controller,
+    rfid_admin_controller,
+    cliente_pedido_controller,
 )
 
+from app.services.rfid_service import fechar_rfid
 from app.auth import get_usuario_opcional, get_usuario_logado
 
 
@@ -66,9 +69,25 @@ async def lifespan(app: FastAPI):
         tarefa_fechamento.cancel()
         with suppress(asyncio.CancelledError):
             await tarefa_fechamento
+        fechar_rfid()
 
 
 app = FastAPI(title="Sistema Estoque", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def limitar_acesso_cliente(request: Request, call_next):
+    usuario = get_usuario_opcional(request)
+    if usuario and usuario.get("role") == "cliente":
+        import re
+        path = request.url.path
+        allowed = (path.startswith("/static/") or path.startswith("/auth/") or
+                   path.startswith("/cliente/") or path == "/rfid/operacoes" or
+                   bool(re.fullmatch(r"/rfid/operacoes/[0-9a-f]{32}(?:/cancelar)?", path)) or
+                   bool(re.fullmatch(r"/pdv/venda/\d+", path)) or path.startswith("/confirmar-qr/"))
+        if not allowed:
+            return RedirectResponse("/cliente/", status_code=303) if request.method == "GET" else JSONResponse({"detail": "Acesso não permitido."}, status_code=403)
+    return await call_next(request)
 
 # 2º: CONFIGURAR ARQUIVOS ESTÁTICOS E TEMPLATES
 APP_DIR = Path(__file__).resolve().parent
@@ -196,6 +215,8 @@ app.include_router(categorias_controller.router)
 app.include_router(produto_controller.router)
 app.include_router(movimentacao_controller.router)
 app.include_router(pdv_controller.router)
+app.include_router(rfid_admin_controller.router)
+app.include_router(cliente_pedido_controller.router)
 app.include_router(tamanhos_controller.router)
 app.include_router(estoque_controller.router)
 app.include_router(insights_controller.router)

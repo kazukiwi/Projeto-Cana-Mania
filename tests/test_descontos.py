@@ -10,9 +10,10 @@ with patch.object(Base.metadata, "create_all"):
 
 
 class DescontoVendaTests(unittest.TestCase):
-    def finalizar(self, desconto="", cortesia="false", pagamento="dinheiro"):
+    def finalizar(self, desconto="", cortesia="false", pagamento="rfid"):
         produto = SimpleNamespace(id=4, nome="Produto teste", preco=20.0, eh_consumo=True)
         db = MagicMock()
+        db.info = {"rfid_venda": True}
         db.query.return_value.join.return_value.filter.return_value.with_for_update.return_value.first.return_value = produto
         resposta = finalizar_venda(
             request=None,

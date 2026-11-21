@@ -867,3 +867,40 @@ body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:d
 body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final { background: linear-gradient(135deg,#ff1877,#d90864) !important; color: #fff !important; border-color: rgba(255,255,255,.34) !important; }
 body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:disabled { background: linear-gradient(135deg,#ff1877,#d90864) !important; color: #fff !important; border-color: rgba(255,255,255,.34) !important; }
 body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover, html[data-theme="dark"] body .pdv-finalizar-sticky #btn-salvar-venda-banco.btn-salvar-venda-final:not(:disabled):hover { background: linear-gradient(135deg,#d90864,#b50754) !important; color: #fff !important; }
+.pagamento-card[hidden], .pagamento-card [hidden] { display: none !important; }
+.pagamento-card {
+  box-sizing: border-box; margin: 18px 0; padding: 24px; border: 1px solid #aad9c9; border-radius: 18px;
+  background: #f1fbf6; color: #123d32; text-align: center;
+  box-shadow: 0 12px 28px rgba(8, 83, 58, .1);
+  animation: pagamento-abrir .25s ease-out;
+}
+.pagamento-card-icone { display: grid; place-items: center; width: 54px; height: 54px; margin: 0 auto 12px; border-radius: 50%; background: #d5f4e5; color: #087455; font-size: 22px; }
+.pagamento-card h3 { margin: 0 0 8px; font-size: 20px; }
+.pagamento-card p { margin: 8px auto; max-width: 360px; line-height: 1.5; }
+.pagamento-card img { display: block; max-width: 100%; height: auto; margin: 16px auto; border: 10px solid white; border-radius: 10px; }
+.pagamento-card .pagamento-card-ajuda { color: #56756a; font-size: 13px; }
+.pagamento-card-sucesso {
+  position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 50% 0%, #fff 0%, #effcf0 48%, #d9f5e1 100%);
+  border-color: #8fd8a4; box-shadow: 0 16px 38px rgba(8, 83, 58, .16);
+}
+.pagamento-card-sucesso::before, .pagamento-card-sucesso::after {
+  content: '✦  ·  ✧'; position: absolute; top: 20%; color: #f59e0b;
+  font-size: 22px; letter-spacing: 5px; pointer-events: none;
+  animation: pagamento-brilho 1.3s ease-in-out infinite alternate;
+}
+.pagamento-card-sucesso::before { left: 8%; transform: rotate(-18deg); }
+.pagamento-card-sucesso::after { right: 8%; color: #ed4990; animation-delay: .3s; }
+.pagamento-card-sucesso .pagamento-card-icone {
+  width: 72px; height: 72px; margin-bottom: 16px; color: white; font-size: 32px;
+  background: linear-gradient(135deg, #12ad75, #08744f); box-shadow: 0 0 0 9px rgba(18, 173, 117, .12);
+  animation: pagamento-celebrar .6s cubic-bezier(.18,.9,.32,1.4) both;
+}
+.pagamento-card-sucesso h3 { color: #075b3c; font-size: 24px; }
+.pagamento-card-sucesso #rfid-status-venda { color: #245e48; font-weight: 600; }
+.pagamento-card-sucesso #pagamento-card-ajuda { margin-top: 16px; }
+.pagamento-card-erro { background: #fff3f4; color: #81213a; border-color: #f1a5b4; }
+@keyframes pagamento-abrir { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pagamento-celebrar { from { opacity: 0; transform: scale(.45) rotate(-15deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes pagamento-brilho { from { opacity: .4; translate: 0 5px; } to { opacity: 1; translate: 0 -5px; } }
+@media (prefers-reduced-motion: reduce) { .pagamento-card, .pagamento-card-sucesso::before, .pagamento-card-sucesso::after, .pagamento-card-sucesso .pagamento-card-icone { animation: none; } }

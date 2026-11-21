@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>PDV - Nova Venda</title>
-    <link rel="stylesheet" href="/static/css/vendas.css?v=pdv-ux-13">
+    <link rel="stylesheet" href="/static/css/vendas.css?v=pagamento-card-4">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="/static/javascript/confirmar_saida.js" defer></script>
 </head>
@@ -89,7 +89,7 @@
                     </select>
                 </div>
 
-                <form id="form-add-item-pdv">
+                <form id="form-add-item-pdv" data-sem-processando>
                     <div class="form-group" style="margin-bottom: 15px;">
                         <label for="busca-frozen" style="display:block; font-weight:bold; margin-bottom:5px;">Produto</label>
                         <input id="busca-frozen" type="search" placeholder="Digite para procurar um consumo..." autocomplete="off" role="combobox" aria-expanded="false" aria-controls="resultado-busca-frozen" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px;">
@@ -166,7 +166,7 @@
                     </div>
                 </div>
 
-                <form id="form-finalizar-real" action="/pdv/finalizar" method="POST">
+                <form id="form-finalizar-real" action="/pdv/finalizar" method="POST" data-sem-processando>
                     <input type="hidden" name="carrinho_json" id="carrinho_json_input">
                     <input type="hidden" name="desconto_manual_percentual" id="desconto-manual-aplicado" value="">
                     <input type="hidden" name="cortesia" id="cortesia-aplicada" value="false">
@@ -184,7 +184,7 @@
                         </select>
                     </div>
                     <div class="form-group" style="margin-bottom:15px;">
-                        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;"><input type="checkbox" id="dividir-pagamento"> Dividir em duas formas de pagamento</label>
+                        <label style="display:none"><input type="checkbox" id="dividir-pagamento"> Dividir pagamento</label>
                     </div>
                     <div id="segundo-pagamento" hidden>
                         <div class="form-group" style="margin-bottom:15px;">
@@ -224,6 +224,24 @@
                             <button type="button" id="pix-copiar" class="pix-button pix-button-secondary"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copiar código Pix</button>
                         </div>
                         <p class="pix-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span>Confira o recebimento no banco antes de finalizar a venda. A confirmação não é automática.</span></p>
+                    </section>
+
+                    <div id="confirmacao-opcoes" hidden style="margin-bottom:15px">
+                        <label for="confirmacao-modo">Confirmar com</label>
+                        <select id="confirmacao-modo" style="width:100%;padding:10px">
+                            <option value="cartao">Cartão ou pulseira na maquininha</option>
+                            <option value="qr">QR Code no celular</option>
+                        </select>
+                    </div>
+                    <section id="pagamento-card" class="pagamento-card" hidden aria-live="polite">
+                        <span class="pagamento-card-icone" aria-hidden="true"><i id="pagamento-card-icone" class="fa-solid fa-credit-card"></i></span>
+                        <h3 id="pagamento-card-titulo">Aguardando pagamento</h3>
+                        <p id="rfid-status-venda" role="status"></p>
+                        <div id="confirmacao-qr" hidden>
+                            <img id="confirmacao-qr-imagem" width="220" height="220" alt="QR Code de confirmação da venda simulada">
+                            <p class="pagamento-card-ajuda">Leia o código com o celular conectado à mesma rede.</p>
+                        </div>
+                        <p class="pagamento-card-ajuda" id="pagamento-card-ajuda">Pagamento simulado</p>
                     </section>
 
                     <div class="form-group" style="margin-bottom:15px;">
@@ -288,8 +306,7 @@
 
     <script id="variacoes-produtos" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":[{% for variacao in produto.estoques_variacoes %}{"tamanho_id":{{ variacao.tamanho_id }},"cor":{{ variacao.cor|tojson }},"estoque_atual":{{ variacao.estoque_atual }},"preco":{{ variacao.preco }}}{% if not loop.last %},{% endif %}{% endfor %}]{% if not loop.last %},{% endif %}{% endfor %} }</script>
     <script id="estoque-filiais" type="application/json">{ {% for produto in produtos %}"{{ produto.id }}":{ {% for filial in filiais %}{{ filial|tojson }}:{{ estoque_filiais.get((produto.id, filial), 0) }}{% if not loop.last %},{% endif %}{% endfor %} }{% if not loop.last %},{% endif %}{% endfor %} }</script>
-    <script src="/static/javascript/vendas.js?v=pdv-ux-4"></script>
-    <script src="/static/javascript/pix.js?v=discount-aware-2"></script>
+    <script src="/static/javascript/vendas.js?v=pagamento-card-4"></script>
     <script type="application/x-disabled">
         let carrinho = [];
 

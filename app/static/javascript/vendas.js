@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const campoDescontoManual = document.getElementById('desconto-manual-percentual');
     const formaPagamento = document.getElementById('forma_pagamento');
     const dividirPagamento = document.getElementById('dividir-pagamento');
+    const opcoesConfirmacao = document.getElementById('confirmacao-opcoes');
+    const modoConfirmacao = document.getElementById('confirmacao-modo');
+    formaPagamento.addEventListener('change', () => {
+        opcoesConfirmacao.hidden = !['pix', 'cortesia'].includes(formaPagamento.value);
+        modoConfirmacao.value = formaPagamento.value === 'pix' ? 'qr' : 'cartao';
+    });
     const tamanho = document.getElementById('pdv-tamanho');
     const cor = document.getElementById('pdv-cor');
     const grupoTamanho = document.getElementById('grupo-tamanho');
@@ -226,36 +232,101 @@ document.addEventListener('DOMContentLoaded', () => {
 
         atualizarPagamentoDividido();
         if (!formulario.reportValidity()) return;
-        const descontoConfirmacao = document.getElementById('pdv-linha-desconto').style.display !== 'none'
-            ? `\n${document.getElementById('pdv-desconto-label').textContent} ${document.getElementById('pdv-desconto').textContent}` : '';
-        const pagamento1 = document.getElementById('forma_pagamento');
-        const pagamentosConfirmacao = [{
-            forma: pagamento1.selectedOptions[0]?.text.trim(),
-            valor: dividirPagamento.checked ? Number(document.getElementById('valor_pagamento_1').value) : Number(document.getElementById('pdv-total-geral').textContent.replace(/[^\d,.]/g, '').replace(/\./g, '').replace(',', '.')),
-        }];
-        if (dividirPagamento.checked) {
-            const pagamento2 = document.getElementById('forma_pagamento_2');
-            pagamentosConfirmacao.push({ forma: pagamento2.selectedOptions[0]?.text.trim(), valor: Number(document.getElementById('valor_pagamento_2').value) });
-        }
-        const confirmado = await confirmarVendaPDV({
-            loja: filial.value,
-            cliente: document.getElementById('select-cliente').selectedOptions[0]?.text.trim(),
-            itens: carrinho.map(item => `${item.quantidade} x ${item.nome}${item.tamanho ? ` (${item.tamanho}, ${item.cor})` : ''}`),
-            desconto: descontoConfirmacao,
-            total: document.getElementById('pdv-total-geral').textContent,
-            pagamentos: pagamentosConfirmacao,
-        });
-        if (!confirmado) return;
-
         formulario.dataset.enviando = 'true';
         botao.disabled = true;
-        botao.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Realizando venda...';
+        const status = document.getElementById('rfid-status-venda');
+        const modo = opcoesConfirmacao.hidden ? 'cartao' : modoConfirmacao.value;
+        const card = document.getElementById('pagamento-card');
+        const titulo = document.getElementById('pagamento-card-titulo');
+        const icone = document.getElementById('pagamento-card-icone');
+        card.hidden = false;
+        card.style.minHeight = '';
+        card.classList.remove('pagamento-card-sucesso', 'pagamento-card-erro');
+        titulo.textContent = 'Aguardando pagamento';
+        document.getElementById('pagamento-card-ajuda').textContent = 'Pagamento simulado';
+        icone.className = modo === 'qr' ? 'fa-solid fa-qrcode' : 'fa-solid fa-credit-card';
+        const valor = document.getElementById('pdv-total-geral').textContent.trim();
+        status.textContent = modo === 'qr' ? `Leia o QR Code para confirmar o pagamento de ${valor}.` : `Encoste o cartão na maquininha para realizar o pagamento de ${valor}.`;
+        document.getElementById('confirmacao-qr').hidden = true;
+        card.scrollIntoView({behavior: 'smooth', block: 'center'});
+        const dados = Object.fromEntries(new FormData(formulario));
+        formaPagamento.disabled = true;
+        modoConfirmacao.disabled = true;
+        dados.tipo = 'pagar';
+        dados.confirmacao = modo;
+        dados.centavos = Math.round(Number(document.getElementById('pdv-total-geral').textContent.replace(/[^\d,.]/g, '').replace(/\./g, '').replace(',', '.')) * 100);
+        try {
+            const inicio = await fetch('/rfid/operacoes', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(dados)});
+            const operacao = await inicio.json();
+            if (!inicio.ok) throw new Error(operacao.detail || 'Não foi possível iniciar a leitura.');
+            if (modo === 'qr') {
+                document.getElementById('confirmacao-qr-imagem').src = operacao.qr_code;
+                document.getElementById('confirmacao-qr').hidden = false;
+                status.textContent = `Leia o QR Code para confirmar o pagamento de ${valor}.`;
+            }
+            while (true) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                const resposta = await fetch(`/rfid/operacoes/${encodeURIComponent(operacao.id)}`, {cache: 'no-store'});
+                const resultado = await resposta.json();
+                if (!resposta.ok) throw new Error(resultado.detail || 'Falha ao consultar leitura.');
+                if (resultado.status === 'na_fila') {
+                    titulo.textContent = 'Aguardando sua vez';
+                    status.textContent = `Seu pedido está na fila. Posição: ${resultado.posicao || 'aguardando'}.`;
+                    continue;
+                }
+                if (resultado.status === 'aguardando_tag') {
+                    titulo.textContent = 'Aguardando pagamento';
+                    status.textContent = `Encoste o cartão na maquininha para realizar o pagamento de ${valor}.`;
+                }
+                if (['aguardando_tag', 'aguardando_qr', 'tag_recebida', 'processando'].includes(resultado.status)) continue;
+                if (resultado.status === 'aprovado' && resultado.venda_id) {
+                    sessionStorage.removeItem('carrinhoPDV');
+                    card.style.minHeight = `${card.offsetHeight}px`;
+                    document.getElementById('confirmacao-qr').hidden = true;
+                    card.classList.add('pagamento-card-sucesso');
+                    icone.className = 'fa-solid fa-circle-check';
+                    titulo.textContent = 'Compra realizada!';
+                    status.textContent = 'Pagamento confirmado. Pegue o seu brinde!';
+                    document.getElementById('pagamento-card-ajuda').textContent = 'Abrindo o comprovante...';
+                    window.setTimeout(() => window.location.assign(`/pdv/venda/${resultado.venda_id}?sucesso=ok`), 3500);
+                    return;
+                }
+                if (resultado.status === 'negado_saldo_insuficiente') {
+                    card.classList.add('pagamento-card-erro');
+                    icone.className = 'fa-solid fa-circle-exclamation';
+                    titulo.textContent = 'Saldo insuficiente';
+                    status.textContent = 'O cartão não possui saldo suficiente.';
+                    document.getElementById('pagamento-card-ajuda').textContent = 'Voltando para a venda. Os produtos continuam no carrinho.';
+                    window.setTimeout(() => {
+                        card.hidden = true;
+                        formulario.dataset.enviando = 'false';
+                        botao.disabled = false;
+                        formaPagamento.disabled = false;
+                        modoConfirmacao.disabled = false;
+                        formaPagamento.value = '';
+                        formaPagamento.dispatchEvent(new Event('change'));
+                        formaPagamento.focus();
+                    }, 3500);
+                    return;
+                }
+                throw new Error(resultado.erro || `Leitura encerrada: ${resultado.status}`);
+            }
+        } catch (erro) {
+            document.getElementById('confirmacao-qr').hidden = true;
+            card.classList.add('pagamento-card-erro');
+            titulo.textContent = 'Não foi possível confirmar';
+            status.textContent = erro.message || 'Falha de comunicação com a maquininha.';
+            formulario.dataset.enviando = 'false';
+            botao.disabled = false;
+            formaPagamento.disabled = false;
+            modoConfirmacao.disabled = false;
+        }
 
-        const card = document.createElement('div');
-        card.className = 'pdv-processando-venda';
-        card.innerHTML = '<div class="pdv-processando-venda-card" role="status" aria-live="polite"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i><h2>Realizando venda...</h2><p>Registrando os itens e atualizando o estoque.</p></div>';
-        document.body.appendChild(card);
-        window.setTimeout(() => formulario.submit(), 150);
+    });
+    formaPagamento.addEventListener('change', evento => {
+        if (evento.isTrusted && carrinho.length && formaPagamento.value && document.getElementById('form-finalizar-real').dataset.enviando !== 'true') {
+            document.getElementById('form-finalizar-real').requestSubmit();
+        }
     });
     document.getElementById('select-cliente')?.addEventListener('change', atualizarTabelaCarrinho);
     document.getElementById('corpo-carrinho-pdv')?.addEventListener('click', evento => {

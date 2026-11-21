@@ -30,7 +30,7 @@ from app.auth import get_usuario_logado
 
 router = APIRouter(prefix="/pdv", tags=["PDV"])
 templates = Jinja2Templates(directory="app/templates")
-FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite", "cortesia"}
+FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite", "cortesia", "rfid"}
 
 # O Brasil não adota horário de verão desde 2019. Usar UTC-3 evita depender do
 # pacote tzdata, que não vem instalado em algumas instalações do Windows.
@@ -292,6 +292,8 @@ def finalizar_venda(
         {"produto_id": 2, "nome": "Caderno", "preco": 15.00, "quantidade": 1}
     ]
     """
+    if not db.info.get("rfid_venda"):
+        return RedirectResponse(url="/pdv?erro=rfid", status_code=302)
     if filial not in FILIAIS:
         return RedirectResponse(url="/pdv?erro=filial", status_code=302)
     cortesia_ativa = cortesia.strip().lower() in {"1", "true", "on", "sim"}
@@ -511,7 +513,7 @@ def finalizar_venda(
             if item["estoque_variacao"]:
                 item["estoque_variacao"].estoque_atual -= item["quantidade"]
 
-    db.commit()
+    db.flush()
 
     return RedirectResponse(
         url=f"/pdv/venda/{venda.id}?sucesso=ok",
@@ -529,8 +531,8 @@ def detalhe_venda(
     """Comprovante da venda — exibido imediatamente após finalizar."""
     venda = db.query(Venda).filter(Venda.id == venda_id).first()
 
-    if not venda:
-        return RedirectResponse(url="/pdv", status_code=302)
+    if not venda or (usuario.get("role") == "cliente" and venda.usuario_id != usuario.get("id")):
+        raise HTTPException(status_code=404, detail="Comprovante não encontrado.")
 
     return templates.TemplateResponse(
         request,

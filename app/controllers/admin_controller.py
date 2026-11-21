@@ -48,8 +48,12 @@ def cadastrar_usuario(
     nome: str = Form(...),
     email: str = Form(...),
     senha: str = Form(...),
-    db: Session = Depends(get_db)
+    role: str = Form("funcionario"),
+    db: Session = Depends(get_db),
+    admin = Depends(get_admin),
 ):
+    if role not in {"funcionario", "admin", "cliente"}:
+        return RedirectResponse("/usuarios/novo?erro=perfil", status_code=303)
     #Verificar se o email já existe
     usuario_existente = db.query(Usuario).filter(Usuario.email == email).first()
     if usuario_existente:
@@ -61,7 +65,7 @@ def cadastrar_usuario(
     
     #Criar novo usuário
     senha_hash = hash_senha(senha)
-    novo_usuario = Usuario(nome=nome, email=email, senha_hash=senha_hash)
+    novo_usuario = Usuario(nome=nome, email=email, senha_hash=senha_hash, role=role)
     db.add(novo_usuario)
     db.commit()
 

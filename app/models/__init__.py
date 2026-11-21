@@ -10,3 +10,5 @@ from app.models import filial
 
 from app.models import reposicao_estoque
 from app.models import transferencia_estoque
+
+from app.models import rfid
