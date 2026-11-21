@@ -4,7 +4,7 @@ Este sketch identifica tags e recebe respostas pela Serial USB. Ele **não grava
 
 ## IDE Arduino
 
-1. Abra `smartpdv_rfid_banco.ino` desta pasta. Não abra o sketch legado em `SmartPDV_I2C` para este fluxo.
+1. Abra `SmartPDV_RFID.ino` desta pasta. O nome do arquivo deve corresponder ao da pasta do sketch. Não abra o sketch legado em `SmartPDV_I2C` para este fluxo.
 2. Instale as bibliotecas **MFRC522** e **LiquidCrystal_I2C**.
 3. Selecione **Arduino Uno** e a porta USB do leitor (por exemplo, COM5), feche o Monitor Serial e carregue o sketch.
 4. Configure `ARDUINO_PORT` no ambiente do servidor Cana Mania. O servidor precisa ter acesso local à mesma porta USB.
@@ -44,6 +44,8 @@ O QR Code usa o endereço pelo qual a página foi aberta, ou tenta descobrir o I
 A espera pela tag é de até 120 segundos. Depois da leitura, o Arduino aguarda até 180 segundos para cadastro/recarga e 15 segundos para o resultado da compra. `READY`, `EXPIRADO` e `ERRO|...` são mensagens de estado/erro.
 
 Ao receber `PAGAR`, o visor mostra o valor em reais na primeira linha e `Aproxime cartao` na segunda. Após alterar o sketch, envie-o novamente ao Arduino pela IDE; feche o Monitor Serial antes de usar o sistema.
+
+Enquanto está livre, o visor rola a mensagem `Seja bem-vindo ao Cana Mania`. Na aprovação, mostra somente `Compra aprovada` por cinco segundos e volta à mensagem de boas-vindas. Se houver outro pedido na fila, ele aparece depois desses cinco segundos. Durante o pagamento, o código do pedido continua alternando com a instrução para aproximar o cartão, para identificar a vez de cada cliente.
 
 ## Ligações
 

@@ -408,7 +408,11 @@ class RFIDSerialService:
             elif line.startswith("ERRO|"):
                 with self._lock:
                     if self._active and self._active["status"] in ATIVOS:
-                        self._finish_error(self._active["id"], line[5:80])
+                        error_code = line[5:80]
+                        message = ("Arduino recusou o valor. Atualize o sketch da maquininha."
+                                   if error_code == "VALOR" else error_code)
+                        self._finish_error(self._active["id"], message)
+                        self._proximo()
 
 
 _service = None

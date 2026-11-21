@@ -17,10 +17,12 @@ const byte RFID_RST = 9;
 const unsigned long TIMEOUT_TAG = 120000UL;
 const unsigned long TIMEOUT_CADASTRO = 180000UL;
 const unsigned long TIMEOUT_PAGAMENTO = 15000UL;
+const unsigned long TEMPO_RESULTADO = 5000UL;
+const unsigned long VELOCIDADE_BOAS_VINDAS = 280UL;
 MFRC522 rfid(RFID_SS, RFID_RST);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-enum Estado { OCIOSO, ESPERANDO_TAG_IDENTIFICAR, ESPERANDO_TAG_PAGAR, ESPERANDO_CONFIRMACAO, ESPERANDO_RESPOSTA_PAGAMENTO };
+enum Estado { OCIOSO, EXIBINDO_RESULTADO, ESPERANDO_TAG_IDENTIFICAR, ESPERANDO_TAG_PAGAR, ESPERANDO_CONFIRMACAO, ESPERANDO_RESPOSTA_PAGAMENTO };
 Estado estado = OCIOSO;
 unsigned long iniciadoEm = 0;
 char linhaSerial[64];
@@ -29,9 +31,42 @@ unsigned long valorPendente = 0;
 char codigoPedido[7] = "";
 bool exibindoCodigo = false;
 unsigned long ultimaTroca = 0;
+unsigned long resultadoIniciadoEm = 0;
+unsigned long ultimoPassoBoasVindas = 0;
+int posicaoBoasVindas = -16;
+const char mensagemBoasVindas[] = "Seja bem-vindo ao Cana Mania";
+char comandoPendente[64] = "";
 
 void mostrar(const char *linha1, const char *linha2) {
   lcd.clear(); lcd.setCursor(0, 0); lcd.print(linha1); lcd.setCursor(0, 1); lcd.print(linha2);
+}
+
+void iniciarBoasVindas() {
+  estado = OCIOSO;
+  posicaoBoasVindas = -16;
+  ultimoPassoBoasVindas = millis() - VELOCIDADE_BOAS_VINDAS;
+  lcd.clear();
+}
+
+void animarBoasVindas() {
+  if (millis() - ultimoPassoBoasVindas < VELOCIDADE_BOAS_VINDAS) return;
+  ultimoPassoBoasVindas = millis();
+  char linha[17];
+  const int tamanho = strlen(mensagemBoasVindas);
+  for (byte i = 0; i < 16; i++) {
+    int indice = posicaoBoasVindas + i;
+    linha[i] = (indice >= 0 && indice < tamanho) ? mensagemBoasVindas[indice] : ' ';
+  }
+  linha[16] = '\0';
+  lcd.setCursor(0, 0);
+  lcd.print(linha);
+  posicaoBoasVindas++;
+  if (posicaoBoasVindas > tamanho) posicaoBoasVindas = -16;
+}
+
+void exibirResultado() {
+  estado = EXIBINDO_RESULTADO;
+  resultadoIniciadoEm = millis();
 }
 
 void telaAguardarTag(bool pagamento) {
@@ -78,14 +113,27 @@ void mostrarUID() {
 }
 
 void cancelar(const char *mensagem) {
-  estado = OCIOSO;
+  comandoPendente[0] = '\0';
   mostrar(mensagem, "Tente novamente");
+  exibirResultado();
   Serial.println("RESULT|CANCELADO");
 }
 
 void processar(const char *linha) {
   if (strcmp(linha, "PING") == 0) { Serial.println("PONG"); return; }
-  if (strcmp(linha, "CANCELAR") == 0) { cancelar("Leitura cancelada"); return; }
+  if (strcmp(linha, "CANCELAR") == 0) {
+    if (estado == EXIBINDO_RESULTADO && comandoPendente[0]) {
+      comandoPendente[0] = '\0'; Serial.println("RESULT|CANCELADO"); return;
+    }
+    cancelar("Leitura cancelada"); return;
+  }
+
+  // A próxima venda pode chegar imediatamente da fila; não interromper a mensagem atual.
+  if (estado == EXIBINDO_RESULTADO && (strcmp(linha, "IDENTIFICAR") == 0 || strncmp(linha, "PAGAR|", 6) == 0)) {
+    strncpy(comandoPendente, linha, sizeof(comandoPendente) - 1);
+    comandoPendente[sizeof(comandoPendente) - 1] = '\0';
+    return;
+  }
 
   if (strcmp(linha, "IDENTIFICAR") == 0) {
     estado = ESPERANDO_TAG_IDENTIFICAR; iniciadoEm = millis();
@@ -108,28 +156,28 @@ void processar(const char *linha) {
 
   unsigned long saldo;
   if (strncmp(linha, "CADASTRO_OK|", 12) == 0 && obterCentavos(linha + 12, saldo)) {
-    estado = OCIOSO; mostrarSaldo("Cartao cadastrado", saldo); Serial.println("RESULT|CADASTRO_OK"); return;
+    mostrarSaldo("Cartao cadastrado", saldo); exibirResultado(); Serial.println("RESULT|CADASTRO_OK"); return;
   }
   if (strncmp(linha, "RECARGA_OK|", 11) == 0 && obterCentavos(linha + 11, saldo)) {
-    estado = OCIOSO; mostrarSaldo("Recarga confirmada", saldo); Serial.println("RESULT|RECARGA_OK"); return;
+    mostrarSaldo("Recarga confirmada", saldo); exibirResultado(); Serial.println("RESULT|RECARGA_OK"); return;
   }
   if (strncmp(linha, "SALDO|", 6) == 0 && obterCentavos(linha + 6, saldo)) {
-    estado = OCIOSO; mostrarSaldo("Saldo disponivel", saldo); Serial.println("RESULT|SALDO"); return;
+    mostrarSaldo("Saldo disponivel", saldo); exibirResultado(); Serial.println("RESULT|SALDO"); return;
   }
   if (strncmp(linha, "APROVADO|", 9) == 0 && obterCentavos(linha + 9, saldo)) {
-    estado = OCIOSO; mostrarSaldo("Compra aprovada", saldo); Serial.println("RESULT|APROVADO"); return;
+    mostrar("Compra aprovada", ""); exibirResultado(); Serial.println("RESULT|APROVADO"); return;
   }
   if (strncmp(linha, "BRINDE|", 7) == 0 && obterCentavos(linha + 7, saldo)) {
-    estado = OCIOSO; mostrar("Parabens!", "Ganhou brinde!"); Serial.println("RESULT|BRINDE"); return;
+    mostrar("Compra aprovada", ""); exibirResultado(); Serial.println("RESULT|BRINDE"); return;
   }
   if (strncmp(linha, "NEGADO|SALDO_INSUFICIENTE|", 26) == 0 && obterCentavos(linha + 26, saldo)) {
-    estado = OCIOSO; mostrarSaldo("Saldo insuficiente", saldo); Serial.println("RESULT|NEGADO|SALDO_INSUFICIENTE"); return;
+    mostrarSaldo("Saldo insuficiente", saldo); exibirResultado(); Serial.println("RESULT|NEGADO|SALDO_INSUFICIENTE"); return;
   }
   if (strcmp(linha, "NEGADO|NAO_CADASTRADO") == 0) {
-    estado = OCIOSO; mostrar("Cartao nao", "cadastrado"); Serial.println("RESULT|NEGADO|NAO_CADASTRADO"); return;
+    mostrar("Cartao nao", "cadastrado"); exibirResultado(); Serial.println("RESULT|NEGADO|NAO_CADASTRADO"); return;
   }
   if (strncmp(linha, "NEGADO|", 7) == 0) {
-    estado = OCIOSO; mostrar("Compra negada", "Sem alteracao"); Serial.println("RESULT|NEGADO"); return;
+    mostrar("Compra negada", "Sem alteracao"); exibirResultado(); Serial.println("RESULT|NEGADO"); return;
   }
   Serial.println("ERRO|COMANDO");
 }
@@ -137,7 +185,7 @@ void processar(const char *linha) {
 void setup() {
   Serial.begin(9600); Wire.begin(); lcd.init(); lcd.backlight();
   SPI.begin(); rfid.PCD_Init();
-  mostrar("Cana Mania RFID", "Aguardando PDV");
+  iniciarBoasVindas();
   delay(80); Serial.println("READY");
 }
 
@@ -150,14 +198,26 @@ void loop() {
     else { indiceSerial = 0; Serial.println("ERRO|LINHA_LONGA"); }
   }
 
-  if (estado == OCIOSO) return;
+  if (estado == OCIOSO) { animarBoasVindas(); return; }
+  if (estado == EXIBINDO_RESULTADO) {
+    if (millis() - resultadoIniciadoEm >= TEMPO_RESULTADO) {
+      iniciarBoasVindas();
+      if (comandoPendente[0]) {
+        char proximoComando[sizeof(comandoPendente)];
+        strcpy(proximoComando, comandoPendente);
+        comandoPendente[0] = '\0';
+        processar(proximoComando);
+      }
+    }
+    return;
+  }
   if (estado == ESPERANDO_TAG_PAGAR && codigoPedido[0] && millis() - ultimaTroca >= 2500UL) {
     exibindoCodigo = !exibindoCodigo; ultimaTroca = millis(); telaPagamento(valorPendente);
   }
   unsigned long limite = (estado == ESPERANDO_TAG_IDENTIFICAR || estado == ESPERANDO_TAG_PAGAR) ? TIMEOUT_TAG :
                          (estado == ESPERANDO_CONFIRMACAO ? TIMEOUT_CADASTRO : TIMEOUT_PAGAMENTO);
   if (millis() - iniciadoEm >= limite) {
-    estado = OCIOSO; mostrar("Tempo esgotado", "Inicie novamente"); Serial.println("EXPIRADO"); return;
+    mostrar("Tempo esgotado", "Inicie novamente"); exibirResultado(); Serial.println("EXPIRADO"); return;
   }
 
   if ((estado == ESPERANDO_TAG_IDENTIFICAR || estado == ESPERANDO_TAG_PAGAR) &&

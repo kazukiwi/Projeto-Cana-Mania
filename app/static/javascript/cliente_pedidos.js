@@ -54,14 +54,22 @@
                     operacaoId = null;
                     cancelar.hidden = true; qr.hidden = true; qrLink.hidden = true;
                     if (resultado.status === 'aprovado' && resultado.venda_id) {
+                        window.somPagamento?.confirmar();
                         titulo.textContent = 'Compra realizada!';
                         status.textContent = 'Pagamento simulado confirmado. Mostre seu comprovante à equipe.';
                         comprovante.href = `/pdv/venda/${resultado.venda_id}`;
                         comprovante.hidden = false;
+                        await esperar(450);
                         window.location.assign(comprovante.href);
                     } else {
                         titulo.textContent = 'Pedido não concluído';
-                        status.textContent = resultado.status === 'negado_saldo_insuficiente' ? 'Saldo insuficiente. Seus produtos continuam selecionados; tente novamente ou escolha outra forma de pagamento.' : 'O pagamento não foi concluído. Seus produtos continuam selecionados; tente novamente.';
+                        if (resultado.status === 'negado_saldo_insuficiente') {
+                            status.textContent = 'Saldo insuficiente. Seus produtos continuam selecionados; tente novamente ou escolha outra forma de pagamento.';
+                        } else if (resultado.erro?.startsWith('Arduino recusou o valor')) {
+                            status.textContent = 'A maquininha precisa ser atualizada. Avise a equipe; seus produtos continuam selecionados.';
+                        } else {
+                            status.textContent = 'O pagamento não foi concluído. Seus produtos continuam selecionados; tente novamente.';
+                        }
                         enviar.disabled = false;
                     }
                     return;
@@ -76,6 +84,7 @@
 
     form.addEventListener('submit', async event => {
         event.preventDefault();
+        window.somPagamento?.preparar();
         if (operacaoId || !form.reportValidity()) return;
         const carrinho = quantidades.filter(input => Number(input.value) > 0).map(input => ({produto_id: Number(input.dataset.produto), quantidade: Number(input.value)}));
         if (!carrinho.length) { alert('Selecione ao menos um produto.'); return; }

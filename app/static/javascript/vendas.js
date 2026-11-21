@@ -226,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         evento.preventDefault();
+        window.somPagamento?.preparar();
         const formulario = evento.currentTarget;
         const botao = document.getElementById('btn-salvar-venda-banco');
         if (formulario.dataset.enviando === 'true') return;
@@ -280,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (['aguardando_tag', 'aguardando_qr', 'tag_recebida', 'processando'].includes(resultado.status)) continue;
                 if (resultado.status === 'aprovado' && resultado.venda_id) {
+                    window.somPagamento?.confirmar();
                     sessionStorage.removeItem('carrinhoPDV');
                     card.style.minHeight = `${card.offsetHeight}px`;
                     document.getElementById('confirmacao-qr').hidden = true;

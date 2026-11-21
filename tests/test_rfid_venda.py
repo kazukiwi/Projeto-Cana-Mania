@@ -1,4 +1,5 @@
 import json
+import time
 import unittest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -58,6 +59,23 @@ class RFIDVendaTests(unittest.TestCase):
     def test_total_divergente_nao_debita_nem_cria_venda(self):
         status, venda, saldo, count, erro = self.executar(900)
         self.assertEqual((status, venda, saldo, count), ('erro_comunicacao', None, 1500, 0), erro)
+
+    def test_erro_valor_do_arduino_explica_atualizacao_do_sketch(self):
+        db = self.sessions()
+        db.add(OperacaoRFID(operacao_id='arduino', tipo='pagar', status='aguardando_tag', valor_centavos=1500, operador_id=1))
+        db.commit(); db.close()
+        self.service._active = {'id': 'arduino', 'tipo': 'pagar', 'status': 'aguardando_tag', 'valor': 1500, 'started': time.monotonic()}
+        service = self.service
+        class SerialFake:
+            def readline(self):
+                service._stop.set()
+                return b'ERRO|VALOR\n'
+        self.service._serial = SerialFake()
+        self.service._listen()
+        operacao = self.service.consultar('arduino', 1)
+        self.assertEqual(operacao['status'], 'erro_comunicacao')
+        self.assertIn('Atualize o sketch', operacao['erro'])
+        db = self.sessions(); self.assertEqual(db.query(Venda).count(), 0); db.close()
 
     def test_finalizacao_direta_e_bloqueada(self):
         from app.controllers.pdv_controller import finalizar_venda

@@ -14,4 +14,4 @@
 </form>
 <section id="acompanhamento" class="card" hidden><h2 id="titulo">Aguardando</h2><p id="status" role="status" aria-live="polite"></p><img class="qr" id="qr" alt="QR Code para confirmar pagamento simulado" hidden><a id="qr-link" target="_blank" rel="noopener" hidden>Confirmar Pix simulado neste celular</a><button id="cancelar" type="button" hidden>Cancelar pedido na fila</button><a id="comprovante" class="comprovante" hidden>Ver comprovante</a></section>
 <section id="minhas-compras" class="card"><h2>Minhas compras</h2>{% for venda in vendas %}<a class="comprovante" href="/pdv/venda/{{ venda.id }}">Compra #{{ venda.id }} · R$ {{ '%.2f'|format(venda.total_liquido)|replace('.', ',') }}</a>{% else %}<p>Seus comprovantes aparecerão aqui.</p>{% endfor %}</section>
-</main><script src="/static/javascript/cliente_pedidos.js?v=1"></script></body></html>
+</main><script src="/static/javascript/som-pagamento.js?v=1"></script><script src="/static/javascript/cliente_pedidos.js?v=pagamento-som-1"></script></body></html>
