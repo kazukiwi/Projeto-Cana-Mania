@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Cardápio | Canamania{% endblock %}
+{% block styles %}<link rel="stylesheet" href="/static/css/cliente-area.css?v=1">{% endblock %}
+{% block content %}
+<main class="canamaniaco-page">
+    <header class="canamaniaco-heading">
+        <div><p class="eyebrow">Área Canamaniaco</p><h1>Cardápio</h1><p>Veja os produtos disponíveis na Canamania. O cardápio acompanha os produtos ativos cadastrados pela equipe.</p></div>
+        <a class="canamaniaco-cta" href="/cliente/pdv">Ir para o ponto de compra <span aria-hidden="true">&rarr;</span></a>
+    </header>
+    {% if produtos %}
+    <section class="canamaniaco-grid" aria-label="Produtos do cardápio">
+        {% for produto in produtos %}
+        <article class="canamaniaco-product">
+            <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" loading="lazy" onerror="this.onerror=null;this.src='/static/img/produto_padrao.png';">
+            <div class="canamaniaco-product-body">
+                <span class="canamaniaco-product-category">{{ produto.categoria.nome if produto.categoria else 'Canamania' }}</span>
+                <h2>{{ produto.nome }}</h2>
+                <p class="canamaniaco-product-price">R$ {{ '%.2f'|format(produto.preco or 0)|replace('.', ',') }}</p>
+                <a class="canamaniaco-cta" href="/cliente/pdv">Escolher no ponto de compra</a>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+    {% else %}
+    <p class="canamaniaco-empty">Ainda não há produtos ativos no cardápio. Volte mais tarde para conferir as novidades.</p>
+    {% endif %}
+</main>
+{% endblock %}

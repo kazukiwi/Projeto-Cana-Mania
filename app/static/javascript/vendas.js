@@ -1,3 +1,11 @@
+async function lerRespostaRfid(resposta, mensagemFallback) {
+    const tipo = resposta.headers.get('content-type') || '';
+    if (!tipo.includes('application/json')) {
+        if (resposta.status === 401) throw new Error('Sua sessão expirou. Entre novamente no sistema.');
+        throw new Error(`${mensagemFallback} (resposta inesperada do servidor: HTTP ${resposta.status}).`);
+    }
+    return resposta.json();
+}
 let carrinho = [];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,6 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
     formaPagamento.addEventListener('change', () => {
         opcoesConfirmacao.hidden = !['pix', 'cortesia'].includes(formaPagamento.value);
         modoConfirmacao.value = formaPagamento.value === 'pix' ? 'qr' : 'cartao';
+    });
+    formaPagamento.addEventListener('change', evento => {
+        if (evento.isTrusted && carrinho.length && formaPagamento.value && document.getElementById('form-finalizar-real').dataset.enviando !== 'true') {
+            document.getElementById('form-finalizar-real').requestSubmit();
+        }
     });
     const tamanho = document.getElementById('pdv-tamanho');
     const cor = document.getElementById('pdv-cor');
@@ -258,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dados.centavos = Math.round(Number(document.getElementById('pdv-total-geral').textContent.replace(/[^\d,.]/g, '').replace(/\./g, '').replace(',', '.')) * 100);
         try {
             const inicio = await fetch('/rfid/operacoes', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(dados)});
-            const operacao = await inicio.json();
+            const operacao = await lerRespostaRfid(inicio, 'Não foi possível iniciar a leitura');
             if (!inicio.ok) throw new Error(operacao.detail || 'Não foi possível iniciar a leitura.');
             if (modo === 'qr') {
                 document.getElementById('confirmacao-qr-imagem').src = operacao.qr_code;
@@ -268,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
             while (true) {
                 await new Promise(resolve => setTimeout(resolve, 500));
                 const resposta = await fetch(`/rfid/operacoes/${encodeURIComponent(operacao.id)}`, {cache: 'no-store'});
-                const resultado = await resposta.json();
+                const resultado = await lerRespostaRfid(resposta, 'Falha ao consultar a leitura');
                 if (!resposta.ok) throw new Error(resultado.detail || 'Falha ao consultar leitura.');
                 if (resultado.status === 'na_fila') {
                     titulo.textContent = 'Aguardando sua vez';
@@ -324,11 +337,6 @@ document.addEventListener('DOMContentLoaded', () => {
             modoConfirmacao.disabled = false;
         }
 
-    });
-    formaPagamento.addEventListener('change', evento => {
-        if (evento.isTrusted && carrinho.length && formaPagamento.value && document.getElementById('form-finalizar-real').dataset.enviando !== 'true') {
-            document.getElementById('form-finalizar-real').requestSubmit();
-        }
     });
     document.getElementById('select-cliente')?.addEventListener('change', atualizarTabelaCarrinho);
     document.getElementById('corpo-carrinho-pdv')?.addEventListener('click', evento => {

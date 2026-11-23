@@ -9,13 +9,34 @@
     const qr = document.getElementById('qr');
     const qrLink = document.getElementById('qr-link');
     const total = document.getElementById('total');
+    const itensResumo = document.getElementById('pedido-itens');
     const quantidades = [...document.querySelectorAll('[data-produto]')];
     const moeda = value => (value / 100).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
     const valor = () => quantidades.reduce((sum, input) => sum + Math.round(Number(input.dataset.preco) * 100) * Number(input.value || 0), 0);
     const esperar = ms => new Promise(resolve => setTimeout(resolve, ms));
     let operacaoId = null;
     let cancelando = false;
-    quantidades.forEach(input => input.addEventListener('input', () => { total.textContent = moeda(valor()); }));
+    function atualizarResumo() {
+        total.textContent = moeda(valor());
+        const selecionados = quantidades.filter(input => Number(input.value) > 0);
+        if (!selecionados.length) {
+            const linha = document.createElement('tr');
+            const celula = document.createElement('td');
+            celula.colSpan = 3; celula.className = 'cliente-pdv-vazio'; celula.textContent = 'Adicione produtos do cardápio.';
+            linha.append(celula); itensResumo.replaceChildren(linha); return;
+        }
+        itensResumo.replaceChildren(...selecionados.map(input => {
+            const quantidade = Number(input.value);
+            const subtotal = Math.round(Number(input.dataset.preco) * 100) * quantidade;
+            const linha = document.createElement('tr');
+            const nome = document.createElement('td'); nome.textContent = input.dataset.nome;
+            const qtd = document.createElement('td'); qtd.textContent = String(quantidade);
+            const valorItem = document.createElement('td'); valorItem.textContent = moeda(subtotal);
+            linha.append(nome, qtd, valorItem); return linha;
+        }));
+    }
+    quantidades.forEach(input => input.addEventListener('input', atualizarResumo));
+    atualizarResumo();
 
     async function acompanhar(id) {
         operacaoId = id;

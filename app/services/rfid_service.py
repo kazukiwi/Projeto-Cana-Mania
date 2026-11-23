@@ -34,7 +34,8 @@ class RFIDSerialService:
     def __init__(self, session_factory=SessionLocal, serial_factory=None, port=None):
         self._sessions = session_factory
         self._serial_factory = serial_factory
-        self._port = port or os.getenv("ARDUINO_PORT", "COM5")
+        self._port = port or os.getenv("ARDUINO_PORT")
+        self._configured_port = self._port
         self._serial = None
         self._thread = None
         self._lock = threading.RLock()
@@ -48,21 +49,82 @@ class RFIDSerialService:
         if self._serial is not None and getattr(self._serial, "is_open", True):
             return
         try:
-            if self._serial_factory:
-                self._serial = self._serial_factory(self._port, 9600, timeout=0.2, write_timeout=2)
-            else:
-                import serial
-                self._serial = serial.Serial(self._port, 9600, timeout=0.2, write_timeout=2)
-                time.sleep(2.2)  # Uno reinicia ao abrir a porta USB.
-                self._serial.reset_input_buffer()
-        except Exception as exc:
-            self._serial = None
-            raise RFIDError(f"Nao foi possivel abrir {self._port}: {exc}") from exc
+            import serial
+        except ImportError as exc:
+            raise RFIDError("Dependência pyserial ausente. Instale os requisitos do sistema.") from exc
+
+        if self._configured_port:
+            candidatos = [self._configured_port]
+        else:
+            try:
+                from serial.tools import list_ports
+                portas = list(list_ports.comports())
+            except Exception as exc:
+                raise RFIDError(f"Não foi possível localizar portas USB seriais: {exc}") from exc
+            identificadores_arduino = {
+                (0x2341, 0x0043), (0x2A03, 0x0043), (0x2341, 0x0001), (0x2A03, 0x0001),
+                (0x1A86, 0x7523), (0x1A86, 0x5523), (0x10C4, 0xEA60), (0x0403, 0x6001),
+            }
+            descritores = ("arduino", "ch340", "ch341", "cp210", "usb serial", "usb-serial", "ftdi")
+            candidatos = [
+                porta.device for porta in portas
+                if (getattr(porta, "vid", None), getattr(porta, "pid", None)) in identificadores_arduino
+                or any(palavra in " ".join(filter(None, (porta.description, porta.manufacturer))).lower()
+                       for palavra in descritores)
+            ]
+            if not candidatos:
+                disponiveis = ", ".join(f"{porta.device} ({porta.description})" for porta in portas) or "nenhuma"
+                raise RFIDError(
+                    "Arduino não detectado. Conecte a placa por USB e confira se ela aparece no computador. "
+                    f"Portas seriais encontradas: {disponiveis}. Se necessário, configure ARDUINO_PORT."
+                )
+
+        falhas = []
+        for candidato in candidatos:
+            porta_serial = None
+            try:
+                if self._serial_factory:
+                    porta_serial = self._serial_factory(candidato, 9600, timeout=0.2, write_timeout=2)
+                else:
+                    porta_serial = serial.Serial(candidato, 9600, timeout=0.2, write_timeout=2)
+                    time.sleep(2.2)  # O Uno reinicia ao abrir a porta USB.
+                    porta_serial.reset_input_buffer()
+                    porta_serial.write(b"PING\n")
+                    porta_serial.flush()
+                    prazo = time.monotonic() + 2.5
+                    respondeu = False
+                    while time.monotonic() < prazo:
+                        linha = porta_serial.readline().decode("ascii", errors="replace").strip()
+                        if linha == "PONG":
+                            respondeu = True
+                            break
+                    if not respondeu:
+                        falhas.append(f"{candidato}: firmware sem resposta ao PING")
+                        porta_serial.close()
+                        continue
+                self._serial = porta_serial
+                self._port = candidato
+                break
+            except Exception as exc:
+                if porta_serial is not None:
+                    try:
+                        porta_serial.close()
+                    except Exception:
+                        pass
+                falhas.append(f"{candidato}: {exc}")
+
+        if self._serial is None:
+            if any("firmware sem resposta" in falha for falha in falhas):
+                raise RFIDError(
+                    "Arduino detectado, mas o sketch não respondeu. Grave hardware/SmartPDV_RFID/SmartPDV_RFID.ino "
+                    "na placa usando o Arduino IDE."
+                )
+            raise RFIDError("Não foi possível abrir uma porta compatível com o Arduino: " + "; ".join(falhas))
+
         if self._thread is None or not self._thread.is_alive():
             self._stop.clear()
             self._thread = threading.Thread(target=self._listen, daemon=True, name="rfid-serial")
             self._thread.start()
-
     def close(self):
         self._stop.set()
         serial_port = self._serial

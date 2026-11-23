@@ -6,8 +6,8 @@ Este sketch identifica tags e recebe respostas pela Serial USB. Ele **não grava
 
 1. Abra `SmartPDV_RFID.ino` desta pasta. O nome do arquivo deve corresponder ao da pasta do sketch. Não abra o sketch legado em `SmartPDV_I2C` para este fluxo.
 2. Instale as bibliotecas **MFRC522** e **LiquidCrystal_I2C**.
-3. Selecione **Arduino Uno** e a porta USB do leitor (por exemplo, COM5), feche o Monitor Serial e carregue o sketch.
-4. Configure `ARDUINO_PORT` no ambiente do servidor Cana Mania. O servidor precisa ter acesso local à mesma porta USB.
+3. Na primeira instalação ou quando atualizar o firmware, selecione **Arduino Uno** e a porta USB que o IDE mostrar, feche o Monitor Serial e carregue o sketch.
+4. No uso normal, deixe o Arduino IDE fechado. O Cana Mania procura automaticamente o Arduino Uno e adaptadores USB seriais comuns (CH340/CH341, CP210x e FTDI). Se a detecção automática não funcionar, defina `ARDUINO_PORT` com a porta exibida no computador e reinicie o servidor.
 5. Instale as dependências (`pip install -r requirements.txt`), aplique as migrações (`alembic upgrade head`) e reinicie o Cana Mania. A tela administrativa **Cartões RFID** permite ler, cadastrar, consultar e recarregar. A venda aguarda a confirmação e o comprovante será exibido em seguida.
 
 No PDV, selecione débito, crédito, Pix ou cortesia. A confirmação por cartão usa o saldo fictício cadastrado; Pix e cortesia também podem ser confirmados pelo QR Code do sistema, sem cobrança bancária. Na cortesia, o cartão não é debitado e a mensagem de brinde aparece no comprovante e, conforme a opção escolhida, no celular ou no visor da maquininha. O pagamento dividido não está disponível neste fluxo.

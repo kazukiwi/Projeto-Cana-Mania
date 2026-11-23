@@ -279,7 +279,7 @@ def login_usuario(
     token = criar_token(token_data)
 
     #Redirecionar para a tela inicial com o token no cookie
-    response = RedirectResponse(url="/cliente/" if usuario.role == "cliente" else "/?login=ok", status_code=303)
+    response = RedirectResponse(url="/cliente/cardapio" if usuario.role == "cliente" else "/?login=ok", status_code=303)
     response.set_cookie(
         key="access_token", 
         value=token, 

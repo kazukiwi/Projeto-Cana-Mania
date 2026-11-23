@@ -134,6 +134,9 @@ def suporte(request: Request):
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    caminho = request.url.path.rstrip("/")
+    if caminho == "/rfid/operacoes" or caminho.startswith("/rfid/operacoes/") or caminho.startswith("/admin/cartoes-rfid/"):
+        return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers={**(exc.headers or {}), "Cache-Control": "no-store"})
     if request.url.path.rstrip("/") == "/pdv/pix":
         return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers={**(exc.headers or {}), "Cache-Control": "no-store"})
     if exc.status_code == 401:
@@ -178,6 +181,9 @@ async def http_exception_handler(request: Request, exc: StarletteHTTPException):
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    caminho = request.url.path.rstrip("/")
+    if caminho == "/rfid/operacoes" or caminho.startswith("/rfid/operacoes/") or caminho.startswith("/admin/cartoes-rfid/"):
+        return JSONResponse({"detail": "Confira os dados da operação RFID e tente novamente."}, status_code=422, headers={"Cache-Control": "no-store"})
     if request.url.path.rstrip("/") == "/pdv/pix":
         return JSONResponse({"detail": "Confira os itens e a loja selecionada e tente novamente."}, status_code=422, headers={"Cache-Control": "no-store"})
     """Evita expor uma resposta técnica quando um filtro ou formulário é inválido."""
@@ -198,6 +204,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.exception_handler(Exception)
 async def unexpected_exception_handler(request: Request, exc: Exception):
+    caminho = request.url.path.rstrip("/")
+    if caminho == "/rfid/operacoes" or caminho.startswith("/rfid/operacoes/") or caminho.startswith("/admin/cartoes-rfid/"):
+        logger.exception("RFID endpoint failed", exc_info=exc)
+        return JSONResponse({"detail": "Não foi possível iniciar ou consultar a operação RFID."}, status_code=500, headers={"Cache-Control": "no-store"})
     if request.url.path.rstrip("/") == "/pdv/pix":
         logger.exception("Pix endpoint failed", exc_info=exc)
         return JSONResponse({"detail": "Não foi possível gerar o Pix. Confira a configuração e tente novamente."}, status_code=500, headers={"Cache-Control": "no-store"})

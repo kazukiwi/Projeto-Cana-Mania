@@ -13,8 +13,8 @@
         <button type="button" class="menu-toggle" aria-label="Abrir menu" aria-controls="menu-principal" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
         <ul class="menu" id="menu-principal">
             {% if usuario.role in ['cliente', 'visitante'] %}
-            <li><a href="/cliente/" class="{{ 'active' if caminho == '/cliente/' else '' }}">Dashboard</a></li>
-            <li><a href="/cliente/pdv" class="{{ 'active' if caminho.startswith('/cliente/pdv') else '' }}">Ponto de venda</a></li>
+            <li><a href="/cliente/cardapio" class="{{ 'active' if caminho.startswith('/cliente/cardapio') else '' }}">Cardápio</a></li>
+            <li><a href="/cliente/pdv" class="{{ 'active' if caminho.startswith('/cliente/pdv') else '' }}">Ponto de compra</a></li>
             <li><a href="/auth/logout" class="btn-sair">Sair</a></li>
             {% else %}
             <li><a href="/" class="{{ 'active' if caminho == '/' else '' }}">Dashboard</a></li>

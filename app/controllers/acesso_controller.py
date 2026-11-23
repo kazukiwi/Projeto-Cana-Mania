@@ -54,7 +54,7 @@ def entrada_usuario(request: Request):
 
 def iniciar_sessao(usuario: Usuario):
     token = criar_token({"sub": usuario.email, "nome": usuario.nome, "role": usuario.role, "id": usuario.id})
-    response = RedirectResponse("/cliente/", status_code=303)
+    response = RedirectResponse("/cliente/cardapio", status_code=303)
     response.set_cookie("access_token", token, httponly=True, max_age=3600, samesite="lax")
     response.headers["Cache-Control"] = "no-store"
     return response
