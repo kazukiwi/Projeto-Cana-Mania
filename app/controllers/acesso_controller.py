@@ -81,7 +81,11 @@ def cadastrar(request: Request, nome: str = Form(...), email: str = Form(...), s
               db: Session = Depends(get_db)):
     nome, email = nome.strip(), email.strip().lower()
     erro = None
-    if not nome or len(nome) > 100 or len(email) > 100 or "@" not in email:
+    if (
+        not nome or len(nome) > 100 or len(email) > 100
+        or email.count("@") != 1 or email.startswith("@") or email.endswith("@")
+        or any(caractere.isspace() for caractere in email)
+    ):
         erro = "Confira seu nome e e-mail."
     elif not 8 <= len(senha) or len(senha.encode("utf-8")) > 72:
         erro = "Use uma senha com pelo menos 8 caracteres e até 72 bytes."

@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, Request, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.usuario import Usuario
-from app.auth import get_admin, hash_senha, verificar_senha, criar_token
+from app.auth import get_admin, hash_senha
 
 router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 
@@ -52,25 +54,44 @@ def cadastrar_usuario(
     db: Session = Depends(get_db),
     admin = Depends(get_admin),
 ):
+    nome, email = nome.strip(), email.strip().lower()
+    valores = {"nome": nome, "email": email, "role": role}
+    erro = None
     if role not in {"funcionario", "admin", "cliente"}:
-        return RedirectResponse("/usuarios/novo?erro=perfil", status_code=303)
-    #Verificar se o email já existe
-    usuario_existente = db.query(Usuario).filter(Usuario.email == email).first()
-    if usuario_existente:
+        erro = "Selecione um perfil de acesso válido."
+    elif (
+        not nome or len(nome) > 100 or len(email) > 100
+        or email.count("@") != 1 or email.startswith("@") or email.endswith("@")
+        or any(c.isspace() for c in email)
+    ):
+        erro = "Confira o nome e o e-mail informados."
+    elif len(senha) < 8 or len(senha.encode("utf-8")) > 72:
+        erro = "A senha deve ter pelo menos 8 caracteres e no máximo 72 bytes."
+    elif db.query(Usuario.id).filter(func.lower(Usuario.email) == email).first():
+        erro = "Este e-mail já está cadastrado."
+    if erro:
         return templates.TemplateResponse(
             request,
             "users/criar_usuarios.html",
-            {"request": request, "erro": "E-mail já cadastrado"}
+            {"request": request, "usuario": admin, "erro": erro, "valores": valores},
+            status_code=400,
         )
-    
-    #Criar novo usuário
-    senha_hash = hash_senha(senha)
-    novo_usuario = Usuario(nome=nome, email=email, senha_hash=senha_hash, role=role)
-    db.add(novo_usuario)
-    db.commit()
 
-    #Redirecionar para a tela de login após cadastro
-    return RedirectResponse("/usuarios?cadastro=success", status_code=303)
+    senha_hash = hash_senha(senha)
+    novo_usuario = Usuario(nome=nome, email=email, senha_hash=senha_hash, role=role, ativo=True)
+    db.add(novo_usuario)
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        return templates.TemplateResponse(
+            request,
+            "users/criar_usuarios.html",
+            {"request": request, "usuario": admin, "erro": "Este e-mail já está cadastrado.", "valores": valores},
+            status_code=400,
+        )
+
+    return RedirectResponse("/usuarios?criado=ok", status_code=303)
 
 @router.post("/{usuario_id}/toggle-ativo")
 def toggle_usuario_ativo(

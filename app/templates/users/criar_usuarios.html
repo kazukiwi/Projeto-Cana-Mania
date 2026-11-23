@@ -86,7 +86,7 @@
                     <div class="input-wrapper">
                         <i data-lucide="key-round" class="input-icon"></i>
                         <input type="password" id="senha" name="senha" {{ "placeholder='Deixe vazio para não alterar'"
-                            if editando else "placeholder='Mínimo 6 caracteres' required minlength='6'" }}>
+                            if editando else "placeholder='Mínimo 8 caracteres' required minlength='8' maxlength='72'" }}>
                     </div>
                 </div>
 
@@ -99,7 +99,7 @@
                                 (valores and valores.role=='funcionario' ) else '' }}>Funcionário</option>
                             <option value="admin" {{ 'selected' if (editando and editando.role=='admin' ) or (valores
                                 and valores.role=='admin' ) else '' }}>Administrador</option>
-                            <option value="cliente" {{ 'selected' if editando and editando.role == 'cliente' else '' }}>Cliente</option>
+                            <option value="cliente" {{ 'selected' if (editando and editando.role == 'cliente') or (valores and valores.role == 'cliente') else '' }}>Canamaniaco (cliente)</option>
                         </select>
                     </div>
                 </div>

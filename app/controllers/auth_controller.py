@@ -219,7 +219,8 @@ def redefinir_senha(
             status_code=400,
         )
 
-    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    email = email.strip().lower()
+    usuario = db.query(Usuario).filter(func.lower(Usuario.email) == email).first()
     if not usuario or not usuario.ativo:
         return templates.TemplateResponse(
             request,
@@ -250,7 +251,8 @@ def login_usuario(
     db: Session = Depends(get_db)
 ):
     #Verificar se o usuário existe
-    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    email = email.strip().lower()
+    usuario = db.query(Usuario).filter(func.lower(Usuario.email) == email).first()
     if not usuario or not verificar_senha(senha, usuario.senha_hash):
         return templates.TemplateResponse(
             request,
@@ -267,6 +269,8 @@ def login_usuario(
     
     if origem == "cliente" and usuario.role != "cliente":
         return templates.TemplateResponse(request, "acesso/usuario.html", {"request": request, "erro": "Use o acesso da equipe para esta conta."}, status_code=403)
+    if origem != "cliente" and usuario.role not in {"admin", "funcionario"}:
+        return templates.TemplateResponse(request, "index.html", {"request": request, "erro": "Esta conta é de Canamaniaco. Use o acesso de Canamaniaco."}, status_code=403)
 
     #Criar token de acesso
     token_data = {
@@ -286,6 +290,7 @@ def login_usuario(
         httponly=True, 
         max_age=3600,
         samesite="lax")
+    response.headers["Cache-Control"] = "no-store"
     return response
 
 @router.get("/logout")
