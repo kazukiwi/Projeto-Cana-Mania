@@ -12,6 +12,16 @@
     const total = document.getElementById('total');
     const itensResumo = document.getElementById('pedido-itens');
     const quantidades = [...document.querySelectorAll('[data-produto]')];
+    async function lerResposta(response) {
+        const corpo = await response.text();
+        try { return JSON.parse(corpo); }
+        catch (_) {
+            if (response.redirected || /<!doctype html|<html/i.test(corpo)) {
+                throw new Error('O servidor retornou uma pagina HTML em vez do resultado do pedido. Atualize a tela e entre novamente se a sessao expirou.');
+            }
+            throw new Error(`Resposta invalida do servidor (HTTP ${response.status}).`);
+        }
+    }
     const moeda = value => (value / 100).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
     const valor = () => quantidades.reduce((sum, input) => sum + Math.round(Number(input.dataset.preco) * 100) * Number(input.value || 0), 0);
     function atualizarResumo() {
@@ -61,7 +71,7 @@
         acompanhamento.hidden = false; enviar.disabled = true; codigoEl.textContent = codigo;
         try {
             const response = await fetch(`/cliente/pedidos/${encodeURIComponent(codigo)}`, {cache: 'no-store'});
-            const pedido = await response.json();
+            const pedido = await lerResposta(response);
             if (!response.ok) throw new Error(pedido.detail || 'Nao foi possivel consultar o pedido.');
             if (pedido.status === 'aguardando') {
                 titulo.textContent = 'Aguarde ser chamado'; status.textContent = `Seu pedido ${codigo} foi enviado. Aguarde a equipe chamar seu codigo.`;
@@ -90,7 +100,7 @@
         enviar.disabled = true; acompanhamento.hidden = false; titulo.textContent = 'Enviando pedido'; status.textContent = 'Aguarde...';
         try {
             const response = await fetch('/cliente/pedidos', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({itens, filial: document.getElementById('filial').value})});
-            const result = await response.json(); if (!response.ok) throw new Error(result.detail || 'Nao foi possivel enviar o pedido.');
+            const result = await lerResposta(response); if (!response.ok) throw new Error(result.detail || 'Nao foi possivel enviar o pedido.');
             sessionStorage.setItem('pedido_cliente_pendente', result.codigo); acompanhar(result.codigo);
         } catch (error) { titulo.textContent = 'Nao foi possivel enviar'; status.textContent = error.message; enviar.disabled = false; }
     });
