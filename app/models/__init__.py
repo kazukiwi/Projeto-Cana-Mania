@@ -12,3 +12,5 @@ from app.models import reposicao_estoque
 from app.models import transferencia_estoque
 
 from app.models import rfid
+
+from app.models import pedido_cliente

@@ -37,6 +37,7 @@ from app.controllers import (
     insights_controller,
     rfid_admin_controller,
     cliente_pedido_controller,
+    pedidos_cliente_controller,
     acesso_controller,
 )
 
@@ -236,6 +237,7 @@ app.include_router(movimentacao_controller.router)
 app.include_router(pdv_controller.router)
 app.include_router(rfid_admin_controller.router)
 app.include_router(cliente_pedido_controller.router)
+app.include_router(pedidos_cliente_controller.router)
 app.include_router(acesso_controller.router)
 app.include_router(tamanhos_controller.router)
 app.include_router(estoque_controller.router)

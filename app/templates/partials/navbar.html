@@ -26,6 +26,7 @@
             <li><a href="/estoque/" class="{{ 'active' if caminho.startswith('/estoque') else '' }}">Estoque</a></li>
             {% endif %}
             {% if usuario.role == 'admin' %}
+            <li><a href="/admin/pedidos-clientes" class="{{ 'active' if caminho.startswith('/admin/pedidos-clientes') else '' }}">Pedidos de clientes</a></li>
             <li><a href="/admin/cartoes-rfid" class="{{ 'active' if caminho.startswith('/admin/cartoes-rfid') else '' }}">Cartões RFID</a></li>
             <li><a href="/maquinas" class="{{ 'active' if caminho.startswith('/maquinas') else '' }}">Máquinas</a></li>
             <li><a href="/usuarios" class="{{ 'active' if caminho.startswith('/usuarios') else '' }}">Funcionários</a></li>
