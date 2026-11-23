@@ -37,6 +37,7 @@ from app.controllers import (
     insights_controller,
     rfid_admin_controller,
     cliente_pedido_controller,
+    pedidos_cliente_controller,
     acesso_controller,
 )
 
@@ -135,6 +136,8 @@ def suporte(request: Request):
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):
     caminho = request.url.path.rstrip("/")
+    if caminho.startswith("/cliente/pedidos"):
+        return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers={**(exc.headers or {}), "Cache-Control": "no-store"})
     if caminho == "/rfid/operacoes" or caminho.startswith("/rfid/operacoes/") or caminho.startswith("/admin/cartoes-rfid/"):
         return JSONResponse({"detail": exc.detail}, status_code=exc.status_code, headers={**(exc.headers or {}), "Cache-Control": "no-store"})
     if request.url.path.rstrip("/") == "/pdv/pix":
@@ -205,6 +208,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.exception_handler(Exception)
 async def unexpected_exception_handler(request: Request, exc: Exception):
     caminho = request.url.path.rstrip("/")
+    if caminho.startswith("/cliente/pedidos"):
+        logger.exception("Customer order endpoint failed", exc_info=exc)
+        return JSONResponse({"detail": "Nao foi possivel processar o pedido. Confira o servidor e tente novamente."}, status_code=500, headers={"Cache-Control": "no-store"})
     if caminho == "/rfid/operacoes" or caminho.startswith("/rfid/operacoes/") or caminho.startswith("/admin/cartoes-rfid/"):
         logger.exception("RFID endpoint failed", exc_info=exc)
         return JSONResponse({"detail": "Não foi possível iniciar ou consultar a operação RFID."}, status_code=500, headers={"Cache-Control": "no-store"})
@@ -236,6 +242,7 @@ app.include_router(movimentacao_controller.router)
 app.include_router(pdv_controller.router)
 app.include_router(rfid_admin_controller.router)
 app.include_router(cliente_pedido_controller.router)
+app.include_router(pedidos_cliente_controller.router)
 app.include_router(acesso_controller.router)
 app.include_router(tamanhos_controller.router)
 app.include_router(estoque_controller.router)
