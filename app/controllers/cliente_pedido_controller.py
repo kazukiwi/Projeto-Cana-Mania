@@ -95,11 +95,25 @@ async def criar_pedido(request: Request, db: Session = Depends(get_db), usuario=
         ).first())
         if not produto:
             raise HTTPException(400, "Um dos produtos nao esta mais dispon?vel.")
+        sabores = []
+        if produto.nome.strip().casefold() == "cana mix":
+            sabores_recebidos = item.get("sabores", [])
+            if not isinstance(sabores_recebidos, list) or len(sabores_recebidos) > 2:
+                raise HTTPException(400, "O Cana Mix permite escolher no maximo dois sabores.")
+            for sabor in sabores_recebidos:
+                if not isinstance(sabor, str):
+                    raise HTTPException(400, "Confira os sabores escolhidos para o Cana Mix.")
+                sabor = sabor.strip()
+                if not sabor or len(sabor) > 40 or any(s.casefold() == sabor.casefold() for s in sabores):
+                    raise HTTPException(400, "Confira os sabores escolhidos para o Cana Mix.")
+                sabores.append(sabor)
         preco_centavos = round(float(produto.preco or 0) * 100)
         subtotal = preco_centavos * quantidade
         total_centavos += subtotal
-        snapshot.append({"produto_id": produto.id, "nome": produto.nome, "quantidade": quantidade,
-                         "preco_unitario": preco_centavos / 100, "subtotal": subtotal / 100})
+        nome_pedido = produto.nome + (f" ({', '.join(sabores)})" if sabores else "")
+        snapshot.append({"produto_id": produto.id, "nome": nome_pedido, "sabores": sabores,
+                         "quantidade": quantidade, "preco_unitario": preco_centavos / 100,
+                         "subtotal": subtotal / 100})
 
     pedido = None
     for _ in range(5):

@@ -23,6 +23,11 @@
         }
     }
     const moeda = value => (value / 100).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'});
+    const saboresMix = input => {
+        const campo = [...document.querySelectorAll('[data-mix-sabores]')]
+            .find(item => item.dataset.mixSabores === input.dataset.produto);
+        return (campo?.value || '').split(/[,;\n]+/).map(sabor => sabor.trim()).filter(Boolean);
+    };
     const valor = () => quantidades.reduce((sum, input) => sum + Math.round(Number(input.dataset.preco) * 100) * Number(input.value || 0), 0);
     function atualizarResumo() {
         total.textContent = moeda(valor());
@@ -34,13 +39,17 @@
         }
         itensResumo.replaceChildren(...selecionados.map(input => {
             const qtd = Number(input.value); const linha = document.createElement('tr');
-            const nome = document.createElement('td'); nome.textContent = input.dataset.nome;
+            const sabores = saboresMix(input);
+            const nome = document.createElement('td');
+            nome.textContent = sabores.length ? input.dataset.nome + ' (' + sabores.join(', ') + ')' : input.dataset.nome;
             const quantidade = document.createElement('td'); quantidade.textContent = String(qtd);
             const subtotal = document.createElement('td'); subtotal.textContent = moeda(Math.round(Number(input.dataset.preco) * 100) * qtd);
             linha.append(nome, quantidade, subtotal); return linha;
         }));
     }
-    quantidades.forEach(input => input.addEventListener('input', atualizarResumo)); atualizarResumo();
+    quantidades.forEach(input => input.addEventListener('input', atualizarResumo));
+    document.querySelectorAll('[data-mix-sabores]').forEach(input => input.addEventListener('input', atualizarResumo));
+    atualizarResumo();
 
     function mostrarPagamentoEmAndamento(pagamento, pedido) {
         statusPagamento.hidden = false;
@@ -95,8 +104,17 @@
 
     form.addEventListener('submit', async event => {
         event.preventDefault(); if (!form.reportValidity() || enviar.disabled) return;
-        const itens = quantidades.filter(input => Number(input.value) > 0).map(input => ({produto_id: Number(input.dataset.produto), quantidade: Number(input.value)}));
-        if (!itens.length) { alert('Selecione ao menos um produto.'); return; }
+        const selecionados = quantidades.filter(input => Number(input.value) > 0);
+        if (!selecionados.length) { alert('Selecione ao menos um produto.'); return; }
+        if (selecionados.some(input => saboresMix(input).length > 2)) {
+            alert('O Cana Mix permite escolher no maximo dois sabores.');
+            return;
+        }
+        const itens = selecionados.map(input => ({
+            produto_id: Number(input.dataset.produto),
+            quantidade: Number(input.value),
+            sabores: saboresMix(input),
+        }));
         enviar.disabled = true; acompanhamento.hidden = false; titulo.textContent = 'Enviando pedido'; status.textContent = 'Aguarde...';
         try {
             const response = await fetch('/cliente/pedidos', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({itens, filial: document.getElementById('filial').value})});

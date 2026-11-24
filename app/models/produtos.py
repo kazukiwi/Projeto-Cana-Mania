@@ -9,7 +9,7 @@ STATIC_DIR = Path(__file__).resolve().parents[1] / "static"
 IMAGEM_PADRAO_URL = "/static/img/produto_padrao.png"
 LIMITE_ESTOQUE_BAIXO = 3
 CATEGORIAS_CONSUMO = frozenset({"abre-alas", "enredo", "maniacos por drink"})
-CATEGORIAS_PDV = CATEGORIAS_CONSUMO | frozenset({"cookies"})
+CATEGORIAS_PDV = CATEGORIAS_CONSUMO | frozenset({"cookies", "palitinho de cana"})
 
 
 def categoria_eh_consumo(nome_categoria: str | None) -> bool:

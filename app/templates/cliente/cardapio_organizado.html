@@ -30,7 +30,7 @@
                     <span class="canamaniaco-product-category">{{ categoria.nome }}</span>
                     <h3>{{ produto.nome }}</h3>
                     <p class="canamaniaco-product-price">R$ {{ '%.2f'|format(produto.preco or 0)|replace('.', ',') }}</p>
-                    <a class="canamaniaco-cta" href="/cliente/pdv">Escolher no ponto de compra</a>
+                    <a class="canamaniaco-cta" href="/cliente/pdv">Adicionar</a>
                 </div>
             </article>
             {% endfor %}
