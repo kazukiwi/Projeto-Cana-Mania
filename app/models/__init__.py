@@ -7,3 +7,10 @@ from app.models import cliente
 from app.models import armario
 from app.models import reserva_armario
 from app.models import filial
+
+from app.models import reposicao_estoque
+from app.models import transferencia_estoque
+
+from app.models import rfid
+
+from app.models import pedido_cliente

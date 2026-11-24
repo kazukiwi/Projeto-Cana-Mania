@@ -1,0 +1,39 @@
+:root { color-scheme: light; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.entrada-page { min-height: 100vh; background: #f9f8f1; color: #173c2a; }
+.entrada-shell { max-width: 540px; min-height: 100vh; margin: 0 auto; display: flex; flex-direction: column; }
+.entrada-marca { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; padding: 20px 20px 24px; background: #db0768; }
+.entrada-marca::before, .entrada-marca::after { content: ""; position: absolute; width: 170px; height: 170px; border: 1px solid #ffffff24; border-radius: 50%; }
+.entrada-marca::before { left: -85px; top: -75px; box-shadow: 0 0 0 35px #ffffff0b; }
+.entrada-marca::after { right: -110px; bottom: -100px; box-shadow: 0 0 0 50px #ffffff0b; }
+.entrada-marca img { width: 160px; height: 160px; object-fit: cover; border-radius: 22px; }
+.entrada-etiqueta { position: relative; color: #fff4db; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.entrada-conteudo { position: relative; flex: 1; margin-top: -1px; padding: 32px 24px 20px; border-radius: 26px 26px 0 0; background: #f9f8f1; }
+.entrada-saudacao { margin: 0 0 10px; color: #b00856; font-size: 11px; font-weight: 800; letter-spacing: .14em; }
+.entrada-conteudo h1 { margin: 0; font-size: clamp(27px, 7vw, 34px); line-height: 1.12; letter-spacing: -.04em; }
+.entrada-intro { margin: 10px 0 24px; color: #6d7f70; font-size: 15px; }
+.entrada-opcoes { display: grid; gap: 11px; }
+.entrada-opcoes form { margin: 0; }
+.entrada-opcao { width: 100%; display: flex; align-items: center; gap: 14px; min-height: 78px; padding: 13px 15px; border: 1px solid #e5eadf; border-radius: 16px; background: white; box-shadow: 0 5px 18px #173c2a0a; color: inherit; font: inherit; text-decoration: none; text-align: left; cursor: pointer; transition: border-color .18s, transform .18s, box-shadow .18s; }
+.entrada-opcao:hover { border-color: #a5c7ad; transform: translateY(-2px); box-shadow: 0 8px 22px #173c2a14; }
+.entrada-opcao:focus-visible, .entrada-voltar:focus-visible, .entrada-link:focus-visible { outline: 3px solid #e20c6e; outline-offset: 3px; }
+.entrada-icone { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 13px; }
+.entrada-icone svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.entrada-icone-usuario { background: #e8f5d9; color: #31743c; }
+.entrada-icone-visitante { background: #fff0df; color: #bc6929; }
+.entrada-icone-equipe { background: #fce7f0; color: #b91860; }
+.entrada-opcao-texto { flex: 1; min-width: 0; }
+.entrada-opcao-texto strong, .entrada-opcao-texto small { display: block; }
+.entrada-opcao-texto strong { font-size: 15px; line-height: 1.3; }
+.entrada-opcao-texto small { margin-top: 4px; color: #7a897d; font-size: 13px; }
+.entrada-seta { color: #a5b6a5; font-size: 23px; }
+.entrada-nota { margin: 20px 2px 0; color: #7a897d; font-size: 12px; line-height: 1.55; }
+.entrada-shell footer { padding: 18px 24px 24px; color: #9aa69a; font-size: 12px; text-align: center; }
+.entrada-shell footer span { color: #e20c6e; }
+.entrada-voltar, .entrada-link { color: #0b6b44; font-weight: 700; text-decoration: none; }
+.entrada-form label { display: block; margin-top: 16px; font-weight: 700; font-size: 14px; }
+.entrada-form input { width: 100%; min-height: 48px; margin-top: 7px; padding: 12px; border: 1px solid #ceddce; border-radius: 10px; font: inherit; }
+.entrada-form button { width: 100%; min-height: 50px; margin: 22px 0 14px; border: 0; border-radius: 11px; background: #087347; color: white; font: inherit; font-weight: 800; cursor: pointer; }
+.entrada-erro { padding: 12px; border-radius: 10px; background: #fff0f3; color: #a51a43; font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .entrada-opcao { transition: none; } }

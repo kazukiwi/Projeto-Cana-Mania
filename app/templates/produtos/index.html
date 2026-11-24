@@ -7,7 +7,7 @@
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>Produtos - Canamania</title>
 
-    <link class="cdn" rel="stylesheet" href="/static/css/produtos.css?v=2">
+    <link class="cdn" rel="stylesheet" href="/static/css/produtos.css?v=3">
     <link rel="stylesheet" href="/static/css/listagem.css">
     <link rel="stylesheet" href="/static/css/confirmacao.css">
     <link class="cdn" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -120,8 +120,7 @@
                                 onerror="this.onerror=null; this.src='/static/img/produto_padrao.png';">
                         </td>
                         <td>
-                            <a href="/produtos/{{ produto.id }}"
-                                style="color: #1e1b4b; text-decoration: none; font-weight: bold;">
+                            <a href="/produtos/{{ produto.id }}" class="produto-nome-link">
                                 {{ produto.nome }}
                             </a>
                             {% if possui_preview_variacoes %}
@@ -162,8 +161,7 @@
                             <div style="display: inline-flex; align-items: center; justify-content: center; gap: 15px;">
 
                                 {% if usuario and (usuario.is_admin or usuario.role == "admin") %}
-                                <a href="/produtos/{{ produto.id }}/editar"
-                                    style="color: #1e1b4b; text-decoration: none; font-size: 18px; display: inline-flex; align-items: center;">
+                                <a href="/produtos/{{ produto.id }}/editar" class="produto-editar-link" aria-label="Editar {{ produto.nome }}">
                                     <i class="fa-solid fa-pen-to-square" title="Editar Produto"></i>
                                 </a>
 

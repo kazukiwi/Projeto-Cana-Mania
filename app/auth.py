@@ -4,13 +4,14 @@ from passlib.context import CryptContext
 from fastapi import Request, HTTPException, status
 from dotenv import load_dotenv
 import os
+import secrets
 from pathlib import Path
 
 # Carrega sempre o .env da raiz do projeto, independentemente do diretório em
 # que o Uvicorn/Python foi iniciado.
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
-SECRET_KEY = os.getenv("SECRET_KEY", "canamania-chave-local-altere-em-producao")
+SECRET_KEY = os.getenv("SECRET_KEY") or secrets.token_urlsafe(32)
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRACAO_MINUTOS = int(os.getenv("ACCESS_TOKEN_EXPIRACAO_MINUTOS", "60"))
 RESET_TOKEN_EXPIRACAO_MINUTOS = int(os.getenv("RESET_TOKEN_EXPIRACAO_MINUTOS", "30"))

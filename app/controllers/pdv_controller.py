@@ -30,11 +30,23 @@ from app.auth import get_usuario_logado
 
 router = APIRouter(prefix="/pdv", tags=["PDV"])
 templates = Jinja2Templates(directory="app/templates")
-FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite"}
+FORMAS_PAGAMENTO = {"credito", "debito", "dinheiro", "pix", "convite", "cortesia", "rfid"}
 
 # O Brasil não adota horário de verão desde 2019. Usar UTC-3 evita depender do
 # pacote tzdata, que não vem instalado em algumas instalações do Windows.
 FUSO_HORARIO = timezone(timedelta(hours=-3), name="America/Sao_Paulo")
+
+
+def data_hora_brasilia(valor: datetime | None) -> str:
+    """Formata datas armazenadas em UTC para o horário local do recibo."""
+    if valor is None:
+        return "Não informada"
+    if valor.tzinfo is None:
+        valor = valor.replace(tzinfo=timezone.utc)
+    return valor.astimezone(FUSO_HORARIO).strftime("%d/%m/%Y %H:%M:%S")
+
+
+templates.env.filters["data_hora_brasilia"] = data_hora_brasilia
 
 
 def fechar_dia(db: Session, data_referencia: date, automatico: bool = False) -> FechamentoDiario:
@@ -173,6 +185,8 @@ def gerar_pix_carrinho(
     carrinho_json: str = Form(..., max_length=100000),
     filial: str = Form(...),
     valor_pix: str = Form(""),
+    funcionario_comprador_id: str = Form(""),
+    desconto_manual_percentual: str = Form("0"),
     db: Session = Depends(get_db),
     usuario=Depends(get_usuario_logado),
 ):
@@ -217,6 +231,27 @@ def gerar_pix_carrinho(
             raise HTTPException(status_code=400, detail="Produto com preço inválido.")
         total += preco * quantidade
 
+    funcionario_comprador = None
+    funcionario_comprador_id = funcionario_comprador_id if isinstance(funcionario_comprador_id, str) else ""
+    if funcionario_comprador_id.strip():
+        try:
+            funcionario_id = int(funcionario_comprador_id)
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="Funcionário inválido.") from None
+        funcionario_comprador = db.query(Usuario).filter(
+            Usuario.id == funcionario_id, Usuario.role == "funcionario", Usuario.ativo == True
+        ).first()
+        if not funcionario_comprador:
+            raise HTTPException(status_code=400, detail="Funcionário inválido.")
+    try:
+        desconto_manual = Decimal(desconto_manual_percentual.strip().replace(",", ".")) if isinstance(desconto_manual_percentual, str) else Decimal("0")
+    except (InvalidOperation, ValueError, AttributeError):
+        raise HTTPException(status_code=400, detail="Desconto inválido.") from None
+    if not desconto_manual.is_finite() or desconto_manual < 0 or desconto_manual > 100:
+        raise HTTPException(status_code=400, detail="Desconto inválido.")
+    desconto_percentual = min(Decimal("100"), (Decimal("15") if funcionario_comprador else Decimal("0")) + desconto_manual)
+    total = (total * (Decimal("100") - desconto_percentual) / Decimal("100")).quantize(Decimal("0.01"))
+
     if isinstance(valor_pix, str) and valor_pix.strip():
         try:
             valor_solicitado = Decimal(valor_pix.strip().replace(",", "."))
@@ -238,6 +273,8 @@ def finalizar_venda(
     carrinho_json: str = Form(...),  # JSON serializado pelo JS
     observacao: str    = Form(""),
     funcionario_comprador_id: str = Form(""),
+    desconto_manual_percentual: str = Form(""),
+    cortesia: str = Form("false"),
     forma_pagamento: str = Form(""),
     forma_pagamento_2: str = Form(""),
     valor_pagamento_1: str = Form(""),
@@ -255,8 +292,18 @@ def finalizar_venda(
         {"produto_id": 2, "nome": "Caderno", "preco": 15.00, "quantidade": 1}
     ]
     """
+    if not db.info.get("rfid_venda"):
+        return RedirectResponse(url="/pdv?erro=rfid", status_code=302)
     if filial not in FILIAIS:
         return RedirectResponse(url="/pdv?erro=filial", status_code=302)
+    cortesia_ativa = cortesia.strip().lower() in {"1", "true", "on", "sim"}
+    desconto_manual_percentual = desconto_manual_percentual.strip()
+    if cortesia_ativa:
+        if desconto_manual_percentual:
+            return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+        forma_pagamento = "cortesia"
+    elif forma_pagamento == "cortesia":
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
     if forma_pagamento not in FORMAS_PAGAMENTO:
         return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
     forma_pagamento_2 = forma_pagamento_2.strip()
@@ -279,7 +326,20 @@ def finalizar_venda(
         ).first()
         if not funcionario_comprador:
             return RedirectResponse(url="/pdv?erro=funcionario", status_code=302)
-    desconto_percentual = 10.0 if funcionario_comprador else 0.0
+    try:
+        desconto_manual = Decimal(desconto_manual_percentual.replace(",", ".")) if desconto_manual_percentual else Decimal("0")
+    except (InvalidOperation, ValueError, AttributeError):
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+    if (
+        not desconto_manual.is_finite()
+        or desconto_manual < 0
+        or desconto_manual > 100
+        or desconto_manual != desconto_manual.quantize(Decimal("0.01"))
+    ):
+        return RedirectResponse(url="/pdv?erro=desconto", status_code=302)
+    desconto_percentual = Decimal("100") if cortesia_ativa else min(
+        Decimal("100"), (Decimal("15") if funcionario_comprador else Decimal("0")) + desconto_manual
+    )
 
     # ── Valida estoque e calcula totais ──────────────────────
     total_bruto = 0.0
@@ -383,7 +443,7 @@ def finalizar_venda(
         })
 
     # ── Calcula desconto e total final
-    desconto_valor = total_bruto * (desconto_percentual / 100)
+    desconto_valor = float((Decimal(str(total_bruto)) * desconto_percentual / Decimal("100")).quantize(Decimal("0.01")))
     total_liquido  = round(total_bruto - desconto_valor, 2)
     valor_pagamento_1_db = total_liquido
     valor_pagamento_2_db = None
@@ -409,17 +469,23 @@ def finalizar_venda(
     elif valor_pagamento_1.strip() or valor_pagamento_2.strip():
         return RedirectResponse(url="/pdv?erro=pagamento", status_code=302)
     # ── Persiste tudo em uma única transação
+    marcadores_observacao = []
+    if cortesia_ativa:
+        marcadores_observacao.append("Cortesia")
+    elif desconto_manual is not None:
+        marcadores_observacao.append(f"Desconto manual: {desconto_percentual:g}%")
     if funcionario_comprador:
-        identificacao_funcionario = f"Compra de funcion\u00e1rio: {funcionario_comprador.nome}"
-        observacao = f"{identificacao_funcionario} | {observacao.strip()}" if observacao.strip() else identificacao_funcionario
-        observacao = observacao[:255]
+        marcadores_observacao.append(f"Compra de funcion\u00e1rio: {funcionario_comprador.nome}")
+    if observacao.strip():
+        marcadores_observacao.append(observacao.strip())
+    observacao = " | ".join(marcadores_observacao)[:255] or None
 
     venda = Venda(
         usuario_id          = usuario.get("id"),
-        desconto_percentual = desconto_percentual,
+        desconto_percentual = float(desconto_percentual),
         total_bruto         = round(total_bruto, 2),
         total_liquido       = total_liquido,
-        observacao          = observacao or None,
+        observacao          = observacao,
         forma_pagamento     = forma_pagamento,
         valor_pagamento_1   = valor_pagamento_1_db,
         forma_pagamento_2   = forma_pagamento_2 or None,
@@ -447,7 +513,7 @@ def finalizar_venda(
             if item["estoque_variacao"]:
                 item["estoque_variacao"].estoque_atual -= item["quantidade"]
 
-    db.commit()
+    db.flush()
 
     return RedirectResponse(
         url=f"/pdv/venda/{venda.id}?sucesso=ok",
@@ -465,8 +531,8 @@ def detalhe_venda(
     """Comprovante da venda — exibido imediatamente após finalizar."""
     venda = db.query(Venda).filter(Venda.id == venda_id).first()
 
-    if not venda:
-        return RedirectResponse(url="/pdv", status_code=302)
+    if not venda or (usuario.get("role") in {"cliente", "visitante"} and venda.usuario_id != usuario.get("id")):
+        raise HTTPException(status_code=404, detail="Comprovante não encontrado.")
 
     return templates.TemplateResponse(
         request,

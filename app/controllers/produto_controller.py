@@ -440,7 +440,7 @@ async def _salvar_imagem(imagem: UploadFile | None):
         return None
 
     # Valida a extensão — aceita apenas imagens
-    extensoes_permitidas = {".jpg", ".jpeg", ".png", ".webp"}
+    extensoes_permitidas = {".jpg", ".jpeg", ".png", ".webp", ".avif"}
     _, ext = os.path.splitext(imagem.filename.lower())
 
     if ext not in extensoes_permitidas:

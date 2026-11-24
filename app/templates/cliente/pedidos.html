@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ponto de compra | Canamania</title>
+<link rel="stylesheet" href="/static/css/vendas.css?v=payment-card-4">
+<link rel="stylesheet" href="/static/css/cliente-pdv.css?v=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+</head><body>
+{% include "partials/navbar.html" %}
+<main class="vendas-container-main cliente-pdv-page">
+    <div class="header-vendas">
+        <div><p class="cliente-pdv-eyebrow">ÁREA CANAMANIACO</p><h1><i class="fa-solid fa-basket-shopping" aria-hidden="true"></i> Ponto de compra</h1><p>Escolha seus produtos e acompanhe a confirmação do pedido.</p></div>
+        <a href="/cliente/cardapio" class="btn-voltar-historico"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Voltar ao Cardápio</a>
+    </div>
+
+    <form id="pedido" data-sem-processando>
+        <div class="pdv-layout-split cliente-pdv-layout">
+            <section class="pdv-box-cadastro cliente-pdv-panel" aria-labelledby="titulo-produtos">
+                <h2 id="titulo-produtos"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i> Cardápio</h2>
+                <p class="pdv-ajuda-carrinho">Escolha as quantidades dos produtos que deseja comprar.</p>
+                <div class="cliente-pdv-produtos">
+                    {% for produto in produtos %}
+                    <div class="cliente-pdv-produto">
+                        <div><strong>{{ produto.nome }}</strong><small>R$ {{ '%.2f'|format(produto.preco or 0)|replace('.', ',') }}</small></div>
+                        <label>Qtd<input aria-label="Quantidade de {{ produto.nome }}" type="number" min="0" max="99" value="0" data-produto="{{ produto.id }}" data-nome="{{ produto.nome }}" data-preco="{{ produto.preco or 0 }}"></label>
+                    </div>
+                    {% else %}<p class="cliente-pdv-vazio">Nenhum produto disponível no momento.</p>{% endfor %}
+                </div>
+            </section>
+
+            <section class="pdv-box-carrinho cliente-pdv-panel" aria-labelledby="titulo-resumo">
+                <div>
+                    <h2 id="titulo-resumo"><i class="fa-solid fa-receipt" aria-hidden="true"></i> Resumo da compra</h2>
+                    <p class="pdv-ajuda-carrinho">Confira os itens antes de enviar seu pedido.</p>
+                    <div class="mini-tabela-wrapper cliente-pdv-tabela">
+                        <table class="mini-tabela-pdv"><thead><tr><th>Produto</th><th>Qtd.</th><th>Subtotal</th></tr></thead><tbody id="pedido-itens"><tr><td colspan="3" class="cliente-pdv-vazio">Adicione produtos do cardápio.</td></tr></tbody></table>
+                    </div>
+                </div>
+                <div class="cliente-pdv-opcoes">
+                    <label for="filial">Loja</label>
+                    <select id="filial">{% for filial in filiais %}<option value="{{ filial }}">{{ filial }}</option>{% endfor %}</select>
+                </div>
+                <div class="pdv-finalizar-sticky cliente-pdv-totalizador">
+                    <div class="linha-total"><span>Total da compra</span><strong id="total">R$ 0,00</strong></div>
+                    <button id="enviar" class="btn-salvar-venda-final" type="submit"><i class="fa-solid fa-check" aria-hidden="true"></i> Fazer pedido</button>
+                </div>
+            </section>
+        </div>
+    </form>
+
+    <section id="acompanhamento" class="pdv-box-carrinho cliente-pdv-panel cliente-pdv-acompanhamento" hidden aria-live="polite">
+        <h2 id="titulo">Pedido enviado</h2><p id="status" role="status"></p><p class="pedido-codigo-cliente">Codigo: <strong id="codigo-pedido"></strong></p>
+        <p id="status-pagamento" role="status" hidden></p>
+        <img class="qr" id="qr-pagamento" alt="QR Code Pix" hidden>
+        <a id="qr-pagamento-link" target="_blank" rel="noopener" hidden>Abrir confirmacao do Pix</a>
+        <a id="comprovante-pedido" class="comprovante" hidden>Ver comprovante</a>
+    </section>
+
+    <section id="minhas-compras" class="pdv-box-carrinho cliente-pdv-panel cliente-pdv-historico">
+        <h2><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i> Minhas compras</h2>
+        {% for venda in vendas %}<a class="comprovante" href="/pdv/venda/{{ venda.id }}">Compra #{{ venda.id }} · R$ {{ '%.2f'|format(venda.total_liquido)|replace('.', ',') }}</a>{% else %}<p>Seus comprovantes aparecerão aqui.</p>{% endfor %}
+    </section>
+</main>
+<footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
+<script src="/static/javascript/som-pagamento.js?v=1"></script><script src="/static/javascript/cliente_pedidos.js?v=pedidos-json-1" defer></script>
+</body></html>

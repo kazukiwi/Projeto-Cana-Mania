@@ -219,7 +219,8 @@ def redefinir_senha(
             status_code=400,
         )
 
-    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    email = email.strip().lower()
+    usuario = db.query(Usuario).filter(func.lower(Usuario.email) == email).first()
     if not usuario or not usuario.ativo:
         return templates.TemplateResponse(
             request,
@@ -237,7 +238,7 @@ def redefinir_senha(
 def tela_login(request: Request):
     return templates.TemplateResponse(
         request,
-        "auth/login.html",
+        "index.html",
         {"request": request}
     )
 
@@ -246,24 +247,31 @@ def login_usuario(
     request: Request,
     email: str = Form(...),
     senha: str = Form(...),
+    origem: str = Form(""),
     db: Session = Depends(get_db)
 ):
     #Verificar se o usuário existe
-    usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    email = email.strip().lower()
+    usuario = db.query(Usuario).filter(func.lower(Usuario.email) == email).first()
     if not usuario or not verificar_senha(senha, usuario.senha_hash):
         return templates.TemplateResponse(
             request,
-            "index.html",
+            "acesso/usuario.html" if origem == "cliente" else "index.html",
             {"request": request, "erro": "E-mail ou senha inválidos"}
         )
     
     if not usuario.ativo:
         return templates.TemplateResponse(
             request,
-            "index.html",
+            "acesso/usuario.html" if origem == "cliente" else "index.html",
             {"request": request, "erro": "Usuário inativo. Contate o administrador."}
         )
     
+    if origem == "cliente" and usuario.role != "cliente":
+        return templates.TemplateResponse(request, "acesso/usuario.html", {"request": request, "erro": "Use o acesso da equipe para esta conta."}, status_code=403)
+    if origem != "cliente" and usuario.role not in {"admin", "funcionario"}:
+        return templates.TemplateResponse(request, "index.html", {"request": request, "erro": "Esta conta é de Canamaniaco. Use o acesso de Canamaniaco."}, status_code=403)
+
     #Criar token de acesso
     token_data = {
         "sub": usuario.email,
@@ -275,13 +283,14 @@ def login_usuario(
     token = criar_token(token_data)
 
     #Redirecionar para a tela inicial com o token no cookie
-    response = RedirectResponse(url="/?login=ok", status_code=303)
+    response = RedirectResponse(url="/cliente/cardapio" if usuario.role == "cliente" else "/?login=ok", status_code=303)
     response.set_cookie(
         key="access_token", 
         value=token, 
         httponly=True, 
         max_age=3600,
         samesite="lax")
+    response.headers["Cache-Control"] = "no-store"
     return response
 
 @router.get("/logout")
