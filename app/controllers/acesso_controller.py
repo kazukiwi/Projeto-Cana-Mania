@@ -1,6 +1,7 @@
 """Entrada pelo celular e QR Code de acesso à rede local."""
 import base64
 import ipaddress
+import logging
 import os
 import socket
 import secrets
@@ -22,6 +23,7 @@ from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/acesso", tags=["Acesso pelo celular"])
 templates = Jinja2Templates(directory="app/templates")
+logger = logging.getLogger(__name__)
 
 
 def endereco_celular(request: Request) -> str:
@@ -73,7 +75,7 @@ def visitante(db: Session = Depends(get_db)):
 
 @router.get("/cadastro")
 def formulario_cadastro(request: Request):
-    return templates.TemplateResponse(request, "acesso/cadastro.html", {"request": request})
+    return templates.TemplateResponse(request, "acesso/cadastro_auth.html", {"request": request})
 
 
 @router.post("/cadastro")
@@ -91,17 +93,26 @@ def cadastrar(request: Request, nome: str = Form(...), email: str = Form(...), s
         erro = "Use uma senha com pelo menos 8 caracteres e até 72 bytes."
     elif email.endswith("@visitante.invalid"):
         erro = "Informe um e-mail válido."
-    elif db.query(Usuario.id).filter(func.lower(Usuario.email) == email).first():
+    elif db.query(Usuario.id).filter(func.trim(func.lower(Usuario.email)) == email).first():
         erro = "Este e-mail já está cadastrado. Entre com sua conta."
     if erro:
-        return templates.TemplateResponse(request, "acesso/cadastro.html", {"request": request, "erro": erro, "nome": nome, "email": email}, status_code=400)
+        return templates.TemplateResponse(request, "acesso/cadastro_auth.html", {"request": request, "erro": erro, "nome": nome, "email": email}, status_code=400)
     usuario = Usuario(nome=nome, email=email, senha_hash=hash_senha(senha), role="cliente", ativo=True)
     db.add(usuario)
     try:
         db.commit()
     except IntegrityError:
         db.rollback()
-        return templates.TemplateResponse(request, "acesso/cadastro.html", {"request": request, "erro": "Este e-mail já está cadastrado.", "nome": nome, "email": email}, status_code=400)
+        duplicado = db.query(Usuario.id).filter(func.trim(func.lower(Usuario.email)) == email).first()
+        if not duplicado:
+            logger.exception("Falha de integridade ao criar conta Canamaniaco para %s", email)
+            return templates.TemplateResponse(
+                request,
+                "acesso/cadastro_auth.html",
+                {"request": request, "erro": "N\u00e3o foi poss\u00edvel concluir o cadastro agora. Tente novamente mais tarde.", "nome": nome, "email": email},
+                status_code=400,
+            )
+        return templates.TemplateResponse(request, "acesso/cadastro_auth.html", {"request": request, "erro": "Este e-mail já está cadastrado.", "nome": nome, "email": email}, status_code=400)
     db.refresh(usuario)
     return iniciar_sessao(usuario)
 
@@ -117,4 +128,4 @@ def qr_acesso(request: Request, usuario=Depends(get_usuario_logado)):
     arquivo = BytesIO()
     qrcode.make(url, image_factory=SvgPathImage).save(arquivo)
     imagem = "data:image/svg+xml;base64," + base64.b64encode(arquivo.getvalue()).decode("ascii")
-    return templates.TemplateResponse(request, "acesso/qr.html", {"request": request, "usuario": usuario, "url": url, "imagem": imagem})
+    return templates.TemplateResponse(request, "acesso/qr_tema.html", {"request": request, "usuario": usuario, "url": url, "imagem": imagem})

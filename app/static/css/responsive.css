@@ -193,3 +193,41 @@ pre, code, a, p, td, th, label, small { overflow-wrap: anywhere; }
 @media (max-width: 620px) {
   .filiais-grid { grid-template-columns: minmax(0, 1fr) !important; }
 }
+
+/* Pedidos de clientes: formulários e cartões não apertam nem excedem a tela. */
+@media (max-width: 640px) {
+  .pedidos-wrap { width: 100%; max-width: 100%; margin: 22px auto; padding-inline: 14px; }
+  .pedido-card { min-width: 0; padding: 16px; }
+  .pedido-top { align-items: stretch; gap: 12px; }
+  .pedido-top > * { min-width: 0; max-width: 100%; }
+  .pedido-meta, .pedido-itens { overflow-wrap: anywhere; }
+  .forma-pagamento-admin { width: 100%; align-items: stretch; }
+  .forma-pagamento-admin label,
+  .forma-pagamento-admin select,
+  .forma-pagamento-admin button { width: 100%; min-width: 0; min-height: 44px; }
+  .pedido-card img { max-width: 100%; height: auto; }
+}
+
+
+/* Mobile refinements for public and standalone screens. */
+@media (max-width: 760px) {
+  html, body { overflow-x: clip; }
+  .login-shell { min-width: 0; }
+  .login-shell > *, .access-panel, .brand-panel { min-width: 0; }
+  .login-card { width: min(100%, 480px); }
+  .access-panel { align-items: start; }
+  .brand-panel { overflow: hidden; }
+  .brand-copy, .login-lead, .login-feedback { overflow-wrap: anywhere; }
+  .acesso-publico-shell, .acesso-publico-card,
+  .erro-page, .erro-card, .info-page, .info-card { width: min(100% - 28px, 100%); }
+  .acesso-publico-card, .erro-card, .info-card { padding: clamp(18px, 5vw, 28px); }
+  .main-footer { text-align: center; }
+}
+@media (max-width: 420px) {
+  .login-card { padding: 24px 20px !important; border-radius: 22px; }
+  .brand-panel { padding: 30px 22px !important; }
+  .brand-copy h1 { font-size: clamp(2.1rem, 11vw, 2.65rem) !important; }
+  .flavor-chips { gap: 7px; }
+  .flavor-chips b { padding: 8px 10px; font-size: .72rem; }
+  .erro-acoes > *, .access-choice { width: 100%; }
+}

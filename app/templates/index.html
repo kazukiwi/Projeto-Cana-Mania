@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Canamania | Gestão de consumos</title>
     <link rel="stylesheet" href="/static/css/index.css?v=canamania-5">
-    <link rel="stylesheet" href="/static/css/responsive.css?v=5">
+    <link rel="stylesheet" href="/static/css/responsive.css?v=7">
     <link rel="stylesheet" href="/static/css/feedback.css?v=3">
     <link rel="stylesheet" href="/static/css/feedback-progress.css?v=2">
     <link rel="stylesheet" href="/static/css/login-transition.css?v=1">
@@ -28,7 +28,7 @@
             <form class="login-card" action="/auth/login" method="post" data-sem-processando>
                 <p class="eyebrow">Área da equipe</p>
                 <h2>Bem-vindo de volta</h2>
-                <p class="login-lead">Entre para cuidar das lojas Canamania.</p><label>E-mail<input type="email"
+                <p class="login-lead">Entre para cuidar das lojas Canamania.</p>{% if request.query_params.get("conta_desativada") %}<p class="login-feedback login-feedback--error" role="alert">Esta conta foi desativada. Fale com um administrador para recuperar o acesso.</p>{% endif %}<label>E-mail<input type="email"
                         name="email" placeholder="voce@canamania.com" required></label><label>Senha<input
                         type="password" name="senha" placeholder="Sua senha" required></label>{% if erro %}<p
                     class="login-feedback login-feedback--error">{{ erro }}</p>{% endif %}{% if

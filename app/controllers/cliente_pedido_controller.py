@@ -42,8 +42,16 @@ def inicio(request: Request, usuario=Depends(get_usuario_logado)):
 @router.get("/cardapio")
 def cardapio(request: Request, db: Session = Depends(get_db), usuario=Depends(get_usuario_logado)):
     exigir_canamaniaco(usuario)
-    return templates.TemplateResponse(request, "cliente/cardapio.html", {
-        "request": request, "usuario": usuario, "produtos": produtos_do_cardapio(db),
+    produtos = produtos_do_cardapio(db)
+    grupos = {}
+    for produto in produtos:
+        categoria = produto.categoria.nome if produto.categoria else "Canamania"
+        categoria_id = produto.categoria_id if produto.categoria else "sem-categoria"
+        if categoria_id not in grupos:
+            grupos[categoria_id] = {"id": categoria_id, "nome": categoria, "produtos": []}
+        grupos[categoria_id]["produtos"].append(produto)
+    return templates.TemplateResponse(request, "cliente/cardapio_organizado.html", {
+        "request": request, "usuario": usuario, "categorias_cardapio": list(grupos.values()),
     })
 
 
@@ -87,11 +95,25 @@ async def criar_pedido(request: Request, db: Session = Depends(get_db), usuario=
         ).first())
         if not produto:
             raise HTTPException(400, "Um dos produtos nao esta mais dispon?vel.")
+        sabores = []
+        if produto.nome.strip().casefold() == "cana mix":
+            sabores_recebidos = item.get("sabores", [])
+            if not isinstance(sabores_recebidos, list) or len(sabores_recebidos) > 2:
+                raise HTTPException(400, "O Cana Mix permite escolher no maximo dois sabores.")
+            for sabor in sabores_recebidos:
+                if not isinstance(sabor, str):
+                    raise HTTPException(400, "Confira os sabores escolhidos para o Cana Mix.")
+                sabor = sabor.strip()
+                if not sabor or len(sabor) > 40 or any(s.casefold() == sabor.casefold() for s in sabores):
+                    raise HTTPException(400, "Confira os sabores escolhidos para o Cana Mix.")
+                sabores.append(sabor)
         preco_centavos = round(float(produto.preco or 0) * 100)
         subtotal = preco_centavos * quantidade
         total_centavos += subtotal
-        snapshot.append({"produto_id": produto.id, "nome": produto.nome, "quantidade": quantidade,
-                         "preco_unitario": preco_centavos / 100, "subtotal": subtotal / 100})
+        nome_pedido = produto.nome + (f" ({', '.join(sabores)})" if sabores else "")
+        snapshot.append({"produto_id": produto.id, "nome": nome_pedido, "sabores": sabores,
+                         "quantidade": quantidade, "preco_unitario": preco_centavos / 100,
+                         "subtotal": subtotal / 100})
 
     pedido = None
     for _ in range(5):

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Cardápio | Canamania{% endblock %}
+{% block styles %}<link rel="stylesheet" href="/static/css/cliente-area.css?v=2"><link rel="stylesheet" href="/static/css/cardapio.css?v=1">{% endblock %}
+{% block content %}
+<main class="canamaniaco-page">
+    <header class="canamaniaco-heading">
+        <div><p class="eyebrow">Área Canamaniaco</p><h1>Cardápio</h1><p>Encontre seus favoritos por categoria ou pesquise pelo nome.</p></div>
+        <a class="canamaniaco-cta" href="/cliente/pdv">Ir para o ponto de compra <span aria-hidden="true">&rarr;</span></a>
+    </header>
+    {% if categorias_cardapio %}
+    <div class="canamaniaco-toolbar" role="search" aria-label="Pesquisar produtos no cardápio">
+        <nav class="canamaniaco-category-nav" aria-label="Categorias de produtos">
+            <button class="canamaniaco-category-link is-active" type="button" data-category-filter="all" aria-pressed="true">Todos</button>
+            {% for categoria in categorias_cardapio %}
+            <button class="canamaniaco-category-link" type="button" data-category-filter="{{ categoria.id }}" aria-pressed="false">{{ categoria.nome }}</button>
+            {% endfor %}
+        </nav>
+        <label class="canamaniaco-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span class="sr-only">Pesquisar produtos</span><input id="busca-cardapio" type="search" placeholder="Buscar produto..." autocomplete="off"></label>
+    </div>
+    <p class="canamaniaco-results" id="resultado-cardapio" aria-live="polite"></p>
+    <div class="canamaniaco-no-results" id="sem-resultados" role="status" hidden>Nenhum produto encontrado. Tente outro nome ou categoria.</div>
+    {% for categoria in categorias_cardapio %}
+    <section class="canamaniaco-category-section" data-category-section="{{ categoria.id }}" aria-labelledby="titulo-categoria-{{ categoria.id }}">
+        <h2 id="titulo-categoria-{{ categoria.id }}">{{ categoria.nome }}</h2>
+        <div class="canamaniaco-grid">
+            {% for produto in categoria.produtos %}
+            <article class="canamaniaco-product" data-product-card data-category="{{ categoria.id }}" data-search="{{ produto.nome }} {{ categoria.nome }}">
+                <img src="{{ produto.imagem_url }}" alt="{{ produto.nome }}" loading="lazy" onerror="this.onerror=null;this.src='/static/img/produto_padrao.png';">
+                <div class="canamaniaco-product-body">
+                    <span class="canamaniaco-product-category">{{ categoria.nome }}</span>
+                    <h3>{{ produto.nome }}</h3>
+                    <p class="canamaniaco-product-price">R$ {{ '%.2f'|format(produto.preco or 0)|replace('.', ',') }}</p>
+                    <a class="canamaniaco-cta" href="/cliente/pdv">Adicionar</a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+    </section>
+    {% endfor %}
+    {% else %}
+    <p class="canamaniaco-empty">Ainda não há produtos ativos no cardápio. Volte mais tarde para conferir as novidades.</p>
+    {% endif %}
+</main>
+{% endblock %}
+{% block scripts %}<script src="/static/javascript/cardapio.js?v=1" defer></script>{% endblock %}

@@ -19,9 +19,10 @@
                 <p class="pdv-ajuda-carrinho">Escolha as quantidades dos produtos que deseja comprar.</p>
                 <div class="cliente-pdv-produtos">
                     {% for produto in produtos %}
-                    <div class="cliente-pdv-produto">
+                    <div class="cliente-pdv-produto{% if produto.nome == "Cana Mix" %} cliente-pdv-produto-mix{% endif %}">
                         <div><strong>{{ produto.nome }}</strong><small>R$ {{ '%.2f'|format(produto.preco or 0)|replace('.', ',') }}</small></div>
                         <label>Qtd<input aria-label="Quantidade de {{ produto.nome }}" type="number" min="0" max="99" value="0" data-produto="{{ produto.id }}" data-nome="{{ produto.nome }}" data-preco="{{ produto.preco or 0 }}"></label>
+                        {% if produto.nome == "Cana Mix" %}<label class="cliente-pdv-mix-sabores" for="mix-sabores-{{ produto.id }}">Sabores do Mix (at&eacute; 2, sem custo adicional)<input id="mix-sabores-{{ produto.id }}" type="text" maxlength="100" data-mix-sabores="{{ produto.id }}" placeholder="Ex.: Morango AD, Lim&atilde;o Siciliano AD"><small>Separe os sabores por v&iacute;rgula. Escolha no m&aacute;ximo dois.</small></label>{% endif %}
                     </div>
                     {% else %}<p class="cliente-pdv-vazio">Nenhum produto disponível no momento.</p>{% endfor %}
                 </div>
@@ -64,5 +65,5 @@
     </section>
 </main>
 <footer class="main-footer"><p>&copy; 2026 Canamania. Gestão de consumos.</p></footer>
-<script src="/static/javascript/som-pagamento.js?v=1"></script><script src="/static/javascript/cliente_pedidos.js?v=pedidos-json-1" defer></script>
+<script src="/static/javascript/som-pagamento.js?v=1"></script><script src="/static/javascript/cliente_pedidos.js?v=mix-sabores-1" defer></script>
 </body></html>

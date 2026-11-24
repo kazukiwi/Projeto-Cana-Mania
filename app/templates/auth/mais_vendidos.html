@@ -6,16 +6,17 @@
     <link rel="icon" href="/static/img/image.ico" type="image/x-icon">
     <title>Mais vendidos | Canamania</title>
     <link rel="stylesheet" href="{{ url_for('static', path='css/mais_vendidos.css') }}?v=canamania-2">
+    <link rel="stylesheet" href="/static/css/canamania-legacy.css?v=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <script src="{{ url_for('static', path='javascript/chart.umd.min.js') }}"></script>
 </head>
-<body>
+<body class="mais-vendidos-page">
 
     {% if false %}<header>
         <nav class="navbar">
             <div class="logo">
                 <a href="#">
-                    <img src="/static/img/logo.png" alt="Logo AAPM">
+                    <img src="/static/img/logo.webp" alt="Cana Mania">
                 </a>
             </div>
             <ul class="menu">
@@ -133,7 +134,7 @@
                             <td>
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <div style="flex:1; background:#f1f5f9; height:8px; border-radius:4px; overflow:hidden;">
-                                        <div style="background:#2563eb; width: var(--porcentagem); height:100%; --porcentagem: {{ produto.porcentagem }}%;"></div>
+                                        <div style="background:#ff1877; width: var(--porcentagem); height:100%; --porcentagem: {{ produto.porcentagem }}%;"></div>
                                     </div>
                                     <span style="font-size:12px; font-weight:600;">{{ produto.porcentagem }}%</span>
                                 </div>

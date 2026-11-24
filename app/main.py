@@ -147,7 +147,7 @@ async def websocket_arduino(websocket: WebSocket):
 @app.middleware("http")
 async def limitar_acesso_cliente(request: Request, call_next):
     usuario = get_usuario_opcional(request)
-    if usuario and usuario.get("role") in {"cliente", "visitante"}:
+    if usuario:
         import re
         from app.database import Session as SessionLocal
         db = SessionLocal()
@@ -156,7 +156,13 @@ async def limitar_acesso_cliente(request: Request, call_next):
         finally:
             db.close()
         if not ativo:
-            return JSONResponse({"detail": "Conta desativada."}, status_code=403)
+            destino = "/acesso/usuario?conta_desativada=1" if usuario.get("role") == "cliente" else "/?conta_desativada=1"
+            response = RedirectResponse(destino, status_code=303)
+            response.delete_cookie(key="access_token", path="/", httponly=True, samesite="lax")
+            response.headers["Cache-Control"] = "no-store"
+            return response
+    if usuario and usuario.get("role") in {"cliente", "visitante"}:
+        import re
         path = request.url.path
         allowed = (path.startswith("/static/") or path.startswith("/auth/") or
                    path.startswith("/cliente/") or path.startswith("/acesso/") or path == "/rfid/operacoes" or

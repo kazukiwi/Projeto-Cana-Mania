@@ -1,0 +1,22 @@
+.acesso-publico{min-height:100vh;display:grid;place-items:center;padding:28px 16px;background:radial-gradient(circle at 5% 5%,#ffe2f0 0,transparent 28rem),radial-gradient(circle at 95% 95%,#e8ffd3 0,transparent 28rem),var(--cana-bg);color:var(--cana-ink)}
+.acesso-publico-shell{width:min(520px,100%)}
+.acesso-publico-brand{display:flex;align-items:center;gap:13px;margin:0 auto 18px;width:fit-content;color:var(--cana-green);text-decoration:none}
+.acesso-publico-brand img{width:54px;height:54px;border-radius:15px;object-fit:cover}
+.acesso-publico-brand strong{font-size:1.5rem;letter-spacing:-.06em}.acesso-publico-brand strong span{color:var(--cana-pink)}
+.acesso-publico-brand small{display:block;margin-top:2px;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase}
+.acesso-publico-card{padding:clamp(22px,6vw,34px);border:1px solid color-mix(in srgb,var(--cana-green) 14%,transparent);border-radius:22px;background:color-mix(in srgb,var(--cana-surface) 93%,transparent);box-shadow:0 18px 50px rgba(8,61,44,.12)}
+.acesso-publico-card>.eyebrow{margin:0 0 8px;color:var(--cana-pink);font-size:.75rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase}
+.acesso-publico-card h1{margin:0 0 9px;color:var(--cana-green);font-size:clamp(1.7rem,6vw,2.15rem);letter-spacing:-.045em}
+.acesso-publico-intro,.acesso-publico-hint{color:color-mix(in srgb,var(--cana-ink) 70%,transparent);line-height:1.55}
+.acesso-publico-form label{display:block;margin-top:15px;color:var(--cana-green);font-weight:700}
+.acesso-publico-form input{display:block;width:100%;min-height:48px;margin-top:6px;padding:11px 13px;border:1px solid #ceddce;border-radius:10px;background:var(--cana-surface);color:var(--cana-ink);font:inherit}
+.acesso-publico-form input:focus{border-color:var(--cana-pink);outline:3px solid color-mix(in srgb,var(--cana-pink) 20%,transparent)}
+.acesso-publico-form button{width:100%;min-height:48px;margin-top:22px}
+.acesso-publico-error{padding:12px 14px;border-radius:11px;background:#ffe8f0;color:#9e1747;line-height:1.45}
+.acesso-publico-link{display:inline-flex;margin-top:18px;color:var(--cana-green);font-weight:700;text-decoration:none}.acesso-publico-link:hover{text-decoration:underline;text-decoration-color:var(--cana-pink);text-underline-offset:4px}
+.acesso-publico-qr{display:block;width:min(260px,100%);height:auto;margin:20px auto;padding:10px;border:1px solid #e1e9df;border-radius:14px;background:#fff}
+.acesso-publico-url{overflow-wrap:anywhere;color:var(--cana-green);font-weight:700}
+html[data-theme="dark"] .acesso-publico-card{border-color:#2b4334;background:#141d17}
+html[data-theme="dark"] .acesso-publico-brand,html[data-theme="dark"] .acesso-publico-card h1,html[data-theme="dark"] .acesso-publico-form label,html[data-theme="dark"] .acesso-publico-url,html[data-theme="dark"] .acesso-publico-link{color:#d7fbb3}
+html[data-theme="dark"] .acesso-publico-form input{border-color:#3a5541;background:#0e1510;color:#f5f7f4}
+@media(prefers-reduced-motion:reduce){.acesso-publico *{scroll-behavior:auto}}
