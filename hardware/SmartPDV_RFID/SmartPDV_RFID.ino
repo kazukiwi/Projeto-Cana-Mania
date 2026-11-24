@@ -18,7 +18,6 @@ const unsigned long TIMEOUT_TAG = 120000UL;
 const unsigned long TIMEOUT_CADASTRO = 180000UL;
 const unsigned long TIMEOUT_PAGAMENTO = 15000UL;
 const unsigned long TEMPO_RESULTADO = 5000UL;
-const unsigned long VELOCIDADE_BOAS_VINDAS = 280UL;
 MFRC522 rfid(RFID_SS, RFID_RST);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -32,9 +31,6 @@ char codigoPedido[7] = "";
 bool exibindoCodigo = false;
 unsigned long ultimaTroca = 0;
 unsigned long resultadoIniciadoEm = 0;
-unsigned long ultimoPassoBoasVindas = 0;
-int posicaoBoasVindas = -16;
-const char mensagemBoasVindas[] = "Seja bem-vindo ao Cana Mania";
 char comandoPendente[64] = "";
 
 void mostrar(const char *linha1, const char *linha2) {
@@ -43,25 +39,7 @@ void mostrar(const char *linha1, const char *linha2) {
 
 void iniciarBoasVindas() {
   estado = OCIOSO;
-  posicaoBoasVindas = -16;
-  ultimoPassoBoasVindas = millis() - VELOCIDADE_BOAS_VINDAS;
-  lcd.clear();
-}
-
-void animarBoasVindas() {
-  if (millis() - ultimoPassoBoasVindas < VELOCIDADE_BOAS_VINDAS) return;
-  ultimoPassoBoasVindas = millis();
-  char linha[17];
-  const int tamanho = strlen(mensagemBoasVindas);
-  for (byte i = 0; i < 16; i++) {
-    int indice = posicaoBoasVindas + i;
-    linha[i] = (indice >= 0 && indice < tamanho) ? mensagemBoasVindas[indice] : ' ';
-  }
-  linha[16] = '\0';
-  lcd.setCursor(0, 0);
-  lcd.print(linha);
-  posicaoBoasVindas++;
-  if (posicaoBoasVindas > tamanho) posicaoBoasVindas = -16;
+  mostrar("Seja bem-vindo", "ao Cana Mania");
 }
 
 void exibirResultado() {
@@ -198,7 +176,7 @@ void loop() {
     else { indiceSerial = 0; Serial.println("ERRO|LINHA_LONGA"); }
   }
 
-  if (estado == OCIOSO) { animarBoasVindas(); return; }
+  if (estado == OCIOSO) return;
   if (estado == EXIBINDO_RESULTADO) {
     if (millis() - resultadoIniciadoEm >= TEMPO_RESULTADO) {
       iniciarBoasVindas();
