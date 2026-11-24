@@ -48,6 +48,16 @@ class RFIDSerialService:
     def _connect(self):
         if self._serial is not None and getattr(self._serial, "is_open", True):
             return
+        if os.getenv("ARDUINO_BRIDGE_TOKEN", "").strip():
+            from app.services.arduino_bridge import bridge_serial
+            if not bridge_serial.is_open:
+                raise RFIDError("Ponte Arduino desconectada. Inicie a ponte no computador da maquininha.")
+            self._serial = bridge_serial
+            if self._thread is None or not self._thread.is_alive():
+                self._stop.clear()
+                self._thread = threading.Thread(target=self._listen, daemon=True, name="rfid-bridge")
+                self._thread.start()
+            return
         try:
             import serial
         except ImportError as exc:

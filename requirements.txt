@@ -13,3 +13,4 @@ psycopg2-binary
 qrcode==8.2
 
 pyserial>=3.5,<4.0
+websockets>=14.0,<16.0

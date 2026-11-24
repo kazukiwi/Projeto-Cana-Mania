@@ -1,11 +1,12 @@
 import asyncio
 import logging
+import queue
 from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
 from datetime import date, datetime
 
-from fastapi import FastAPI, Request, Depends, Form
+from fastapi import FastAPI, Request, Depends, Form, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -42,6 +43,7 @@ from app.controllers import (
 )
 
 from app.services.rfid_service import fechar_rfid
+from app.services.arduino_bridge import bridge_serial
 from app.auth import get_usuario_opcional, get_usuario_logado
 
 
@@ -75,6 +77,45 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Sistema Estoque", lifespan=lifespan)
+
+
+@app.websocket("/ws/arduino")
+async def websocket_arduino(websocket: WebSocket):
+    """Transporta linhas serial entre a ponte local e o serviço RFID."""
+    import hmac
+    import os
+
+    expected = os.getenv("ARDUINO_BRIDGE_TOKEN", "").strip()
+    authorization = websocket.headers.get("authorization", "")
+    scheme, _, supplied = authorization.partition(" ")
+    if not expected or scheme.lower() != "bearer" or not hmac.compare_digest(supplied, expected):
+        await websocket.close(code=1008, reason="Autenticacao invalida")
+        return
+    if not bridge_serial.attach():
+        await websocket.close(code=1013, reason="Ja existe uma ponte conectada")
+        return
+
+    try:
+        await websocket.accept()
+        while True:
+            try:
+                command = bridge_serial.commands.get_nowait()
+            except queue.Empty:
+                command = None
+            if command is not None:
+                await websocket.send_text(command)
+            try:
+                line = await asyncio.wait_for(websocket.receive_text(), timeout=0.05)
+            except asyncio.TimeoutError:
+                continue
+            if len(line) > 128 or "\n" in line or "\r" in line:
+                await websocket.close(code=1003, reason="Linha serial invalida")
+                break
+            bridge_serial.feed_response(line)
+    except WebSocketDisconnect:
+        pass
+    finally:
+        bridge_serial.detach()
 
 
 @app.middleware("http")
