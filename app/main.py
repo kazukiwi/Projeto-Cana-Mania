@@ -1,17 +1,18 @@
 import asyncio
 import logging
+import queue
 from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
 from datetime import date, datetime
 
-from fastapi import FastAPI, Request, Depends, Form
+from fastapi import FastAPI, Request, Depends, Form, WebSocket, WebSocketDisconnect
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session, joinedload, selectinload
-from sqlalchemy import func
+from sqlalchemy import func, inspect
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.database import Base, engine, get_db
@@ -42,12 +43,39 @@ from app.controllers import (
 )
 
 from app.services.rfid_service import fechar_rfid
+from app.services.arduino_bridge import bridge_serial
 from app.auth import get_usuario_opcional, get_usuario_logado
 
 
 # Mantém instalações locais que ainda não passaram por todas as migrações
 # utilizáveis, sem alterar nem apagar tabelas e dados já existentes.
 Base.metadata.create_all(bind=engine)
+
+
+def garantir_colunas_pagamento_pedidos():
+    """Completa colunas opcionais quando o banco já tinha a tabela antiga."""
+    colunas_esperadas = {
+        "operacao_rfid_id": "VARCHAR(32)",
+        "qr_url": "VARCHAR(500)",
+    }
+    inspector = inspect(engine)
+    if "pedidos_clientes" not in inspector.get_table_names():
+        return
+
+    existentes = {coluna["name"] for coluna in inspector.get_columns("pedidos_clientes")}
+    faltantes = {nome: tipo for nome, tipo in colunas_esperadas.items() if nome not in existentes}
+    if not faltantes:
+        return
+
+    # Ambas as colunas são anuláveis e não alteram os pedidos já gravados.
+    # A revisão Alembic equivalente também fica disponível para instalações
+    # que aplicam migrações explicitamente.
+    with engine.begin() as conexao:
+        for nome, tipo in faltantes.items():
+            conexao.exec_driver_sql(f"ALTER TABLE pedidos_clientes ADD COLUMN {nome} {tipo}")
+
+
+garantir_colunas_pagamento_pedidos()
 
 
 async def rotina_fechamento_diario():
@@ -75,6 +103,45 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Sistema Estoque", lifespan=lifespan)
+
+
+@app.websocket("/ws/arduino")
+async def websocket_arduino(websocket: WebSocket):
+    """Transporta linhas serial entre a ponte local e o serviço RFID."""
+    import hmac
+    import os
+
+    expected = os.getenv("ARDUINO_BRIDGE_TOKEN", "").strip()
+    authorization = websocket.headers.get("authorization", "")
+    scheme, _, supplied = authorization.partition(" ")
+    if not expected or scheme.lower() != "bearer" or not hmac.compare_digest(supplied, expected):
+        await websocket.close(code=1008, reason="Autenticacao invalida")
+        return
+    if not bridge_serial.attach():
+        await websocket.close(code=1013, reason="Ja existe uma ponte conectada")
+        return
+
+    try:
+        await websocket.accept()
+        while True:
+            try:
+                command = bridge_serial.commands.get_nowait()
+            except queue.Empty:
+                command = None
+            if command is not None:
+                await websocket.send_text(command)
+            try:
+                line = await asyncio.wait_for(websocket.receive_text(), timeout=0.05)
+            except asyncio.TimeoutError:
+                continue
+            if len(line) > 128 or "\n" in line or "\r" in line:
+                await websocket.close(code=1003, reason="Linha serial invalida")
+                break
+            bridge_serial.feed_response(line)
+    except WebSocketDisconnect:
+        pass
+    finally:
+        bridge_serial.detach()
 
 
 @app.middleware("http")

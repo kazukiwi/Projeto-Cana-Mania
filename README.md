@@ -44,6 +44,10 @@ RESET_TOKEN_EXPIRACAO_MINUTOS=30
 
 Para usar PostgreSQL, configure `DATABASE_URL` com a URL da instância, por exemplo `postgresql://usuario:senha@host:5432/banco`. Mantenha a senha fora do repositório.
 
+### Ponte RFID remota (Render)
+
+No serviço Web do Render, configure `ARDUINO_BRIDGE_TOKEN` com uma chave aleatória longa. No computador ligado ao Arduino, defina a mesma variável e `ARDUINO_BRIDGE_URL` com o endereço `wss://SEU-SERVICO.onrender.com/ws/arduino`. Instale os requisitos com `pip install -r requirements.txt` e inicie `python ponte_arduino.py`; a porta padrão é `COM11` (pode ser alterada com `ARDUINO_PORT`). Mantenha o Monitor Serial fechado enquanto a ponte estiver ativa. O token é enviado no cabeçalho Bearer e não deve ser versionado.
+
 ### Pix
 
 O PDV gera o código Pix a partir das credenciais da conta recebedora. Configure no `.env`:
