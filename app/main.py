@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.orm import Session, joinedload, selectinload
-from sqlalchemy import func
+from sqlalchemy import func, inspect
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.database import Base, engine, get_db
@@ -50,6 +50,32 @@ from app.auth import get_usuario_opcional, get_usuario_logado
 # Mantém instalações locais que ainda não passaram por todas as migrações
 # utilizáveis, sem alterar nem apagar tabelas e dados já existentes.
 Base.metadata.create_all(bind=engine)
+
+
+def garantir_colunas_pagamento_pedidos():
+    """Completa colunas opcionais quando o banco já tinha a tabela antiga."""
+    colunas_esperadas = {
+        "operacao_rfid_id": "VARCHAR(32)",
+        "qr_url": "VARCHAR(500)",
+    }
+    inspector = inspect(engine)
+    if "pedidos_clientes" not in inspector.get_table_names():
+        return
+
+    existentes = {coluna["name"] for coluna in inspector.get_columns("pedidos_clientes")}
+    faltantes = {nome: tipo for nome, tipo in colunas_esperadas.items() if nome not in existentes}
+    if not faltantes:
+        return
+
+    # Ambas as colunas são anuláveis e não alteram os pedidos já gravados.
+    # A revisão Alembic equivalente também fica disponível para instalações
+    # que aplicam migrações explicitamente.
+    with engine.begin() as conexao:
+        for nome, tipo in faltantes.items():
+            conexao.exec_driver_sql(f"ALTER TABLE pedidos_clientes ADD COLUMN {nome} {tipo}")
+
+
+garantir_colunas_pagamento_pedidos()
 
 
 async def rotina_fechamento_diario():
