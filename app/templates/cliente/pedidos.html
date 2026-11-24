@@ -51,7 +51,10 @@
         <h2 id="titulo">Pedido enviado</h2><p id="status" role="status"></p><p class="pedido-codigo-cliente">Codigo: <strong id="codigo-pedido"></strong></p>
         <p id="status-pagamento" role="status" hidden></p>
         <img class="qr" id="qr-pagamento" alt="QR Code Pix" hidden>
-        <a id="qr-pagamento-link" target="_blank" rel="noopener" hidden>Abrir confirmacao do Pix</a>
+        <a id="qr-pagamento-link" target="_blank" rel="noopener" hidden>Abrir QR Code Pix</a>
+        <label id="pix-copia-cola-label" for="pix-copia-cola" hidden>Pix copia e cola</label>
+        <textarea id="pix-copia-cola" readonly hidden aria-label="Codigo Pix copia e cola"></textarea>
+        <button id="copiar-pix" type="button" hidden>Copiar codigo Pix</button>
         <a id="comprovante-pedido" class="comprovante" hidden>Ver comprovante</a>
     </section>
 

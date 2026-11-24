@@ -389,7 +389,10 @@ def finalizar_venda(
                 EstoqueFilial.filial == filial,
             ).with_for_update().first()
             quantidade_total_produto = quantidades_por_produto.get(produto.id, 0) + qtd
-            if not saldo_filial or quantidade_total_produto > saldo_filial.quantidade:
+            if (
+                (not saldo_filial or quantidade_total_produto > saldo_filial.quantidade)
+                and not db.info.get("pix_recebido_pedido_cliente")
+            ):
                 return RedirectResponse(url=f"/pdv?erro=estoque&produto={produto.nome}", status_code=302)
             quantidades_por_produto[produto.id] = quantidade_total_produto
         try:

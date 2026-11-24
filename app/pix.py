@@ -4,8 +4,10 @@ from binascii import crc_hqx
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from io import BytesIO
 import os
+from pathlib import Path
 import re
 import unicodedata
+from dotenv import load_dotenv
 
 
 def campo(identificador: str, valor: str) -> str:
@@ -52,6 +54,9 @@ def gerar_pix(valor) -> dict:
     import qrcode
     from qrcode.image.svg import SvgPathImage
 
+    # Carrega também quando o servidor foi iniciado antes da criação/edição do .env.
+    # Variáveis fornecidas pelo ambiente de produção continuam tendo prioridade.
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
     payload = gerar_payload(
         os.getenv("PIX_CHAVE", ""), os.getenv("PIX_NOME_RECEBEDOR", ""),
         os.getenv("PIX_CIDADE", ""), valor,

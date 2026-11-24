@@ -8,6 +8,9 @@
     const statusPagamento = document.getElementById('status-pagamento');
     const qrImagem = document.getElementById('qr-pagamento');
     const qrLink = document.getElementById('qr-pagamento-link');
+    const pixCopiaCola = document.getElementById('pix-copia-cola');
+    const pixCopiaColaLabel = document.getElementById('pix-copia-cola-label');
+    const copiarPix = document.getElementById('copiar-pix');
     const comprovante = document.getElementById('comprovante-pedido');
     const total = document.getElementById('total');
     const itensResumo = document.getElementById('pedido-itens');
@@ -82,6 +85,37 @@
                 titulo.textContent = 'Voce foi chamado!'; status.textContent = 'Dirija-se ao balcao. A equipe vai confirmar o pagamento.';
                 statusPagamento.hidden = true; enviar.disabled = true; setTimeout(() => acompanhar(codigo), 4000); return;
             }
+            if (pedido.status === 'pago') {
+                titulo.textContent = 'Pagamento aprovado!';
+                status.textContent = 'Seu pedido foi pago e confirmado pela equipe.';
+                statusPagamento.hidden = true;
+                qrImagem.hidden = true;
+                qrLink.hidden = true;
+                if (pedido.venda_id) {
+                    comprovante.href = `/pdv/venda/${pedido.venda_id}`;
+                    comprovante.hidden = false;
+                }
+                sessionStorage.removeItem('pedido_cliente_pendente');
+                sessionStorage.removeItem('operacao_cliente_pendente');
+                return;
+            }
+            if (pedido.status === 'pagando' && pedido.qr_url) {
+                titulo.textContent = 'Pagamento via Pix';
+                status.textContent = 'Escaneie o QR Code ou use o Pix copia e cola no aplicativo do banco.';
+                statusPagamento.hidden = false;
+                statusPagamento.textContent = 'Aguardando recebimento no banco. Confirme apenas quando o caixa informar.';
+                qrImagem.hidden = false;
+                qrImagem.src = `/cliente/pedidos/${encodeURIComponent(pedido.codigo)}/qr`;
+                qrLink.hidden = false;
+                qrLink.textContent = 'Abrir QR Code Pix';
+                qrLink.href = `/cliente/pedidos/${encodeURIComponent(pedido.codigo)}/qr`;
+                pixCopiaCola.value = pedido.qr_url;
+                pixCopiaCola.hidden = false;
+                pixCopiaColaLabel.hidden = false;
+                copiarPix.hidden = false;
+                setTimeout(() => acompanhar(codigo), 3000);
+                return;
+            }
             if (pedido.pagamento) {
                 mostrarPagamentoEmAndamento(pedido.pagamento, pedido); return;
             }
@@ -103,6 +137,16 @@
             const result = await lerResposta(response); if (!response.ok) throw new Error(result.detail || 'Nao foi possivel enviar o pedido.');
             sessionStorage.setItem('pedido_cliente_pendente', result.codigo); acompanhar(result.codigo);
         } catch (error) { titulo.textContent = 'Nao foi possivel enviar'; status.textContent = error.message; enviar.disabled = false; }
+    });
+    copiarPix.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(pixCopiaCola.value);
+            copiarPix.textContent = 'Codigo Pix copiado';
+        } catch (_) {
+            pixCopiaCola.focus(); pixCopiaCola.select();
+            document.execCommand('copy');
+            copiarPix.textContent = 'Codigo Pix copiado';
+        }
     });
     const anterior = sessionStorage.getItem('pedido_cliente_pendente'); if (anterior) acompanhar(anterior);
 })();

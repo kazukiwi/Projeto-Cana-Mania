@@ -116,6 +116,12 @@ def consultar_pedido(codigo: str, db: Session = Depends(get_db), usuario=Depends
     if not pedido:
         raise HTTPException(404, "Pedido nao encontrado.")
     resposta = {"codigo": pedido.codigo, "status": pedido.status, "qr_url": pedido.qr_url}
+    if pedido.status == "pago":
+        venda = db.query(Venda).filter_by(
+            usuario_id=usuario["id"], observacao="Pedido " + pedido.codigo
+        ).order_by(Venda.id.desc()).first()
+        if venda:
+            resposta["venda_id"] = venda.id
     if pedido.operacao_rfid_id:
         from app.services.qr_pagamento import qr_pagamento
         from app.models.rfid import OperacaoRFID
