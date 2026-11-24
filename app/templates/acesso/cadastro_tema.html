@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#083d2c"><title>Criar conta | Canamania</title><link rel="stylesheet" href="/static/css/base.css"><link rel="stylesheet" href="/static/css/responsive.css?v=7"><link rel="stylesheet" href="/static/css/acesso-publico.css?v=2"></head>
+<body class="acesso-publico"><main class="acesso-publico-shell">
+    <a class="acesso-publico-brand" href="/acesso/"><img src="/static/img/logo.webp" alt=""><strong><span>Cana</span>mania<small>gestão de consumos</small></strong></a>
+    <section class="acesso-publico-card"><p class="eyebrow">Conta Canamaniaco</p><h1>Criar minha conta</h1><p class="acesso-publico-intro">Cadastre-se para acompanhar seus pedidos e guardar seus comprovantes.</p>
+        {% if erro %}<p class="acesso-publico-error" role="alert">{{ erro }}</p>{% endif %}
+        <form class="acesso-publico-form" action="/acesso/cadastro" method="post"><label>Nome<input name="nome" maxlength="100" autocomplete="name" value="{{ nome or '' }}" required></label><label>E-mail<input name="email" type="email" maxlength="100" autocomplete="email" value="{{ email or '' }}" required></label><label>Senha<input name="senha" type="password" minlength="8" maxlength="72" autocomplete="new-password" required></label><button type="submit">Criar conta</button></form>
+        <a class="acesso-publico-link" href="/acesso/usuario">Já tenho uma conta</a><br><a class="acesso-publico-link" href="/acesso/">Voltar às opções de acesso</a>
+    </section>
+</main></body></html>

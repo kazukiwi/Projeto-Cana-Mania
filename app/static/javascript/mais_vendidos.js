@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td>${vendas} <span style="font-size:12px; color:#64748b;">unidades</span></td>
                 <td style="color:#16a34a; font-weight:600;">${moeda.format(receita)}</td>
                 <td>${moeda.format(vendas ? receita / vendas : 0)}</td>
-                <td><div style="display:flex; align-items:center; gap:8px;"><div style="flex:1; background:#f1f5f9; height:8px; border-radius:4px; overflow:hidden;"><div style="background:#2563eb; width:${percentual}%; height:100%;"></div></div><span style="font-size:12px; font-weight:600;">${percentual}%</span></div></td>
+                <td><div style="display:flex; align-items:center; gap:8px;"><div style="flex:1; background:#edf3eb; height:8px; border-radius:4px; overflow:hidden;"><div style="background:#ff1877; width:${percentual}%; height:100%;"></div></div><span style="font-size:12px; font-weight:600;">${percentual}%</span></div></td>
             </tr>`;
         }).join('');
     }
@@ -81,8 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const ctxProdutos = document.getElementById('chartTopProdutos');
         const ctxCategorias = document.getElementById('chartCategorias');
-        if (ctxProdutos) graficoProdutos = new Chart(ctxProdutos, { type: 'bar', data: { labels: lista.map(p => p.nome), datasets: [{ label: rotulo, data: valoresProdutos, backgroundColor: escuro ? '#ff4b97' : '#2563eb', borderRadius: 6, barThickness: 25 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: corGrade } }, x: { grid: { display: false } } } } });
-        if (ctxCategorias) graficoCategorias = new Chart(ctxCategorias, { type: 'doughnut', data: { labels: Object.keys(dadosCategorias), datasets: [{ data: Object.values(dadosCategorias), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'], borderWidth: 2, borderColor: escuro ? '#141d17' : '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, color: corTexto } } }, cutout: '70%' } });
+        if (ctxProdutos) graficoProdutos = new Chart(ctxProdutos, { type: 'bar', data: { labels: lista.map(p => p.nome), datasets: [{ label: rotulo, data: valoresProdutos, backgroundColor: '#ff1877', borderRadius: 6, barThickness: 25 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: corGrade } }, x: { grid: { display: false } } } } });
+        if (ctxCategorias) graficoCategorias = new Chart(ctxCategorias, { type: 'doughnut', data: { labels: Object.keys(dadosCategorias), datasets: [{ data: Object.values(dadosCategorias), backgroundColor: ['#ff1877', '#083d2c', '#baf57a', '#e65c96', '#4a8f65'], borderWidth: 2, borderColor: escuro ? '#141d17' : '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, color: corTexto } } }, cutout: '70%' } });
     }
 
     function atualizarTela() {

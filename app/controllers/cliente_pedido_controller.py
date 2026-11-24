@@ -42,8 +42,16 @@ def inicio(request: Request, usuario=Depends(get_usuario_logado)):
 @router.get("/cardapio")
 def cardapio(request: Request, db: Session = Depends(get_db), usuario=Depends(get_usuario_logado)):
     exigir_canamaniaco(usuario)
-    return templates.TemplateResponse(request, "cliente/cardapio.html", {
-        "request": request, "usuario": usuario, "produtos": produtos_do_cardapio(db),
+    produtos = produtos_do_cardapio(db)
+    grupos = {}
+    for produto in produtos:
+        categoria = produto.categoria.nome if produto.categoria else "Canamania"
+        categoria_id = produto.categoria_id if produto.categoria else "sem-categoria"
+        if categoria_id not in grupos:
+            grupos[categoria_id] = {"id": categoria_id, "nome": categoria, "produtos": []}
+        grupos[categoria_id]["produtos"].append(produto)
+    return templates.TemplateResponse(request, "cliente/cardapio_organizado.html", {
+        "request": request, "usuario": usuario, "categorias_cardapio": list(grupos.values()),
     })
 
 
